@@ -23,7 +23,7 @@
    }
  }
  
- //backtracking the regular function for the beginning of the build string
+ //backtracking the regular function for the beginning of the build string...the characters in the array should be ordered certainly.
  
  function back_track_regular(drop_off_index_reg) { 
  
@@ -32,7 +32,7 @@
     var a = +async function() { } <--- 
     var a = +    async function() { } <--- 
     when c is found, check for async, then check for character
-    var a = +async +function() {} --- figure out if this is legal... i dont think it is. it doesnt compile so... im not going to add it in.. idk i have to figure it out
+    var a = +async +function() {} --- figure out if this is legal... i dont think it is. it doesnt compile so... im not going to add it in.. idk i have to figure it out. hey kenz. hey tay. hehe 
    */
  
    if(

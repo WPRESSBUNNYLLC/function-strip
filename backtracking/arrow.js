@@ -150,7 +150,7 @@ function get_arrow_parameter_function_name(bt_index_drop_off_function_name) {
 function is_async(bt_index_drop_off_function_name) { 
 
  if(
-  (data.charAt(bt_index_drop_off_function_name-5) === ' ' || data.charAt(bt_index_drop_off_function_name-5) === '\n' || data.charAt(bt_index_drop_off_function_name-5) === '\s') && //possibly add a :
+  (data.charAt(bt_index_drop_off_function_name-5) === ' ' || data.charAt(bt_index_drop_off_function_name-5) === '\n' || data.charAt(bt_index_drop_off_function_name-5) === '\s') && //possibly add a : ...if :, then append async and just end
   data.charAt(bt_index_drop_off_function_name-4) === 'a' &&
   data.charAt(bt_index_drop_off_function_name-3) === 's' &&
   data.charAt(bt_index_drop_off_function_name-2) === 'y' &&

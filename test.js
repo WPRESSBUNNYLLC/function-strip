@@ -1,7 +1,7 @@
 const generate = require("../lib/generate");
 
 const folders = [
-  { folder: "./example_files", files: 'all' }, // "all" for all
+  { folder: "./stripThisTest", files: 'all' },
 ];
 
 const file_to_generate = './example/generated/generated_functions.js';

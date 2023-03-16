@@ -1,0 +1,1 @@
+//functions to strip from file
