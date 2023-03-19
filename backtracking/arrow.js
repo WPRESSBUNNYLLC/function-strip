@@ -1,18 +1,5 @@
 //named and unamed arrow functions... in and out of template literal
 
-function check_arrow() { 
-  if(
-   (data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') &&
-   data.charAt(data_index  ) === '='   && 
-   data.charAt(data_index+1) === '>'   && 
-   (data.charAt(data_index+2) === '\s' || data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{')
-  ) { 
-   return true;
-  } else { 
-   return false;
-  }
-}
-
 function back_track_arrow(bt_index) { 
 
  /*

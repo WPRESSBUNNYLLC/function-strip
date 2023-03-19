@@ -3,25 +3,7 @@
   REGULAR BT BEGINNING: ------------------------------------------------------ use backtracking array to turn things on and off so that I can build the beginning of the function. make sure to get all other types here as well. then recurse and define type of function and start and stop when necessary.
   get rid of this and seperate each of these types of functions individually... more code but you can add them each as a config option... make sure equals and closed scope stay =, (... only backtrack oin these two
  */
- 
- function check_regular() { 
-   if(
-    ((data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === '\s'))) && 
-    data.charAt(data_index  ) === 'f' && 
-    data.charAt(data_index+1) === 'u' &&  
-    data.charAt(data_index+2) === 'n' && 
-    data.charAt(data_index+3) === 'c' && 
-    data.charAt(data_index+4) === 't' && 
-    data.charAt(data_index+5) === 'i' && 
-    data.charAt(data_index+6) === 'o' && 
-    data.charAt(data_index+7) === 'n' && 
-    (data.charAt(data_index+8) === '\s' || data.charAt(data_index+8) === '\n' || data.charAt(data_index+8) === ' ' || data.charAt(data_index+8) === '(')
-   ) { 
-     return true;
-   } else { 
-     return false;
-   }
- }
+
  
  //backtracking the regular function for the beginning of the build string...the characters in the array should be ordered certainly.
  
@@ -61,7 +43,7 @@
  function take_five(drop_off_index_reg) { 
    // backtrack starting from minice 5 here to check for characters. append '+,-,!...' and end
    if(
-     (data.charAt(drop_off_index_reg-5) === ' ' || data.charAt(drop_off_index_reg-5) === '\s' || data.charAt(drop_off_index_reg-5) === '\n') && //or the characters and one behind is nothing, append the addititonal character '!' to async, !async
+     (data.charAt(drop_off_index_reg-5) === ' ' || data.charAt(drop_off_index_reg-5) === '\s' || data.charAt(drop_off_index_reg-5) === '\n') && //or : for the beginning of an object. if : then get out
      data.charAt(drop_off_index_reg-4) === 'a' &&
      data.charAt(drop_off_index_reg-3) === 's' &&
      data.charAt(drop_off_index_reg-2) === 'y' &&
@@ -73,3 +55,5 @@
      return false;
    }
  }
+
+ //scoped and named in the same set... dont take urnary operators into consideration here.... add that in after... when you take ordering into consideration

@@ -19,7 +19,7 @@
    make sure to recurse on if a function is invokable (); - do this at the end
    add config properties for each of the function types. just seperate all of the function types not including closed scope '('
    add an error handler on backtracking... if unknown character found or known character out of position
-   take template literals intto consideration
+   take template literals intto consideration on the `
    make each backtracking beginning set a file. and pass in data and use the parameters above for that file just to make things easier to read
    add jsx functions
   */
@@ -119,6 +119,7 @@
    var in_string_inside_of_function_ = false;
    var in_comment_inside_function_single = false;
    var in_comment_type_inside_function_multi = false;
+   //these below pushed to to other file... just make sure to look at this and figure it out.
    var drop_off_index_reg = 0;
    var bt_regular_parameter_string = [];
    var regular_function_type_found = false;
@@ -140,6 +141,7 @@
    * @param {bt_af_is_async_check} used to turn on or off the condition that appends 'async'
    */
  
+   //these below in other file
    var bt_arrow_parameter_string = [];
    var bt_index = 0;
    var bt_index_drop_off_function_name = 0;
@@ -277,11 +279,7 @@
       file_type = '';
      }
  
-     if(
-      file_type === 'html' || 
-      file_type === 'javascript' || 
-      file_type === 'typescript'
-     ) {
+     if(file_type !== '') { //make sure to get rid of some of these and save the reset in the regular, arrow file
       data_index = 0;
       data = fs.readFileSync(filepath, 'utf8');
       data_length = data.length;
@@ -566,13 +564,23 @@
   */
  
   if(
-   check_regular() === true && 
+   ((data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === '\s'))) && 
+   data.charAt(data_index  ) === 'f' && 
+   data.charAt(data_index+1) === 'u' &&  
+   data.charAt(data_index+2) === 'n' && 
+   data.charAt(data_index+3) === 'c' && 
+   data.charAt(data_index+4) === 't' && 
+   data.charAt(data_index+5) === 'i' && 
+   data.charAt(data_index+6) === 'o' && 
+   data.charAt(data_index+7) === 'n' && 
+   (data.charAt(data_index+8) === '\s' || data.charAt(data_index+8) === '\n' || data.charAt(data_index+8) === ' ' || data.charAt(data_index+8) === '(') &&
    in_function === false && 
    function_types.regular === true
   ) {
    in_function = true;
    drop_off_index_reg = data_index - 2;
-   build_string = back_track_regular(drop_off_index_reg); //same as below.... arrayJoin function
+   //build_string = back_track_regular(drop_off_index_reg); //move all parameters related to the other file... make sure the below functions and this function dont have any of the same parameters.. make sure to set data at the beginning of a new file in each of the backtracking files so not to pass that parameter more than once
+   build_string = back_track_regular(drop_off_index_reg); 
    data_index = data_index + 8; 
    is_arrow = false;
    function_line_number = line_number;
@@ -584,7 +592,10 @@
   */
  
   if(
-   check_arrow() === true && 
+   (data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') &&
+   data.charAt(data_index  ) === '='   && 
+   data.charAt(data_index+1) === '>'   && 
+   (data.charAt(data_index+2) === '\s' || data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{') &&
    in_function === false && 
    function_types.arrow === true
   ) {
@@ -601,7 +612,8 @@
    bt_index_drop_off_append_equals = false;
    bt_af_is_async_check = false;
    function_line_number = line_number;
-   back_track_arrow(bt_index);
+   //build_string = back_track_arrow(bt_index); just pass in data index and reset correct parameters in file.. move all parameters involoved with function to the other files.
+   back_track_arrow(bt_index); //make this the exported file and just return a string to below 'back_track_arrow(bt_index =>' ...and just move the parameters over
    build_string = `${bt_arrow_parameter_string} =>`; 
    data_index = data_index + 2;
    return iterate_through_file_text(data_index);
@@ -800,271 +812,271 @@
  
  }
  
- /*
-  ARROW BT BEGINNING: ------------------------------------------------------ use backtracking array to turn things on and off so that I can build the beginning of the function.
- */
+//  /*
+//   ARROW BT BEGINNING: ------------------------------------------------------ use backtracking array to turn things on and off so that I can build the beginning of the function.
+//  */
  
- function check_arrow() { 
-   if(
-    (data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') &&
-    data.charAt(data_index  ) === '='   && 
-    data.charAt(data_index+1) === '>'   && 
-    (data.charAt(data_index+2) === '\s' || data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{')
-   ) { 
-    return true;
-   } else { 
-    return false;
-   }
- }
+//  function check_arrow() { 
+//    if(
+    // (data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') &&
+    // data.charAt(data_index  ) === '='   && 
+    // data.charAt(data_index+1) === '>'   && 
+    // (data.charAt(data_index+2) === '\s' || data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{')
+//    ) { 
+//     return true;
+//    } else { 
+//     return false;
+//    }
+//  }
  
- function back_track_arrow(bt_index) { 
+//  function back_track_arrow(bt_index) { 
  
-  /*
-   end traversing a string inside a function parameter set
-  */
+//   /*
+//    end traversing a string inside a function parameter set
+//   */
  
-  if(
-   in_bt_string === true &&
-   in_bt_quotation_string.length > 1 && 
-   in_bt_quotation_string[in_bt_quotation_string.length - 1] === in_bt_quotation_string[0]
-  ) { 
-   in_bt_quotation_string = [];
-   in_bt_string = false;
-   return back_track_arrow(bt_index);
-  }
+//   if(
+//    in_bt_string === true &&
+//    in_bt_quotation_string.length > 1 && 
+//    in_bt_quotation_string[in_bt_quotation_string.length - 1] === in_bt_quotation_string[0]
+//   ) { 
+//    in_bt_quotation_string = [];
+//    in_bt_string = false;
+//    return back_track_arrow(bt_index);
+//   }
  
-  /*
-   begin traversing a string inside a function parameter set. dont need first two but helps make things clear.
-  */
+//   /*
+//    begin traversing a string inside a function parameter set. dont need first two but helps make things clear.
+//   */
  
-  if(
-   (in_bt_string === false || in_bt_string === true) &&
-   (data.charAt(bt_index) === '"' || data.charAt(bt_index) === '`' || data.charAt(bt_index) === `'`)
-  ) { 
-   in_bt_quotation_string.push(data.charAt(bt_index)); 
-   in_bt_string = true;
-   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
-   bt_index = bt_index - 1;
-   return back_track_arrow(bt_index);
-  }
+//   if(
+//    (in_bt_string === false || in_bt_string === true) &&
+//    (data.charAt(bt_index) === '"' || data.charAt(bt_index) === '`' || data.charAt(bt_index) === `'`)
+//   ) { 
+//    in_bt_quotation_string.push(data.charAt(bt_index)); 
+//    in_bt_string = true;
+//    bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+//    bt_index = bt_index - 1;
+//    return back_track_arrow(bt_index);
+//   }
  
-  /*
-   track opening and closing parentheses. will always be 1 = 1
-  */
+//   /*
+//    track opening and closing parentheses. will always be 1 = 1
+//   */
  
-  if(in_bt_string === false && data.charAt(bt_index) === ')') {
-   closing_bt_parentheses = closing_bt_parentheses + 1;
-  } else if(in_bt_string === false && data.charAt(bt_index) === '(') { 
-   opening_bt_parentheses = opening_bt_parentheses + 1;
-  }
+//   if(in_bt_string === false && data.charAt(bt_index) === ')') {
+//    closing_bt_parentheses = closing_bt_parentheses + 1;
+//   } else if(in_bt_string === false && data.charAt(bt_index) === '(') { 
+//    opening_bt_parentheses = opening_bt_parentheses + 1;
+//   }
  
-  /*
-   adding to the arrow function parameter set. I add every character from opening to close
-  */
+//   /*
+//    adding to the arrow function parameter set. I add every character from opening to close
+//   */
  
-  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+//   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   
-  /*
-   return the parameters "wow = (a,b,c)" or "wow = async (a,b,c)" count should always be 1 here for closing and opening 1 = 1
-  */
+//   /*
+//    return the parameters "wow = (a,b,c)" or "wow = async (a,b,c)" count should always be 1 here for closing and opening 1 = 1
+//   */
  
-  if(closing_bt_parentheses === opening_bt_parentheses && closing_bt_parentheses === 1) { 
-   bt_index_drop_off_function_name = bt_index - 1;
-   get_arrow_parameter_function_name(bt_index_drop_off_function_name);
-   get_declaration_type(bt_index_drop_off_function_name);
-   bt_arrow_parameter_string = bt_arrow_parameter_string.join();
-   return; 
-  }
+//   if(closing_bt_parentheses === opening_bt_parentheses && closing_bt_parentheses === 1) { 
+//    bt_index_drop_off_function_name = bt_index - 1;
+//    get_arrow_parameter_function_name(bt_index_drop_off_function_name);
+//    get_declaration_type(bt_index_drop_off_function_name);
+//    bt_arrow_parameter_string = bt_arrow_parameter_string.join();
+//    return; 
+//   }
  
-  /*
-   move back one character and go again
-  */
+//   /*
+//    move back one character and go again
+//   */
  
-  bt_index = bt_index - 1;
-  return back_track_arrow(bt_index);
+//   bt_index = bt_index - 1;
+//   return back_track_arrow(bt_index);
  
- } 
+//  } 
  
- /*
-  get the arrow function name by backtracking
- */
+//  /*
+//   get the arrow function name by backtracking
+//  */
  
- function get_arrow_parameter_function_name(bt_index_drop_off_function_name) { 
+//  function get_arrow_parameter_function_name(bt_index_drop_off_function_name) { 
  
-   /*
-    immediately take async into consideration when c is found here - runs once
-   */
+//    /*
+//     immediately take async into consideration when c is found here - runs once
+//    */
  
-   if(
-     bt_af_is_async_check === false && 
-     data.charAt(bt_index_drop_off_function_name) === 'c' && 
-     bt_index_drop_off_found_first_character === false
-    ) {
-     is_async(bt_index_drop_off_function_name);
-     return get_arrow_parameter_function_name(bt_index_drop_off_function_name);
-   }
+//    if(
+//      bt_af_is_async_check === false && 
+//      data.charAt(bt_index_drop_off_function_name) === 'c' && 
+//      bt_index_drop_off_found_first_character === false
+//     ) {
+//      is_async(bt_index_drop_off_function_name);
+//      return get_arrow_parameter_function_name(bt_index_drop_off_function_name);
+//    }
  
-   /*
-     the function name has been appended because a space between the declaration type and function. Or stop when a ':' is found where there is no function name. not sure if /s and ' ' are the same thing 
-   */
+//    /*
+//      the function name has been appended because a space between the declaration type and function. Or stop when a ':' is found where there is no function name. not sure if /s and ' ' are the same thing 
+//    */
  
-   if(
-    (bt_index_drop_off_found_first_character === true && (data.charAt(bt_index_drop_off_function_name) === '\s' || data.charAt(bt_index_drop_off_function_name) === ' ' || data.charAt(bt_index_drop_off_function_name) === ':')) ||
-    (bt_index_drop_off_found_first_character === false && data.charAt(bt_index_drop_off_function_name) === ':')
-   ) { 
-    return;
-   }
+//    if(
+//     (bt_index_drop_off_found_first_character === true && (data.charAt(bt_index_drop_off_function_name) === '\s' || data.charAt(bt_index_drop_off_function_name) === ' ' || data.charAt(bt_index_drop_off_function_name) === ':')) ||
+//     (bt_index_drop_off_found_first_character === false && data.charAt(bt_index_drop_off_function_name) === ':')
+//    ) { 
+//     return;
+//    }
  
-   /*
-    if the first character hasnt been found yet, check to see if a first character exists.
-   */
+//    /*
+//     if the first character hasnt been found yet, check to see if a first character exists.
+//    */
  
-   if(bt_index_drop_off_found_first_character === false) {
-     bt_index_drop_off_found_first_character = bt_index_drop_off_alphabet.test(data.charAt(bt_index_drop_off_function_name)); 
-   }
+//    if(bt_index_drop_off_found_first_character === false) {
+//      bt_index_drop_off_found_first_character = bt_index_drop_off_alphabet.test(data.charAt(bt_index_drop_off_function_name)); 
+//    }
  
-   /*
-    if first character found, unshift.. if first found and first time, make sure to append an equals sign first.
-   */
+//    /*
+//     if first character found, unshift.. if first found and first time, make sure to append an equals sign first.
+//    */
  
-   if(
-     bt_index_drop_off_found_first_character === true && 
-     bt_index_drop_off_append_equals === false
-   ) { 
-     bt_index_drop_off_append_equals = true
-     bt_arrow_parameter_string.unshift(' = ');
-     bt_arrow_parameter_string.unshift(data.charAt(bt_index_drop_off_function_name));
-   } else if(bt_index_drop_off_found_first_character === true && bt_index_drop_off_append_equals === true) { 
-     bt_arrow_parameter_string.unshift(data.charAt(bt_index_drop_off_function_name));
-   } 
+//    if(
+//      bt_index_drop_off_found_first_character === true && 
+//      bt_index_drop_off_append_equals === false
+//    ) { 
+//      bt_index_drop_off_append_equals = true
+//      bt_arrow_parameter_string.unshift(' = ');
+//      bt_arrow_parameter_string.unshift(data.charAt(bt_index_drop_off_function_name));
+//    } else if(bt_index_drop_off_found_first_character === true && bt_index_drop_off_append_equals === true) { 
+//      bt_arrow_parameter_string.unshift(data.charAt(bt_index_drop_off_function_name));
+//    } 
  
-   /*
-    move back one
-   */
+//    /*
+//     move back one
+//    */
  
-   bt_index_drop_off_function_name = bt_index_drop_off_function_name - 1;
-   return get_arrow_parameter_function_name(bt_index_drop_off_function_name);
+//    bt_index_drop_off_function_name = bt_index_drop_off_function_name - 1;
+//    return get_arrow_parameter_function_name(bt_index_drop_off_function_name);
  
- }
+//  }
  
-  /*
-   if async exists add to the string... if not an async function, index remains the same for the next condition, which begins the function name... look at this again
-  */
+//   /*
+//    if async exists add to the string... if not an async function, index remains the same for the next condition, which begins the function name... look at this again
+//   */
  
- function is_async(bt_index_drop_off_function_name) { 
+//  function is_async(bt_index_drop_off_function_name) { 
  
-  if(
-   (data.charAt(bt_index_drop_off_function_name-5) === ' ' || data.charAt(bt_index_drop_off_function_name-5) === '\n' || data.charAt(bt_index_drop_off_function_name-5) === '\s') && //possibly add a :
-   data.charAt(bt_index_drop_off_function_name-4) === 'a' &&
-   data.charAt(bt_index_drop_off_function_name-3) === 's' &&
-   data.charAt(bt_index_drop_off_function_name-2) === 'y' &&
-   data.charAt(bt_index_drop_off_function_name-1) === 'n' &&
-   data.charAt(bt_index_drop_off_function_name  ) === 'c'
-  ) { 
-   bt_arrow_parameter_string.unshift(' ');
-   bt_arrow_parameter_string.unshift('c');
-   bt_arrow_parameter_string.unshift('n');
-   bt_arrow_parameter_string.unshift('y');
-   bt_arrow_parameter_string.unshift('s');
-   bt_arrow_parameter_string.unshift('a');
-   bt_index_drop_off_function_name = bt_index_drop_off_function_name - 6;
-  }
+//   if(
+//    (data.charAt(bt_index_drop_off_function_name-5) === ' ' || data.charAt(bt_index_drop_off_function_name-5) === '\n' || data.charAt(bt_index_drop_off_function_name-5) === '\s') && //possibly add a :
+//    data.charAt(bt_index_drop_off_function_name-4) === 'a' &&
+//    data.charAt(bt_index_drop_off_function_name-3) === 's' &&
+//    data.charAt(bt_index_drop_off_function_name-2) === 'y' &&
+//    data.charAt(bt_index_drop_off_function_name-1) === 'n' &&
+//    data.charAt(bt_index_drop_off_function_name  ) === 'c'
+//   ) { 
+//    bt_arrow_parameter_string.unshift(' ');
+//    bt_arrow_parameter_string.unshift('c');
+//    bt_arrow_parameter_string.unshift('n');
+//    bt_arrow_parameter_string.unshift('y');
+//    bt_arrow_parameter_string.unshift('s');
+//    bt_arrow_parameter_string.unshift('a');
+//    bt_index_drop_off_function_name = bt_index_drop_off_function_name - 6;
+//   }
  
-  bt_af_is_async_check = true;
-  return;
+//   bt_af_is_async_check = true;
+//   return;
  
- }
+//  }
  
- /*
-  get declaration type. backtrack until first letter and check for every type previous to
- */
+//  /*
+//   get declaration type. backtrack until first letter and check for every type previous to
+//  */
  
- function get_declaration_type(bt_index_drop_off_function_name) { 
+//  function get_declaration_type(bt_index_drop_off_function_name) { 
  
- }
+//  }
  
- /*
-  REGULAR BT BEGINNING: ------------------------------------------------------ use backtracking array to turn things on and off so that I can build the beginning of the function. make sure to get all other types here as well. then recurse and define type of function and start and stop when necessary.
-  get rid of this and seperate each of these types of functions individually... more code but you can add them each as a config option... make sure equals and closed scope stay =, (... only backtrack oin these two
- */
+//  /*
+//   REGULAR BT BEGINNING: ------------------------------------------------------ use backtracking array to turn things on and off so that I can build the beginning of the function. make sure to get all other types here as well. then recurse and define type of function and start and stop when necessary.
+//   get rid of this and seperate each of these types of functions individually... more code but you can add them each as a config option... make sure equals and closed scope stay =, (... only backtrack oin these two
+//  */
  
- function check_regular() { 
-   if(
-    ((data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === '\s'))) && 
-    data.charAt(data_index  ) === 'f' && 
-    data.charAt(data_index+1) === 'u' &&  
-    data.charAt(data_index+2) === 'n' && 
-    data.charAt(data_index+3) === 'c' && 
-    data.charAt(data_index+4) === 't' && 
-    data.charAt(data_index+5) === 'i' && 
-    data.charAt(data_index+6) === 'o' && 
-    data.charAt(data_index+7) === 'n' && 
-    (data.charAt(data_index+8) === '\s' || data.charAt(data_index+8) === '\n' || data.charAt(data_index+8) === ' ' || data.charAt(data_index+8) === '(')
-   ) { 
-     return true;
-   } else { 
-     return false;
-   }
- }
+//  function check_regular() { 
+//    if(
+    // ((data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === '\s'))) && 
+    // data.charAt(data_index  ) === 'f' && 
+    // data.charAt(data_index+1) === 'u' &&  
+    // data.charAt(data_index+2) === 'n' && 
+    // data.charAt(data_index+3) === 'c' && 
+    // data.charAt(data_index+4) === 't' && 
+    // data.charAt(data_index+5) === 'i' && 
+    // data.charAt(data_index+6) === 'o' && 
+    // data.charAt(data_index+7) === 'n' && 
+    // (data.charAt(data_index+8) === '\s' || data.charAt(data_index+8) === '\n' || data.charAt(data_index+8) === ' ' || data.charAt(data_index+8) === '(')
+//    ) { 
+//      return true;
+//    } else { 
+//      return false;
+//    }
+//  }
  
- //backtracking the regular function for the beginning of the build string
+//  //backtracking the regular function for the beginning of the build string
  
- function back_track_regular(drop_off_index_reg) { 
+//  function back_track_regular(drop_off_index_reg) { 
  
-   /*
-    var a = async function() { } <--- 
-    var a = +async function() { } <--- 
-    var a = +    async function() { } <--- 
-    when c is found, check for async, then check for character
-    var a = +async +function() {} --- figure out if this is legal... i dont think it is. it doesnt compile so... im not going to add it in.. idk i have to figure it out
-   */
+//    /*
+//     var a = async function() { } <--- 
+//     var a = +async function() { } <--- 
+//     var a = +    async function() { } <--- 
+//     when c is found, check for async, then check for character
+//     var a = +async +function() {} --- figure out if this is legal... i dont think it is. it doesnt compile so... im not going to add it in.. idk i have to figure it out
+//    */
  
-   if(
-    data.charAt(drop_off_index_reg) === 'c' && 
-    take_five(drop_off_index_reg) === true && 
-    regular_function_async_found === false && 
-    regular_function_type_found === false && 
-    regular_function_found_equals === false 
-   ) {
-    //then add the character here if it exists.... create another var. +,-,... if anything else not a real function. equals will be determined after
-    bt_regular_parameter_string.unshift('c');
-    bt_regular_parameter_string.unshift('n');
-    bt_regular_parameter_string.unshift('y');
-    bt_regular_parameter_string.unshift('s');
-    bt_regular_parameter_string.unshift('a');
-    drop_off_index_reg = drop_off_index_reg - 6; //change this to 7
-    regular_function_async_found = true;
-    return back_track_regular(drop_off_index_reg);
-   }
+//    if(
+//     data.charAt(drop_off_index_reg) === 'c' && 
+//     take_five(drop_off_index_reg) === true && 
+//     regular_function_async_found === false && 
+//     regular_function_type_found === false && 
+//     regular_function_found_equals === false 
+//    ) {
+//     //then add the character here if it exists.... create another var. +,-,... if anything else not a real function. equals will be determined after
+//     bt_regular_parameter_string.unshift('c');
+//     bt_regular_parameter_string.unshift('n');
+//     bt_regular_parameter_string.unshift('y');
+//     bt_regular_parameter_string.unshift('s');
+//     bt_regular_parameter_string.unshift('a');
+//     drop_off_index_reg = drop_off_index_reg - 6; //change this to 7
+//     regular_function_async_found = true;
+//     return back_track_regular(drop_off_index_reg);
+//    }
  
-   //check for characters right before function where async and equals doesnt exist..
+//    //check for characters right before function where async and equals doesnt exist..
  
  
- }
+//  }
  
- function take_five(drop_off_index_reg) { 
-   // backtrack starting from minice 5 here to check for characters. append '+,-,!...' and end
-   if(
-     (data.charAt(drop_off_index_reg-5) === ' ' || data.charAt(drop_off_index_reg-5) === '\s' || data.charAt(drop_off_index_reg-5) === '\n') && //or the characters and one behind is nothing, append the addititonal character '!' to async, !async
-     data.charAt(drop_off_index_reg-4) === 'a' &&
-     data.charAt(drop_off_index_reg-3) === 's' &&
-     data.charAt(drop_off_index_reg-2) === 'y' &&
-     data.charAt(drop_off_index_reg-1) === 'n' &&
-     data.charAt(drop_off_index_reg  ) === 'c'
-   ) { 
-     return true;
-   } else { 
-     return false;
-   }
- }
+//  function take_five(drop_off_index_reg) { 
+//    // backtrack starting from minice 5 here to check for characters. append '+,-,!...' and end
+//    if(
+//      (data.charAt(drop_off_index_reg-5) === ' ' || data.charAt(drop_off_index_reg-5) === '\s' || data.charAt(drop_off_index_reg-5) === '\n') && //or the characters and one behind is nothing, append the addititonal character '!' to async, !async
+//      data.charAt(drop_off_index_reg-4) === 'a' &&
+//      data.charAt(drop_off_index_reg-3) === 's' &&
+//      data.charAt(drop_off_index_reg-2) === 'y' &&
+//      data.charAt(drop_off_index_reg-1) === 'n' &&
+//      data.charAt(drop_off_index_reg  ) === 'c'
+//    ) { 
+//      return true;
+//    } else { 
+//      return false;
+//    }
+//  }
  
- /*
-  use the array to build the beginning and whatever, change this comment after
- */
+//  /*
+//   use the array to build the beginning and whatever, change this comment after
+//  */
  
- function get_declaration_type() { 
+//  function get_declaration_type() { 
  
- }
+//  }
  
  /*
   CHECK BEGINNING OF HTML SCRIPT ------------------------------------------- just check for strings here
