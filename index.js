@@ -547,8 +547,8 @@
  
   if(
    (data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') &&
-   data.charAt(data_index  ) ===  '='   && 
-   data.charAt(data_index+1) ===  '>'   && 
+   data.charAt(data_index  ) ===  '='  && 
+   data.charAt(data_index+1) ===  '>'  && 
    (data.charAt(data_index+2) === '\s' || data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{') &&
    in_function === false && 
    function_types.arrow === true
@@ -772,7 +772,7 @@
  
  
  /*
-  PUSH THE FUNCTION -----------------------------------------------------
+  PUSH THE FUNCTION ----------------------------------------------------- make this an array of objects with has_name etc
  */
  
  function push_function() {
