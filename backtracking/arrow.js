@@ -48,6 +48,10 @@ function initiate_arrow(d, d_i) {
   back_track_arrow(bt_index);
 }
 
+/*
+ backtrack beginning of arrow
+*/
+
 function back_track_arrow(bt_index) { 
 
  /*

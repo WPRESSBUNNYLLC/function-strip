@@ -21,14 +21,16 @@
    add an error handler on backtracking... if unknown character found or known character out of position
    take template literals intto consideration on the `
    make each backtracking beginning set a file. and pass in data and use the parameters above for that file just to make things easier to read
-   add jsx functions
-   use an object index set for defining functions inside of functions, without the return statement iteritevely. just increment and decrement going in and out and use that as the definition..... this would be for inside the function... keep an object index for inside function definitions in the backtracking files
+   add jsx and tsx functions
+   use an object index set for defining functions inside of functions, without the return statement iteritevely. just increment and decrement above and below the recursive call. going in and out and use that as the definition..... this would be for inside the function... keep an object index for inside function definitions in the backtracking files
    just move all that data over and f lex in the a
    check for errors in file before recursing, do this before going and just skip the file
+   comment out uneccessary conditions when finished
   */
 
    var fs = require('file-system');
-   var initiate_arrow = require('initiate_arrow');
+   var initiate_arrow = require('./backtracking/arrow');
+   var initiate_regular = require('./backtracking/regular');
 
    /* 
    * data about the file. line_number and fp used in the build string description
@@ -106,11 +108,6 @@
    * @param {in_string_inside_of_function_} compliment of above. on or off signifies not to execute some conditions
    * @param {in_comment_inside_function_single} denoting if i am in a single line comment inside the function
    * @param {in_comment_type_inside_function_multi} tracking multiline comments inside the function
-   * @param {drop_off_index_reg} index used to determine if an async function
-   * @param {bt_regular_parameter_string} using this to backtrack and build the beginning of the build string. "var wow = async function" then pushing the character sets
-   * @param {regular_function_type_found} if type of function found, avoid running async or run async (,+,-,~,! 
-   * @param {regular_function_async_found} if async found, append and also check for the last character... then end it
-   * @param {regular_function_found_equals} when equals is found, turn off others and the function name then type
    */
  
    var opening_bracket = 0;
@@ -123,12 +120,6 @@
    var in_string_inside_of_function_ = false;
    var in_comment_inside_function_single = false;
    var in_comment_type_inside_function_multi = false;
-   //these below pushed to to other file... just make sure to look at this and figure it out.
-   var drop_off_index_reg = 0;
-   var bt_regular_parameter_string = [];
-   var regular_function_type_found = false;
-   var regular_function_async_found = false;
-   var regular_function_found_equals = false; 
  
  /* 
    * search folders, files and get all arrow functions with and without brackets regular functions with brackets. line numbers, filepaths, function names.
@@ -279,8 +270,6 @@
       has_bracket = false;
       in_comment_inside_function_single = false;
       in_comment_type_inside_function_multi = false; 
-      bt_regular_parameter_string = [];
-      drop_off_index_reg = 0;
       iterate_through_file_text(data_index); 
      }
  
@@ -547,9 +536,7 @@
    in_function = true;
    is_arrow = false;
    function_line_number = line_number;
-   //drop_off_index_reg = data_index - 2;
-   //build_string = back_track_regular(data, data_index - 2); //move all parameters related to the other file... make sure the below functions and this function dont have any of the same parameters.. make sure to set data at the beginning of a new file in each of the backtracking files so not to pass that parameter more than once
-   build_string = back_track_regular(drop_off_index_reg); 
+   build_string = initiate_regular(data, data_index); 
    data_index = data_index + 8; 
    return iterate_through_file_text(data_index);
   }

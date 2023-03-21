@@ -1,21 +1,35 @@
-//named and unmaed regular functions
- /*
-  REGULAR BT BEGINNING: ------------------------------------------------------ use backtracking array to turn things on and off so that I can build the beginning of the function. make sure to get all other types here as well. then recurse and define type of function and start and stop when necessary.
-  get rid of this and seperate each of these types of functions individually... more code but you can add them each as a config option... make sure equals and closed scope stay =, (... only backtrack oin these two
- */
+/*
+  * @param {drop_off_index_reg} index used to determine if an async function
+  * @param {bt_regular_parameter_string} using this to backtrack and build the beginning of the build string. "var wow = async function" then pushing the character sets
+  * @param {regular_function_type_found} if type of function found, avoid running async or run async (,+,-,~,! 
+  * @param {regular_function_async_found} if async found, append and also check for the last character... then end it
+  * @param {regular_function_found_equals} when equals is found, turn off others and the function name then type
+*/
 
- 
- //backtracking the regular function for the beginning of the build string...the characters in the array should be ordered certainly.
- 
+var data = '';
+var data_index = 0;
+var drop_off_index_reg = 0;
+var bt_regular_parameter_string = [];
+var regular_function_type_found = false;
+var regular_function_async_found = false;
+var regular_function_found_equals = false; 
+
+function initiate_regular(d, d_i) { 
+ data = '';
+ data_index = d_i;
+ drop_off_index_reg = data_index - 2;
+ bt_regular_parameter_string = [];
+ regular_function_type_found = false;
+ regular_function_async_found = false;
+ regular_function_found_equals = false; 
+}
+
+/*
+ backtrack beginning of regular
+*/
+
+  
  function back_track_regular(drop_off_index_reg) { 
- 
-   /*
-    var a = async function() { } <--- 
-    var a = +async function() { } <--- 
-    var a = +    async function() { } <--- 
-    when c is found, check for async, then check for character
-    var a = +async +function() {} --- figure out if this is legal... i dont think it is. it doesnt compile so... im not going to add it in.. idk i have to figure it out. hey kenz. hey tay. hehe 
-   */
  
    if(
     data.charAt(drop_off_index_reg) === 'c' && 
@@ -41,7 +55,6 @@
  }
  
  function take_five(drop_off_index_reg) { 
-   // backtrack starting from minice 5 here to check for characters. append '+,-,!...' and end
    if(
      (data.charAt(drop_off_index_reg-5) === ' ' || data.charAt(drop_off_index_reg-5) === '\s' || data.charAt(drop_off_index_reg-5) === '\n') && //or : for the beginning of an object. if : then get out
      data.charAt(drop_off_index_reg-4) === 'a' &&
@@ -56,4 +69,4 @@
    }
  }
 
- //scoped and named in the same set... dont take urnary operators into consideration here.... add that in after... when you take ordering into consideration
+ module.exports = initiate_regular;
