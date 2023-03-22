@@ -1,3 +1,4 @@
+
 /*
  * @param {bt_arrow_parameter_string} the parameters of the arrow function. built via an array, and joined as a string returned as the beginning of the function
  * @param {bt_index} the back tracking of an index
@@ -13,14 +14,12 @@
 */
 
 var data = '';
-var data_index = 0; //get rid of this
 var bt_arrow_parameter_string = [];
 var bt_index = 0;
 var in_bt_quotation_string = [];
 var in_bt_string = false;
 var opening_bt_parentheses = 0;
 var closing_bt_parentheses = 0;
-var is_arrow = true;
 var bt_index_drop_off_found_first_character = false;
 var bt_index_drop_off_function_name = 0;
 var bt_index_drop_off_append_equals = false;
@@ -31,16 +30,14 @@ var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/; //function name
  initiate the beginning of the arrow function... use the unshifted bt_arrow parameter array for ordering
 */
 
-function initiate_arrow(d, d_i) {
+function initiate_arrow(d, data_index) {
   data = d;
-  data_index = d_i; //get rid of this and just set the bt_index to minice 1
   bt_arrow_parameter_string = [];
   bt_index = data_index - 1;
   in_bt_quotation_string = [];
   in_bt_string = false;
   opening_bt_parentheses = 0;
   closing_bt_parentheses = 0;
-  is_arrow = true;
   bt_index_drop_off_found_first_character = false;
   bt_index_drop_off_function_name = 0;
   bt_index_drop_off_append_equals = false;
@@ -108,7 +105,7 @@ function back_track_arrow(bt_index) {
   get_arrow_parameter_function_name(bt_index_drop_off_function_name);
   get_declaration_type(bt_index_drop_off_function_name);
   bt_arrow_parameter_string = bt_arrow_parameter_string.join();
-  return bt_arrow_parameter_string; //returns the beginning string of the function
+  return bt_arrow_parameter_string; //returns the beginning string of the function.. also return some other things
  }
 
  /*
@@ -211,7 +208,7 @@ function is_async(bt_index_drop_off_function_name) {
 }
 
 /*
- get declaration type. backtrack until first letter and check for every type previous to if - = let var const whatever...
+ get declaration type. backtrack until first letter and check for every type previous to if - = let var const whatever... if none then no declaration and make sure thats returned when pushing the function
 */
 
 function get_declaration_type(bt_index_drop_off_function_name) { 

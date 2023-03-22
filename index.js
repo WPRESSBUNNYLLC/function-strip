@@ -14,18 +14,14 @@
 
    TODO:
    https://blog.sessionstack.com/how-javascript-works-the-different-ways-of-declaring-a-function-5-best-practices-8a0324c06fe2
-   use backtracking arrays on every function that is found. use conditions on array to determine type of function early to avoid running certain conditions. use a conditional set on the first x characters in the backtracking array.... then assign the type and move one. if only one type is determined, then no need for many true false statements. Can just use one.
-   append a key on each parameter name for each backtrack arrow_x, regular_y
-   make sure to recurse on if a function is invokable (); - do this at the end
-   add config properties for each of the function types. just seperate all of the function types not including closed scope '('
+   make sure to recurse on if a function is invokable (); - do this at the end after push function
    add an error handler on backtracking... if unknown character found or known character out of position
-   take template literals intto consideration on the `
-   make each backtracking beginning set a file. and pass in data and use the parameters above for that file just to make things easier to read
-   add jsx and tsx functions
-   use an object index set for defining functions inside of functions, without the return statement iteritevely. just increment and decrement above and below the recursive call. going in and out and use that as the definition..... this would be for inside the function... keep an object index for inside function definitions in the backtracking files
-   just move all that data over and f lex in the a
-   check for errors in file before recursing, do this before going and just skip the file
+   take template literals intto consideration on the ` maybe
+   add other file types
+   use an object index set for defining functions inside of functions, without the recursive return statement. just increment and decrement above and below the recursive call when inside the function and use the number as an index to push the correct characters. make it an attached set. 
+   just skip the file if there is an error in file
    comment out uneccessary conditions when finished
+   
   */
 
    var fs = require('file-system');
@@ -121,7 +117,6 @@
    * search folders, files and get all arrow functions with and without brackets regular functions with brackets. line numbers, filepaths, function names.
    * @param {fldr} folders being traversed
    * @param {f_t_g} The function file path being written to. if non existant, is created.
-   * @param {unit} the units you are deciding to test
    * @param {f_t} The function types you would like to strip
  */
  
@@ -246,7 +241,7 @@
  }
  
  /*
- recursing on every condition while turning things on and off, making things easier to read. When a definition for a function is found, backtracking to start the build string with the correct beginning value of the function.
+  recursing on every condition while turning things on and off, making things easier to read. When a definition for a function is found, backtracking to start the build string with the correct beginning value of the function.
  */
  
  function iterate_through_file_text(data_index) {
@@ -718,7 +713,6 @@
  function recurse_check_end_script(html_end_script_data_index_two) { 
  
  }
- 
  
  /*
   PUSH THE FUNCTION ----------------------------------------------------- make this an array of objects with has_name etc
