@@ -38,7 +38,6 @@
    * @param {data} the files text
    * @param {data_length} used to end the file... could use error
    * @param {exported_functions} the long string of functions placed in file
-   * @param {unit_configuration} the array of unit tests allowed to add
    * @param {fp} the file path of the function
    * @param {line_number} the current line number
    * @param {function_line_number} the line number of the function
@@ -51,8 +50,7 @@
    var data_index = 0;
    var data = '';
    var data_length = 0;
-   var exported_functions = 'module.exports = [ \n';
-   var unit_configuration = [];
+   var exported_functions = [];
    var fp = '';
    var line_number = 0;
    var function_line_number = 0;
@@ -62,8 +60,6 @@
    var function_types = {
      regular: true,
      arrow: true, 
-     react_function_component: false, 
-     react_class_component: false
    }
  
    /*
@@ -129,36 +125,16 @@
    * @param {f_t} The function types you would like to strip
  */
  
- function generate(fldrs, f_t_g, unit, f_t) {
+ function generate(fldrs, f_t_g, f_t) {
  
   var error_initial = '';
  
   if(
    typeof(f_t) !== 'object' ||
    typeof(f_t.regular) !== 'boolean' || 
-   typeof(f_t.arrow) !== 'boolean' || 
-   typeof(f_t.react_function_component) !== 'boolean' || 
-   typeof(f_t.react_class_component) !== 'boolean'
+   typeof(f_t.arrow) !== 'boolean'
   ) { 
    error_initial += 'f_t: function types must be regular, arrow, react_function_component and react_class_component \n';
-  }
- 
-  for(let i = 0; i < unit.length; i++) { 
-   if(
-     unit[i] !== 'must_be_value' && 
-     unit[i] !== 'must_be_type' && 
-     unit[i] !== 'must_pass_regex' && 
-     unit[i] !== 'must_be_log_of' && 
-     unit[i] !== 'must_be_greater_than' && 
-     unit[i] !== 'must_be_less_than' && 
-     unit[i] !== 'must_be_in_range' && 
-     unit[i] !== 'must_be_even_or_odd' && 
-     unit[i] !== 'must_be_divisible_by' && 
-     unit[i] !== 'must_be_prime_or_not_prime' && 
-     unit[i] !== 'must_be_log_of' 
-   ) {
-    error_initial += 'unit: unit array must only contain allowed unit tests. Found in readme \n';
-   }
   }
  
   if(typeof(f_t_g) !== 'string') { 
@@ -174,22 +150,8 @@
   }
  
   function_types = f_t;
-  unit_configuration = unit;
   file_to_generate = f_t_g;
   folders = fldrs;
- 
-  var ug = ''
-   
-  for(let i = 0; i < unit_configuration.length; i++) { 
-   ug += 
-    `${unit_configuration[i]}:{\n` +
-     " on: true,\n" +
-     " index_exact: true,\n" +
-     " values: []\n" +
-    "}," 
-  }
- 
-  unit_configuration = ug;
  
   for(let i = 0; i < folders.length; i++) {
  
@@ -246,7 +208,7 @@
       file_type = '';
      }
  
-     if(file_type !== '') { //make sure to get rid of some of these and save the reset in the regular, arrow file
+     if(file_type !== '') {
       data_index = 0;
       data = fs.readFileSync(filepath, 'utf8');
       data_length = data.length;
@@ -278,21 +240,8 @@
    })
  
   }
- 
-  /* 
-   create the file and exit
-  */
- 
-  exported_functions += '\n ];';
-  var error = `functions have successfully been copied into ${file_to_generate}`;
- 
-  try {
-   fs.writeFileSync(file_to_generate, exported_functions);
-  } catch(err) { 
-   error = error.message;
-  }
- 
-  return error;
+
+  return exported_functions;
  
  }
  
@@ -776,21 +725,12 @@
  */
  
  function push_function() {
- 
-  exported_functions += 
-   "{\n" + 
-     `index: '${function_index}',\n` +
-     "function_called: {\n" +
-     "on: true,\n" +
-     `description: 'filepath is ${fp} AND line number is ${function_line_number+1}',\n` +
-     "parameters: [], \n" +
-     `function: ${build_string}\n` +
-    "},\n" + 
-     "unit: {\n" +
-      `${unit_configuration}\n` +
-     "},\n" + 
-    "},\n\n\n";
- 
+  exported_functions.push({ 
+    index: function_index, 
+    filepath: fp, 
+    line_number: function_line_number + 1,
+    function_: build_string
+  });
  }
  
  module.exports = generate;
