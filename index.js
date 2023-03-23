@@ -4,7 +4,7 @@
    Title: generate
 
    Description: 
-   strips every chosen type of function in .html, .js, .ts files. Supports react.
+   strips every chosen type of function in .html, .js, .ts files using character sets backtracking arrays. Supports react. capable of additional languages using the file type as an extra conditional in the main function.
    does not strip functions that are found inside strings("'`), single line comments and multline comments and outside of script tags in html documents. 
    Includes the line number, filepath and function name for each function.
    Includes a list of function types to strip. All configurable.
@@ -21,6 +21,7 @@
    use an object index set for defining functions inside of functions, without the recursive return statement. just increment and decrement above and below the recursive call when inside the function and use the number as an index to push the correct characters. make it an attached set. 
    just skip the file if there is an error in file
    comment out uneccessary conditions when finished
+   take , into consideration for routes and stuff
    
   */
 
@@ -464,7 +465,7 @@
   */
  
   if(
-   ((data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === '\s'))) && 
+   ((data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!' || data.charAt(data_index-1) === ',') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === '\s'))) && 
    data.charAt(data_index  ) === 'f' && 
    data.charAt(data_index+1) === 'u' &&  
    data.charAt(data_index+2) === 'n' && 
@@ -490,7 +491,7 @@
   */
  
   if(
-   (data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') &&
+   (data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') && //calma will eventually have to be taken into consideration
    data.charAt(data_index  ) ===  '='  && 
    data.charAt(data_index+1) ===  '>'  && 
    (data.charAt(data_index+2) === '\s' || data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{') &&
