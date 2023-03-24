@@ -4,7 +4,7 @@
    Title: generate
 
    Description: 
-   strips every chosen type of function in .html, .js, .ts files using character sets backtracking arrays. Supports react. capable of additional languages using the file type as an extra conditional in the main function.
+   strips every chosen type of function in .html, .js, .ts files using character sets and backtracking arrays. Supports react. capable of additional languages using the file type as an extra condition wrapped in the main function.
    does not strip functions that are found inside strings("'`), single line comments and multline comments and outside of script tags in html documents. 
    Includes the line number, filepath and function name for each function.
    Includes a list of function types to strip. All configurable.
@@ -178,7 +178,7 @@
  
     if(filename) { 
  
-     file_type = filename.split('');
+     file_type = filename.split(''); //just use a regular expression here or a while loop. i know its ugly. shut up
  
      if(
       file_type.length >= 2 &&
@@ -465,7 +465,7 @@
   */
  
   if(
-   ((data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ',') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === '\s' || data.charAt(data_index-2) === ','))) &&
+   ((data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ',' || data.charAt(data_index-1) === ':') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === '\s' || data.charAt(data_index-2) === ',' || data.charAt(data_index-2) === ':'))) &&
    data.charAt(data_index  ) === 'f' && 
    data.charAt(data_index+1) === 'u' &&  
    data.charAt(data_index+2) === 'n' && 
@@ -492,7 +492,7 @@
   */
  
   if(
-   (data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') && //calma will eventually have to be taken into consideration
+   (data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') && //check calmas inside the file
    data.charAt(data_index  ) ===  '='  && 
    data.charAt(data_index+1) ===  '>'  && 
    (data.charAt(data_index+2) === '\s' || data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{') &&
