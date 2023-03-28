@@ -22,6 +22,7 @@
    just skip the file if there is an error in file
    comment out uneccessary conditions when finished
    take , into consideration for routes and stuff
+   make sure to check the ="" || =' || =` for all the different script types other than the main script type... for example css files... needs to be recursive to keep spaces into consideration
    
   */
 
@@ -297,14 +298,17 @@
    data_index = data_index + 3; 
    return iterate_through_file_text(data_index);
   }
- 
+
+  //check all other tags using a set of recursive calls for each tag.. this is so script isnt found in a specific string within a tag... if a script was in another tag not in a string, there would be an error
+  // <p wow = "<script> </script>"></p> ...just make sure to denote when in an opening and closing tag
+
   /*
    enter into an html script
   */
  
   if(
    file_type === 'html' && 
-   in_html_comment === false &&
+   in_html_comment === false && //and not in all other types of stirngs inside of scripts 
    in_html_script === false && 
    recurse_check_script(data_index) === true
   ) { 
@@ -477,7 +481,7 @@
    (data.charAt(data_index+8) === '\s' || data.charAt(data_index+8) === '\n' || data.charAt(data_index+8) === ' ' || data.charAt(data_index+8) === '(') &&
    in_function === false && 
    function_types.regular === true
-   //add file types here and each of the other conditions
+   //add file types here and each of the other conditions or just make this as a wrapper
   ) {
    in_function = true;
    is_arrow = false;
