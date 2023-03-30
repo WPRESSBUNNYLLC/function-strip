@@ -4,7 +4,7 @@
    Title: generate
 
    Description: 
-   strips every chosen type of function in .html, .js, .ts files using character sets and backtracking arrays. Supports react. capable of additional languages using the file type as an extra condition wrapped in the main function.
+   strips every chosen type of function in .html, .js, .ts files using character sets and backtracking arrays. Supports react. capable of additional languages using the file type as an extra condition wrapped in the main function. assumeds documents has no errors
    does not strip functions that are found inside strings("'`), single line comments and multline comments and outside of script tags in html documents. 
    Includes the line number, filepath and function name for each function.
    Includes a list of function types to strip. All configurable.
@@ -23,6 +23,7 @@
    comment out uneccessary conditions when finished
    take , into consideration for routes and stuff
    make sure to check the ="" || =' || =` for all the different script types other than the main script type... for example css files... needs to be recursive to keep spaces into consideration
+   possibly come up with an easier way to do this
    
   */
 

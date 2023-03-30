@@ -11,19 +11,15 @@
  * @param {opening_bt_parentheses} opening parentheses used for ending. could use count
  * @param {closing_bt_parentheses} closing parentheses used for ending. could use count.
  * @param {bt_af_is_async_check} used to turn on or off the condition that appends 'async'
+ * i fucked this up so doing again
 */
 
 var data = '';
 var bt_arrow_parameter_string = [];
 var bt_index = 0;
-var in_bt_quotation_string = [];
-var in_bt_string = false;
-var opening_bt_parentheses = 0;
-var closing_bt_parentheses = 0;
-var bt_index_drop_off_found_first_character = false;
-var bt_index_drop_off_function_name = 0;
-var bt_index_drop_off_append_equals = false;
-var bt_af_is_async_check = false;
+var found_equals = false;
+var found_async = false;
+var found_name = false;
 var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/; //function name
 
 /*
@@ -34,185 +30,126 @@ function initiate_arrow(d, data_index) {
   data = d;
   bt_arrow_parameter_string = [];
   bt_index = data_index - 1;
-  in_bt_quotation_string = [];
-  in_bt_string = false;
-  opening_bt_parentheses = 0;
-  closing_bt_parentheses = 0;
-  bt_index_drop_off_found_first_character = false;
-  bt_index_drop_off_function_name = 0;
-  bt_index_drop_off_append_equals = false;
-  bt_af_is_async_check = false;
+  found_equals = false;
+  found_name = false;
+  found_async = false;
   back_track_arrow(bt_index);
 }
 
-/*
- backtrack beginning of arrow
-*/
+//the only thing to check for is an equals sign on the backtracking set... when an equals sign is found, you know the function has a name and you can check for the name and if theres a type a type as well. an equals sign before the possible async
+//so right after the possible async, IF there is an equals sign, then i know i can check for a name and a type and know when to stop.... however if : or , I know there is no name and no type.
+
+//if : stop
+//if , stop
+//if no async and no = stop
+//if async and no =, stop
+//if =, check for name then type... type is a set
+
+//this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
 
 function back_track_arrow(bt_index) { 
 
- /*
-  end traversing a string inside a function parameter set
- */
-
- if(
-  in_bt_string === true &&
-  in_bt_quotation_string.length > 1 && 
-  in_bt_quotation_string[in_bt_quotation_string.length - 1] === in_bt_quotation_string[0]
- ) { 
-  in_bt_quotation_string = [];
-  in_bt_string = false;
-  return back_track_arrow(bt_index);
+ //found async
+ if(found_async === false && found_equals === false && data.charAt(bt_index) === 'c' && is_async(bt_index)) { 
+  found_async = true;
+  return back_track_arrow(bt_index); //found async
+ } else { 
+  return bt_arrow_parameter_string.join(); //no async and random set of characters found which are not equals
  }
 
- /*
-  begin traversing a string inside a function parameter set. dont need first two but helps make things clear.
- */
+ //found equals
+ if(data.charAt(bt_index) === '=' && found_equals === false)  { 
+  found_equals = true;
+  bt_arrow_parameter_string.unshift('=')
+  bt_index = bt_index - 1;
+  return back_track_arrow(bt_index); //found the equals sign which should always be after if i found async
+ } 
 
- if(
-  (in_bt_string === false || in_bt_string === true) &&
-  (data.charAt(bt_index) === '"' || data.charAt(bt_index) === '`' || data.charAt(bt_index) === `'`)
- ) { 
-  in_bt_quotation_string.push(data.charAt(bt_index)); 
-  in_bt_string = true;
-  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+ //pushing spaces --should keep this moving -- this can go anywhere maybe ill put it at the top
+ if(data.charAt(bt_index) === ' ' || data.charAt(bt_index) === '\n') { //push all spaces and new lines
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index))
   bt_index = bt_index - 1;
   return back_track_arrow(bt_index);
  }
 
- /*
-  track opening and closing parentheses. will always be 1 = 1
- */
-
- if(in_bt_string === false && data.charAt(bt_index) === ')') {
-  closing_bt_parentheses = closing_bt_parentheses + 1;
- } else if(in_bt_string === false && data.charAt(bt_index) === '(') { 
-  opening_bt_parentheses = opening_bt_parentheses + 1;
+ //have not found equals and not an equals sign, end
+ if(found_equals === false && (data.charAt(bt_index) !== ' ' && data.charAt(bt_index) !== '\n' && data.charAt(bt_index) !== '=')) { 
+  return bt_arrow_parameter_string.join(); //have not found equals and bad character
  }
 
- /*
-  adding to the arrow function parameter set. I add every character from opening to close
- */
-
- bt_arrow_parameter_string.unshift(data.charAt(bt_index));
- 
- /*
-  return the parameters "wow = (a,b,c)" or "wow = async (a,b,c)" count should always be 1 here for closing and opening 1 = 1
- */
-
- if(closing_bt_parentheses === opening_bt_parentheses && closing_bt_parentheses === 1) { 
-  bt_index_drop_off_function_name = bt_index - 1;
-  get_arrow_parameter_function_name(bt_index_drop_off_function_name);
-  get_declaration_type(bt_index_drop_off_function_name);
-  bt_arrow_parameter_string = bt_arrow_parameter_string.join();
-  return bt_arrow_parameter_string; //returns the beginning string of the function.. also return some other things
+ //found equals and pushing name then checking type.. after checking type... end
+ if(found_equals === true && bt_index_drop_off_alphabet.test(data.charAt(bt_index))) {
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+  bt_index = bt_index - 1;
+  recurse_name(bt_index);
+  return;
  }
-
- /*
-  move back one character and go again
- */
-
- bt_index = bt_index - 1;
- return back_track_arrow(bt_index);
-
-} 
-
-/*
- get the arrow function name by backtracking
-*/
-
-function get_arrow_parameter_function_name(bt_index_drop_off_function_name) { 
-
-  /*
-   immediately take async into consideration when c is found here - runs once
-  */
-
-  if(
-    bt_af_is_async_check === false && 
-    data.charAt(bt_index_drop_off_function_name) === 'c' && 
-    bt_index_drop_off_found_first_character === false
-   ) {
-    is_async(bt_index_drop_off_function_name);
-    return get_arrow_parameter_function_name(bt_index_drop_off_function_name);
-  }
-
-  /*
-    the function name has been appended because a space between the declaration type and function. Or stop when a ':' is found where there is no function name. not sure if /s and ' ' are the same thing 
-  */
-
-  if(
-   (bt_index_drop_off_found_first_character === true && (data.charAt(bt_index_drop_off_function_name) === '\s' || data.charAt(bt_index_drop_off_function_name) === ' ' || data.charAt(bt_index_drop_off_function_name) === ':')) ||
-   (bt_index_drop_off_found_first_character === false && data.charAt(bt_index_drop_off_function_name) === ':')
-  ) { 
-   return;
-  }
-
-  /*
-   if the first character hasnt been found yet, check to see if a first character exists.
-  */
-
-  if(bt_index_drop_off_found_first_character === false) {
-    bt_index_drop_off_found_first_character = bt_index_drop_off_alphabet.test(data.charAt(bt_index_drop_off_function_name)); 
-  }
-
-  /*
-   if first character found, unshift.. if first found and first time, make sure to append an equals sign first.
-  */
-
-  if(
-    bt_index_drop_off_found_first_character === true && 
-    bt_index_drop_off_append_equals === false
-  ) { 
-    bt_index_drop_off_append_equals = true
-    bt_arrow_parameter_string.unshift(' = ');
-    bt_arrow_parameter_string.unshift(data.charAt(bt_index_drop_off_function_name));
-  } else if(bt_index_drop_off_found_first_character === true && bt_index_drop_off_append_equals === true) { 
-    bt_arrow_parameter_string.unshift(data.charAt(bt_index_drop_off_function_name));
-  } 
-
-  /*
-   move back one
-  */
-
-  bt_index_drop_off_function_name = bt_index_drop_off_function_name - 1;
-  return get_arrow_parameter_function_name(bt_index_drop_off_function_name);
 
 }
 
- /*
-  if async exists add to the string... if not an async function, index remains the same for the next condition, which begins the function name... look at this again
- */
-
-function is_async(bt_index_drop_off_function_name) { 
+function is_async(bt_index) { 
 
  if(
-  (data.charAt(bt_index_drop_off_function_name-5) === ' ' || data.charAt(bt_index_drop_off_function_name-5) === '\n' || data.charAt(bt_index_drop_off_function_name-5) === '\s') && //possibly add a : ...if :, then append async and just end
-  data.charAt(bt_index_drop_off_function_name-4) === 'a' &&
-  data.charAt(bt_index_drop_off_function_name-3) === 's' &&
-  data.charAt(bt_index_drop_off_function_name-2) === 'y' &&
-  data.charAt(bt_index_drop_off_function_name-1) === 'n' &&
-  data.charAt(bt_index_drop_off_function_name  ) === 'c'
+  (data.charAt(bt_index-5) === ' ' || data.charAt(bt_index-5) === '\n' || data.charAt(bt_index-5) === '\s' || data.charAt(bt_index-5) === ':' || data.charAt(bt_index-5) === ',') && 
+  data.charAt(bt_index-4) === 'a' &&
+  data.charAt(bt_index-3) === 's' &&
+  data.charAt(bt_index-2) === 'y' &&
+  data.charAt(bt_index-1) === 'n' &&
+  data.charAt(bt_index  ) === 'c'
  ) { 
-  bt_arrow_parameter_string.unshift(' ');
   bt_arrow_parameter_string.unshift('c');
   bt_arrow_parameter_string.unshift('n');
   bt_arrow_parameter_string.unshift('y');
   bt_arrow_parameter_string.unshift('s');
   bt_arrow_parameter_string.unshift('a');
-  bt_index_drop_off_function_name = bt_index_drop_off_function_name - 6;
+  if(data.charAt(bt_index-5) === ' ' || data.charAt(bt_index-5) === '\n' || data.charAt(bt_index-5) === '\s') { 
+   bt_arrow_parameter_string.unshift(data.charAt(bt_index-5));
+  }
+  bt_index = bt_index - 5;
+  return true;
  }
 
- bt_af_is_async_check = true;
- return;
+ return false;
 
 }
 
-/*
- get declaration type. backtrack until first letter and check for every type previous to if - = let var const whatever... if none then no declaration and make sure thats returned when pushing the function
-*/
+//recurse name and check type....
+function recurse_name(bt_index) { 
+ if(bt_index_drop_off_alphabet.test(data.charAt(bt_index))) {
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+  bt_index = bt_index - 1;
+  return recurse_name(bt_index);
+ } else if(data.charAt(bt_index) === '\n' || data.charAt(bt_index) === ' ') { 
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+  bt_index = bt_index - 1;
+  return recurse_name(bt_index);
+ } else if(data.charAt(bt_index) === 't' || data.charAt(bt_index) === 'r') { 
+  check_type(bt_index);
+  return;
+ } else { 
+  return;
+ }
+}
 
-function get_declaration_type(bt_index_drop_off_function_name) { 
-
+//append type if there is one then end it
+function check_type(bt_index) { 
+  if(data.charAt(bt_index) === 'r' && data.charAt(bt_index - 1) === 'a' && data.charAt(bt_index - 2) === 'v' && (data.charAt(bt_index - 3) === ' ' || data.charAt(bt_index - 3) === '\n')) { 
+    bt_arrow_parameter_string.unshift('r');
+    bt_arrow_parameter_string.unshift('a');
+    bt_arrow_parameter_string.unshift('v');
+  } else if(data.charAt(bt_index) === 't' && data.charAt(bt_index - 1) === 'e' && data.charAt(bt_index - 2) === 'l' && (data.charAt(bt_index - 3) === ' ' || data.charAt(bt_index - 3) === '\n')) { 
+    bt_arrow_parameter_string.unshift('t');
+    bt_arrow_parameter_string.unshift('e');
+    bt_arrow_parameter_string.unshift('l');
+  } else if(data.charAt(bt_index) === 't' && data.charAt(bt_index - 1) === 's' && data.charAt(bt_index - 2) === 'n' && data.charAt(bt_index - 3) === 'o' && data.charAt(bt_index - 4) === 'c' && (data.charAt(bt_index - 3) === ' ' || data.charAt(bt_index - 3) === '\n')) { 
+    bt_arrow_parameter_string.unshift('t');
+    bt_arrow_parameter_string.unshift('s');
+    bt_arrow_parameter_string.unshift('n');
+    bt_arrow_parameter_string.unshift('o');
+    bt_arrow_parameter_string.unshift('c');
+  } else { 
+    return
+  }
 }
 
 module.exports = initiate_arrow;
