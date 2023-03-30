@@ -6,7 +6,7 @@
  * @param {bt_index_drop_off_alphabet} once the first character is hit, set below to on
  * @param {bt_index_drop_off_found_first_character} once on, when first space or new line hit, end and return the name and function parameters
  * @param {bt_index_drop_off_append_equals} once a character is found, make sure to append the equals sign before the function name
- * @param {in_bt_quotation_string} in and out of a string within the parameter set
+ * @param {in_string_in_parameter_set_} in and out of a string within the parameter set
  * @param {in_bt_string} compliment of above. denotes in and out of a string within the parameter set
  * @param {opening_bt_parentheses} opening parentheses used for ending. could use count
  * @param {closing_bt_parentheses} closing parentheses used for ending. could use count.
@@ -20,6 +20,9 @@ var bt_index = 0;
 var found_equals = false;
 var found_async = false;
 var found_name = false;
+var in_parameter_set;
+var in_string_in_parameter_set = false;
+var in_string_in_parameter_set_ = [];
 var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/; //function name
 
 /*
@@ -33,17 +36,50 @@ function initiate_arrow(d, data_index) {
   found_equals = false;
   found_name = false;
   found_async = false;
+  in_parameter_set;
+  in_string_in_parameter_set = false;
+  in_string_in_parameter_set_ = [];
   back_track_arrow(bt_index);
 }
 
 //the only thing to check for is an equals sign on the backtracking set... when an equals sign is found, you know the function has a name and possibly a type
 //this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
-//fix this code up a little bit and use it for regular
+//just need to check for when in the parameter set for equals signs that should not be counted..
+//only thing that needs to come first is the async check before equals check
+//fix this code up a little bit and use it for regular..without the parameter set though
+
 
 function back_track_arrow(bt_index) { 
 
+ //exit a string inside of a parameter set.. for determing real (
+ if((in_parameter_set === true && in_string_in_parameter_set === true) && in_string_in_parameter_set_.length > 1 && in_string_in_parameter_set_[in_string_in_parameter_set_.length - 1] === in_string_in_parameter_set_[0]) { 
+  in_string_in_parameter_set_ = [];
+  in_string_in_parameter_set = false;
+  return back_track_arrow(bt_index);
+ }
+
+ //enter a string inside of a parameter set
+ if((in_parameter_set === true && in_string_in_parameter_set === false) && (data.charAt(bt_index) === '"' || data.charAt(bt_index) === '`' || data.charAt(bt_index) === `'`)) { 
+  in_string_in_parameter_set_.push(data.charAt(bt_index)); 
+  in_string_in_parameter_set = true;
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+  bt_index = bt_index - 1;
+  return back_track_arrow(bt_index);
+ }
+
+ //entering and exiting the parameter set... when exiting making sure not in a string
+ if(in_parameter_set === false && data.charAt(bt_index) === ')' && found_async === false && found_equals === false) { //shouldnt need last two
+  in_parameter_set = true;
+  bt_index = bt_index - 1;
+  return back_track_arrow(bt_index); 
+ } else if(in_parameter_set === true && data.charAt(bt_index) === '(' && in_string_in_parameter_set === false) { 
+  in_parameter_set = false;
+  bt_index = bt_index - 1;
+  return back_track_arrow(bt_index);
+ }
+
  //found async
- if(found_async === false && found_equals === false && data.charAt(bt_index) === 'c' && is_async(bt_index)) { 
+ if(found_async === false && found_equals === false && data.charAt(bt_index) === 'c' && is_async(bt_index) && in_parameter_set === false) { 
   found_async = true;
   return back_track_arrow(bt_index); //found async
  } else { 
@@ -51,7 +87,7 @@ function back_track_arrow(bt_index) {
  }
 
  //found equals
- if(data.charAt(bt_index) === '=' && found_equals === false)  { 
+ if(data.charAt(bt_index) === '=' && found_equals === false && in_parameter_set === false)  { 
   found_equals = true;
   bt_arrow_parameter_string.unshift('=')
   bt_index = bt_index - 1;
@@ -59,29 +95,40 @@ function back_track_arrow(bt_index) {
  } 
 
  //pushing spaces --should keep this moving -- this can go anywhere maybe ill put it at the top
- if(data.charAt(bt_index) === ' ' || data.charAt(bt_index) === '\n') { //push all spaces and new lines
+ if(data.charAt(bt_index) === ' ' || data.charAt(bt_index) === '\n' && in_parameter_set === false) { //push all spaces and new lines
   bt_arrow_parameter_string.unshift(data.charAt(bt_index))
   bt_index = bt_index - 1;
   return back_track_arrow(bt_index);
  }
 
  //have not found equals and not an equals sign, end
- if(found_equals === false && (data.charAt(bt_index) !== ' ' && data.charAt(bt_index) !== '\n' && data.charAt(bt_index) !== '=')) { 
+ if(found_equals === false && (data.charAt(bt_index) !== ' ' && data.charAt(bt_index) !== '\n' && data.charAt(bt_index) !== '=') && in_parameter_set === false) { 
   return bt_arrow_parameter_string.join(); //have not found equals and bad character... this works because already checked async
  }
 
  //found equals and pushing name then checking type.. after checking type... end
- if(found_equals === true && bt_index_drop_off_alphabet.test(data.charAt(bt_index))) {
+ if(found_equals === true && bt_index_drop_off_alphabet.test(data.charAt(bt_index)) && in_parameter_set === false) {
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   recurse_name(bt_index);
   return;
  }
 
+ //pushing every character when in the parameter set
+ if(in_parameter_set === true) { 
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+  bt_index = bt_index - 1;
+  return back_track_arrow(bt_index);
+ }
+
+ //should not hit
+ console.log('error arrow');
+ bt_index = bt_index - 1; 
+ return back_track_arrow(bt_index);
+
 }
 
 function is_async(bt_index) { 
-
  if(
   (data.charAt(bt_index-5) === ' ' || data.charAt(bt_index-5) === '\n' || data.charAt(bt_index-5) === '\s' || data.charAt(bt_index-5) === ':' || data.charAt(bt_index-5) === ',') && 
   data.charAt(bt_index-4) === 'a' &&
@@ -97,13 +144,12 @@ function is_async(bt_index) {
   bt_arrow_parameter_string.unshift('a');
   if(data.charAt(bt_index-5) === ' ' || data.charAt(bt_index-5) === '\n' || data.charAt(bt_index-5) === '\s') { 
    bt_arrow_parameter_string.unshift(data.charAt(bt_index-5));
+   bt_index = bt_index - 1;
   }
   bt_index = bt_index - 5;
   return true;
  }
-
  return false;
-
 }
 
 //recurse name and check type....
@@ -113,7 +159,6 @@ function recurse_name(bt_index) {
   bt_index = bt_index - 1;
   return recurse_name(bt_index);
  } else if(data.charAt(bt_index) === '\n' || data.charAt(bt_index) === ' ') { 
-  //name has ended pushing spaces until a t or v
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return recurse_name(bt_index);
