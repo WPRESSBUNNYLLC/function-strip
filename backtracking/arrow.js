@@ -1,17 +1,20 @@
 
 /*
+
  * @param {bt_arrow_parameter_string} the parameters of the arrow function. built via an array, and joined as a string returned as the beginning of the function
  * @param {bt_index} the back tracking of an index
- * @param {bt_index_drop_off_function_name} the index that backtracks the arrow function name. definition used for ending
- * @param {bt_index_drop_off_alphabet} once the first character is hit, set below to on
- * @param {bt_index_drop_off_found_first_character} once on, when first space or new line hit, end and return the name and function parameters
- * @param {bt_index_drop_off_append_equals} once a character is found, make sure to append the equals sign before the function name
- * @param {in_string_in_parameter_set_} in and out of a string within the parameter set
- * @param {in_bt_string} compliment of above. denotes in and out of a string within the parameter set
- * @param {opening_bt_parentheses} opening parentheses used for ending. could use count
- * @param {closing_bt_parentheses} closing parentheses used for ending. could use count.
- * @param {bt_af_is_async_check} used to turn on or off the condition that appends 'async'
- * i fucked this up so doing again
+ * @param {found_equals} found equals sign so we know when to end... (name and type check)
+ * @param {found_async} found async before i found equals if there is an equals. 
+ * @param {found_name} found equals now i can get the name and type if there is a type.. there has to be a name though if equals is found
+ * @param {in_parameter_set} if in a parameter set, i cannot count a = sign as real
+ * @param {in_string_in_parameter_set} if in a string in a parameter set, i cannot count ( as real
+ 
+   the only thing to check for is an equals sign on the backtracking set... when an equals sign is found, you know the function has a name and possibly a type
+   this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
+   just need to check for when in the parameter set for equals signs that should not be counted..
+   only thing that needs to come first is the async check before equals check
+   fix this code up a little bit and use it for regular..without the parameter set though
+
 */
 
 var data = '';
@@ -20,7 +23,7 @@ var bt_index = 0;
 var found_equals = false;
 var found_async = false;
 var found_name = false;
-var in_parameter_set;
+var in_parameter_set = false;
 var in_string_in_parameter_set = false;
 var in_string_in_parameter_set_ = [];
 var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/; //function name
@@ -41,13 +44,6 @@ function initiate_arrow(d, data_index) {
   in_string_in_parameter_set_ = [];
   back_track_arrow(bt_index);
 }
-
-//the only thing to check for is an equals sign on the backtracking set... when an equals sign is found, you know the function has a name and possibly a type
-//this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
-//just need to check for when in the parameter set for equals signs that should not be counted..
-//only thing that needs to come first is the async check before equals check
-//fix this code up a little bit and use it for regular..without the parameter set though
-
 
 function back_track_arrow(bt_index) { 
 
@@ -70,10 +66,12 @@ function back_track_arrow(bt_index) {
  //entering and exiting the parameter set... when exiting making sure not in a string
  if(in_parameter_set === false && data.charAt(bt_index) === ')' && found_async === false && found_equals === false) { //shouldnt need last two
   in_parameter_set = true;
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return back_track_arrow(bt_index); 
  } else if(in_parameter_set === true && data.charAt(bt_index) === '(' && in_string_in_parameter_set === false) { 
   in_parameter_set = false;
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return back_track_arrow(bt_index);
  }
