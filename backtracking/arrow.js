@@ -36,16 +36,9 @@ function initiate_arrow(d, data_index) {
   back_track_arrow(bt_index);
 }
 
-//the only thing to check for is an equals sign on the backtracking set... when an equals sign is found, you know the function has a name and you can check for the name and if theres a type a type as well. an equals sign before the possible async
-//so right after the possible async, IF there is an equals sign, then i know i can check for a name and a type and know when to stop.... however if : or , I know there is no name and no type.
-
-//if : stop
-//if , stop
-//if no async and no = stop
-//if async and no =, stop
-//if =, check for name then type... type is a set
-
+//the only thing to check for is an equals sign on the backtracking set... when an equals sign is found, you know the function has a name and possibly a type
 //this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
+//fix this code up a little bit and use it for regular
 
 function back_track_arrow(bt_index) { 
 
@@ -54,7 +47,7 @@ function back_track_arrow(bt_index) {
   found_async = true;
   return back_track_arrow(bt_index); //found async
  } else { 
-  return bt_arrow_parameter_string.join(); //no async and random set of characters found which are not equals
+  return bt_arrow_parameter_string.join(); //no async and random set of characters found which are not an equals sign
  }
 
  //found equals
@@ -74,7 +67,7 @@ function back_track_arrow(bt_index) {
 
  //have not found equals and not an equals sign, end
  if(found_equals === false && (data.charAt(bt_index) !== ' ' && data.charAt(bt_index) !== '\n' && data.charAt(bt_index) !== '=')) { 
-  return bt_arrow_parameter_string.join(); //have not found equals and bad character
+  return bt_arrow_parameter_string.join(); //have not found equals and bad character... this works because already checked async
  }
 
  //found equals and pushing name then checking type.. after checking type... end
@@ -120,6 +113,7 @@ function recurse_name(bt_index) {
   bt_index = bt_index - 1;
   return recurse_name(bt_index);
  } else if(data.charAt(bt_index) === '\n' || data.charAt(bt_index) === ' ') { 
+  //name has ended pushing spaces until a t or v
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return recurse_name(bt_index);
