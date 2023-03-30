@@ -8,6 +8,9 @@
  * @param {found_name} found equals now i can get the name and type if there is a type.. there has to be a name though if equals is found
  * @param {in_parameter_set} if in a parameter set, i cannot count a = sign as real
  * @param {in_string_in_parameter_set} if in a string in a parameter set, i cannot count ( as real
+ * @param {param_set_over} just to make sure im out. uneccessary but whatever. hey k haha. mtv vibes out here. 
+ * 
+ * whatsup
  
    the only thing to check for is an equals sign on the backtracking set... when an equals sign is found, you know the function has a name and possibly a type
    this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
@@ -40,7 +43,8 @@ function initiate_arrow(d, data_index) {
   found_equals = false;
   found_name = false;
   found_async = false;
-  in_parameter_set;
+  in_parameter_set = false;
+  param_set_over = false;
   in_string_in_parameter_set = false;
   in_string_in_parameter_set_ = [];
   back_track_arrow(bt_index);
