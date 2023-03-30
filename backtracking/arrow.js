@@ -26,6 +26,7 @@ var found_name = false;
 var in_parameter_set = false;
 var in_string_in_parameter_set = false;
 var in_string_in_parameter_set_ = [];
+var param_set_over = false; //backup
 var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/; //function name
 
 /*
@@ -64,13 +65,21 @@ function back_track_arrow(bt_index) {
  }
 
  //entering and exiting the parameter set... when exiting making sure not in a string
- if(in_parameter_set === false && data.charAt(bt_index) === ')' && found_async === false && found_equals === false) { //shouldnt need last two
+ if(param_set_over === false && in_parameter_set === false && data.charAt(bt_index) === ')' && found_async === false && found_equals === false) { //shouldnt need last two
   in_parameter_set = true;
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return back_track_arrow(bt_index); 
  } else if(in_parameter_set === true && data.charAt(bt_index) === '(' && in_string_in_parameter_set === false) { 
   in_parameter_set = false;
+  param_set_over = true;
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+  bt_index = bt_index - 1;
+  return back_track_arrow(bt_index);
+ }
+
+ //pushing every character when in the parameter set
+ if(in_parameter_set === true) { 
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return back_track_arrow(bt_index);
@@ -110,13 +119,6 @@ function back_track_arrow(bt_index) {
   bt_index = bt_index - 1;
   recurse_name(bt_index);
   return;
- }
-
- //pushing every character when in the parameter set
- if(in_parameter_set === true) { 
-  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
-  bt_index = bt_index - 1;
-  return back_track_arrow(bt_index);
  }
 
  //should not hit
