@@ -24,6 +24,7 @@
    take , into consideration for routes and stuff
    make sure to check the ="" || =' || =` for all the different script types other than the main script type... for example css files... needs to be recursive to keep spaces into consideration
    possibly come up with an easier way to do this
+   define conditions, and for each one that is hit, mark the ones that will be affected... or not able to be reached anymore. do this for the other files. use an object for keysand true and false statements an descriptions. create on off descriptions
    
   */
 
