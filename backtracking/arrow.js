@@ -1,6 +1,5 @@
 
 /*
-
  * @param {bt_arrow_parameter_string} the parameters of the arrow function. built via an array, and joined as a string returned as the beginning of the function
  * @param {bt_index} the back tracking of an index
  * @param {found_equals} found equals sign so we know when to end... (name and type check)
@@ -9,13 +8,6 @@
  * @param {in_parameter_set} if in a parameter set, i cannot count a = sign as real
  * @param {in_string_in_parameter_set} if in a string in a parameter set, i cannot count ( as real
  * @param {param_set_over} just to make sure im out.
- 
-   the only thing to check for is an equals sign on the backtracking set... when an equals sign is found, you know the function has a name and possibly a type. 
-   this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
-   just need to check for when in the parameter set for equals signs that should not be counted..
-   only thing that needs to come first is the async check before equals check
-   fix this code up a little bit and use it for regular..without the parameter set though
-
 */
 
 var data = '';
@@ -50,7 +42,7 @@ function initiate_arrow(d, data_index) {
 }
 
 /*
- after parameter set, first check async... then check equals sign. when you get to the point of checking the equals sign, if there is something different, end the function. if there is an equals sign, get the name, then possibly get the type
+ after parameter set, first check async... then check equals sign. when you get to the point of checking the equals sign, if there is a character that is different, end the function. if there is an equals sign, get the name, then possibly get the type if the type exists
 */
 
 function back_track_arrow(bt_index) { 
@@ -245,16 +237,25 @@ function is_async(bt_index) {
 */
 
 function recurse_name(bt_index) { 
- if(bt_index_drop_off_alphabet.test(data.charAt(bt_index)) === true && found_name === false) {
+ if(
+  bt_index_drop_off_alphabet.test(data.charAt(bt_index)) === true && 
+  found_name === false
+ ) {
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return recurse_name(bt_index);
- } else if(data.charAt(bt_index) === '\n' || data.charAt(bt_index) === ' ') { 
+ } else if(
+  data.charAt(bt_index) === '\n' || 
+  data.charAt(bt_index) === ' '
+ ) { 
   found_name = true
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return recurse_name(bt_index);
- } else if(data.charAt(bt_index) === 't' || data.charAt(bt_index) === 'r') { 
+ } else if(
+  data.charAt(bt_index) === 't' || 
+  data.charAt(bt_index) === 'r'
+ ) { 
   check_type(bt_index);
   return;
  } else { 
@@ -267,23 +268,40 @@ function recurse_name(bt_index) {
 */
 
 function check_type(bt_index) { 
- if(data.charAt(bt_index) === 'r' && data.charAt(bt_index - 1) === 'a' && data.charAt(bt_index - 2) === 'v' && (data.charAt(bt_index - 3) === ' ' || data.charAt(bt_index - 3) === '\n')) { 
+ if(
+  data.charAt(bt_index) === 'r' && 
+  data.charAt(bt_index - 1) === 'a' && 
+  data.charAt(bt_index - 2) === 'v' && 
+  (data.charAt(bt_index - 3) === ' ' || data.charAt(bt_index - 3) === '\n')
+ ) { 
   bt_arrow_parameter_string.unshift('r');
   bt_arrow_parameter_string.unshift('a');
   bt_arrow_parameter_string.unshift('v');
- } else if(data.charAt(bt_index) === 't' && data.charAt(bt_index - 1) === 'e' && data.charAt(bt_index - 2) === 'l' && (data.charAt(bt_index - 3) === ' ' || data.charAt(bt_index - 3) === '\n')) { 
+ } else if(
+  data.charAt(bt_index) === 't' && 
+  data.charAt(bt_index - 1) === 'e' && 
+  data.charAt(bt_index - 2) === 'l' && 
+  (data.charAt(bt_index - 3) === ' ' || data.charAt(bt_index - 3) === '\n')
+ ) { 
   bt_arrow_parameter_string.unshift('t');
   bt_arrow_parameter_string.unshift('e');
   bt_arrow_parameter_string.unshift('l');
- } else if(data.charAt(bt_index) === 't' && data.charAt(bt_index - 1) === 's' && data.charAt(bt_index - 2) === 'n' && data.charAt(bt_index - 3) === 'o' && data.charAt(bt_index - 4) === 'c' && (data.charAt(bt_index - 5) === ' ' || data.charAt(bt_index - 5) === '\n')) { 
+ } else if(
+  data.charAt(bt_index) === 't' && 
+  data.charAt(bt_index - 1) === 's' && 
+  data.charAt(bt_index - 2) === 'n' && 
+  data.charAt(bt_index - 3) === 'o' && 
+  data.charAt(bt_index - 4) === 'c' && 
+  (data.charAt(bt_index - 5) === ' ' || data.charAt(bt_index - 5) === '\n')
+ ) { 
   bt_arrow_parameter_string.unshift('t');
   bt_arrow_parameter_string.unshift('s');
   bt_arrow_parameter_string.unshift('n');
   bt_arrow_parameter_string.unshift('o');
   bt_arrow_parameter_string.unshift('c');
-  } else { 
-    return
-  }
+ } else { 
+  return
+ }
 }
 
 module.exports = initiate_arrow;

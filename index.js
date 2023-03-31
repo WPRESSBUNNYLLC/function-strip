@@ -15,16 +15,10 @@
    TODO:
    https://blog.sessionstack.com/how-javascript-works-the-different-ways-of-declaring-a-function-5-best-practices-8a0324c06fe2
    make sure to recurse on if a function is invokable (); - do this at the end after push function
-   add an error handler on backtracking... if unknown character found or known character out of position
-   take template literals intto consideration on the ` maybe
-   add other file types
-   use an object index set for defining functions inside of functions, without the recursive return statement. just increment and decrement above and below the recursive call when inside the function and use the number as an index to push the correct characters. make it an attached set. 
-   just skip the file if there is an error in file
-   comment out uneccessary conditions when finished
-   take , into consideration for routes and stuff
-   make sure to check the ="" || =' || =` for all the different script types other than the main script type... for example css files... needs to be recursive to keep spaces into consideration
-   possibly come up with an easier way to do this
-   define conditions, and for each one that is hit, mark the ones that will be affected... or not able to be reached anymore. do this for the other files. use an object for keysand true and false statements an descriptions. create on off descriptions
+
+   backtracking
+   the only thing to check for is an equals sign in the backtracking set... when an equals sign is found, you know the function has a name and possibly a type. 
+   this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
    
   */
 
