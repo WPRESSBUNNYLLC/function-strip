@@ -8,9 +8,7 @@
  * @param {found_name} found equals now i can get the name and type if there is a type.. there has to be a name though if equals is found
  * @param {in_parameter_set} if in a parameter set, i cannot count a = sign as real
  * @param {in_string_in_parameter_set} if in a string in a parameter set, i cannot count ( as real
- * @param {param_set_over} just to make sure im out. uneccessary but whatever. hey k haha. mtv vibes out here. 
- * 
- * whatsup
+ * @param {param_set_over} just to make sure im out.
  
    the only thing to check for is an equals sign on the backtracking set... when an equals sign is found, you know the function has a name and possibly a type
    this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
@@ -122,7 +120,7 @@ function back_track_arrow(bt_index) {
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   recurse_name(bt_index);
-  return;
+  return bt_arrow_parameter_string.join();
  }
 
  //should not hit
@@ -132,6 +130,7 @@ function back_track_arrow(bt_index) {
 
 }
 
+//append async if exists
 function is_async(bt_index) { 
  if(
   (data.charAt(bt_index-5) === ' ' || data.charAt(bt_index-5) === '\n' || data.charAt(bt_index-5) === '\s' || data.charAt(bt_index-5) === ':' || data.charAt(bt_index-5) === ',') && 
@@ -158,11 +157,12 @@ function is_async(bt_index) {
 
 //recurse name and check type....
 function recurse_name(bt_index) { 
- if(bt_index_drop_off_alphabet.test(data.charAt(bt_index))) {
+ if(bt_index_drop_off_alphabet.test(data.charAt(bt_index)) && found_name === false) {
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return recurse_name(bt_index);
  } else if(data.charAt(bt_index) === '\n' || data.charAt(bt_index) === ' ') { 
+  found_name = true
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return recurse_name(bt_index);
