@@ -107,7 +107,7 @@ function back_track_arrow(bt_index) {
  } 
 
  //pushing spaces --should keep this moving -- this can go anywhere maybe ill put it at the top
- if(data.charAt(bt_index) === ' ' || data.charAt(bt_index) === '\n' && param_set_over === true) { //push all spaces and new lines
+ if(data.charAt(bt_index) === ' ' || data.charAt(bt_index) === '\n') { //push all spaces and new lines before and aftr p ser
   bt_arrow_parameter_string.unshift(data.charAt(bt_index))
   bt_index = bt_index - 1;
   return back_track_arrow(bt_index);
