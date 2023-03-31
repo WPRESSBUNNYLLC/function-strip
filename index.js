@@ -15,10 +15,12 @@
    TODO:
    https://blog.sessionstack.com/how-javascript-works-the-different-ways-of-declaring-a-function-5-best-practices-8a0324c06fe2
    make sure to recurse on if a function is invokable (); - do this at the end after push function
+   possibly redo the checking to a set of recursive functions where a, b, c, async, then equals, name/type... where each check is its own function 
 
    backtracking
    the only thing to check for is an equals sign in the backtracking set... when an equals sign is found, you know the function has a name and possibly a type. 
    this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
+   every definition you find, there will be a single character or set of characters like the equal sign, that will help define the ending of the beginning of that definition. which now is an arrow and regular function but could be other things.
    
   */
 
@@ -465,7 +467,7 @@
   */
  
   if(
-   ((data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ',' || data.charAt(data_index-1) === ':') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === '\s' || data.charAt(data_index-2) === ',' || data.charAt(data_index-2) === ':'))) &&
+   ((data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ',' || data.charAt(data_index-1) === ':') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === ',' || data.charAt(data_index-2) === ':'))) &&
    data.charAt(data_index  ) === 'f' && 
    data.charAt(data_index+1) === 'u' &&  
    data.charAt(data_index+2) === 'n' && 
@@ -474,7 +476,7 @@
    data.charAt(data_index+5) === 'i' && 
    data.charAt(data_index+6) === 'o' && 
    data.charAt(data_index+7) === 'n' && 
-   (data.charAt(data_index+8) === '\s' || data.charAt(data_index+8) === '\n' || data.charAt(data_index+8) === ' ' || data.charAt(data_index+8) === '(') &&
+   (data.charAt(data_index+8) === '\n' || data.charAt(data_index+8) === ' ' || data.charAt(data_index+8) === '(') &&
    in_function === false && 
    function_types.regular === true
    //add file types here and each of the other conditions or just make this as a wrapper
@@ -492,10 +494,10 @@
   */
  
   if(
-   (data.charAt(data_index-1) === '\s' || data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') && //check calmas inside the file
+   (data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') && //check calmas inside the file
    data.charAt(data_index  ) ===  '='  && 
    data.charAt(data_index+1) ===  '>'  && 
-   (data.charAt(data_index+2) === '\s' || data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{') &&
+   (data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{') &&
    in_function === false && 
    function_types.arrow === true
   ) {

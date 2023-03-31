@@ -21,10 +21,9 @@ var in_string_in_parameter_set = false;
 var in_string_in_parameter_set_ = [];
 var param_set_over = false; //backup
 var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/; //function name
-var on_off = {};
 
 /*
- initiate the beginning of the arrow function... use the unshifted bt_arrow parameter array for ordering
+ initiate the beginning of the arrow function... use the unshifted bt_arrow parameter array for ordering...
 */
 
 function initiate_arrow(d, data_index) {
@@ -38,7 +37,12 @@ function initiate_arrow(d, data_index) {
  param_set_over = false;
  in_string_in_parameter_set = false;
  in_string_in_parameter_set_ = [];
- back_track_arrow(bt_index);
+ //append_parameter_set <- guarenteed
+ //append_possible_async
+ //append_possible_equals
+ //append_name_and_type
+ //vs
+ back_track_arrow(bt_index); //possibly change this to above for clarity
 }
 
 /*
