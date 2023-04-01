@@ -5,6 +5,7 @@
  * @param {found_equals} found equals sign so we know when to end... (name and type check)
  * @param {found_async} found async before i found equals if there is an equals. 
  * @param {found_name} found equals now i can get the name and type if there is a type.. there has to be a name though if equals is found
+ * @param {end_name} name has ended check for the type
  * @param {in_parameter_set} if in a parameter set, i cannot count a = sign as real
  * @param {in_string_in_parameter_set} if in a string in a parameter set, i cannot count ( as real
  * @param {param_set_over} just to make sure im out.
@@ -16,6 +17,7 @@ var bt_index = 0;
 var found_equals = false;
 var found_async = false;
 var found_name = false;
+var end_name = false
 var in_parameter_set = false;
 var in_string_in_parameter_set = false;
 var in_string_in_parameter_set_ = [];
@@ -23,82 +25,123 @@ var param_set_over = false; //backup
 var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/; //function name
 
 /*
- initiate the beginning of the arrow function... use the unshifted bt_arrow parameter array for ordering...
+ initiate the beginning of the arrow function... use the unshifted bt_arrow parameter array for ordering... (look over code and run it)
 */
 
 function initiate_arrow(d, data_index) {
+
  data = d;
+
  bt_arrow_parameter_string = [];
+
  bt_index = data_index - 1;
+
  found_equals = false;
+
  found_name = false;
+
  found_async = false;
+
  in_parameter_set = false;
+
  param_set_over = false;
+
  in_string_in_parameter_set = false;
+
  in_string_in_parameter_set_ = [];
- //append_parameter_set <- guarenteed
- //append_possible_async
- //append_possible_equals
- //append_name_and_type
- //vs
- back_track_arrow(bt_index); //possibly change this to above for clarity
+
+ try {
+
+  append_parameter_set(bt_index);
+
+  var b = append_possible_async(bt_index);
+
+  if(b.continue === false) {
+   return bt_arrow_parameter_string.join();
+  }
+
+  var c = append_possible_equals(bt_index);
+
+  if(c.continue === false) {
+   return bt_arrow_parameter_string.join();
+  }
+
+  append_name_and_possible_type(bt_index);
+
+  return bt_arrow_parameter_string.join();
+
+ } catch(err) { 
+
+  console.log(err.message);
+
+ }
+
 }
 
 /*
- after parameter set, first check async... then check equals sign. when you get to the point of checking the equals sign, if there is a character that is different, end the function. if there is an equals sign, get the name, then possibly get the type if the type exists
+ append the guarenteed parameter set
 */
 
-function back_track_arrow(bt_index) { 
+function append_parameter_set(bt_index) { 
 
  /*
-  exit a string inside of a parameter set.. for determing real (
+  append spaces before reaching the parameter set
  */
 
  if(
-  (in_parameter_set === true && in_string_in_parameter_set === true && param_set_over === false) && 
+  (data.charAt(bt_index) === ' ' || data.charAt(bt_index) === '\n') && 
+  in_parameter_set === false
+ ) {
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index))
+  bt_index = bt_index - 1;
+  return append_parameter_set(bt_index);
+ }
+
+ /*
+  entering the parameter set -- above finished and this is finished
+ */
+
+ if(
+  in_parameter_set === false && 
+  data.charAt(bt_index) === ')'
+ ) { 
+  in_parameter_set = true;
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+  bt_index = bt_index - 1;
+  return append_parameter_set(bt_index); 
+ } 
+
+ /*
+  exit a string inside of a parameter set.. for determing real ( ...character already pushed below
+ */
+
+ if(
+  (in_parameter_set === true && in_string_in_parameter_set === true) && 
   in_string_in_parameter_set_.length > 1 && 
   in_string_in_parameter_set_[in_string_in_parameter_set_.length - 1] === in_string_in_parameter_set_[0]
  ) { 
   in_string_in_parameter_set_ = [];
   in_string_in_parameter_set = false;
-  return back_track_arrow(bt_index);
+  return append_parameter_set(bt_index);
  }
 
  /*
-  enter a string inside of a parameter set
+  enter a string inside of a parameter set for determing real (
  */
 
  if(
-  (in_parameter_set === true && in_string_in_parameter_set === false && param_set_over === false) && 
+  (in_parameter_set === true && in_string_in_parameter_set === false) && 
   (data.charAt(bt_index) === '"' || data.charAt(bt_index) === '`' || data.charAt(bt_index) === `'`)
  ) { 
   in_string_in_parameter_set_.push(data.charAt(bt_index)); 
   in_string_in_parameter_set = true;
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
-  return back_track_arrow(bt_index);
+  return append_parameter_set(bt_index);
  }
 
  /*
-  entering the parameter set... dont need last two conditions
- */
-
- if(
-  param_set_over === false && 
-  in_parameter_set === false && 
-  data.charAt(bt_index) === ')' && 
-  found_async === false && 
-  found_equals === false
- ) { 
-  in_parameter_set = true;
-  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
-  bt_index = bt_index - 1;
-  return back_track_arrow(bt_index); 
- } 
- 
- /*
-  exiting p set...
+  exiting the parameter set...
  */ 
 
  if(
@@ -107,104 +150,210 @@ function back_track_arrow(bt_index) {
   in_string_in_parameter_set === false
  ) { 
   in_parameter_set = false;
-  param_set_over = true;
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
-  return back_track_arrow(bt_index);
+  return;
  }
 
  /*
-  pushing every character when in the parameter set
+  pushing every character when in the parameter set.. must come last for proper conditions to take place
+ */
+
+ if(in_parameter_set === true) { 
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+  bt_index = bt_index - 1;
+  return append_parameter_set(bt_index);
+ }
+
+ /*
+  if arrow function is formatted correctly, this statement will not be hit
+ */
+
+ throw new error(
+ "parameter set error:\n" +
+ "The parameter set conditions are ordered for this statement to be unreachable."
+ )
+
+}
+
+/*
+ append async if it exists
+*/
+
+function append_possible_async(bt_index) { 
+
+ /*
+  append spaces before finding first character
  */
 
  if(
-  in_parameter_set === true && 
-  param_set_over === false
- ) { 
-  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+  (data.charAt(bt_index) === ' ' || data.charAt(bt_index) === '\n') && 
+  found_async === false
+ ) {
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index))
   bt_index = bt_index - 1;
-  return back_track_arrow(bt_index);
+  return append_possible_async(bt_index);
  }
 
  /*
-  found async... if c found and no async, bad character set, get out
+  found async, append and get out
  */
 
  if(
   found_async === false && 
-  found_equals === false && 
   data.charAt(bt_index) === 'c' && 
-  is_async(bt_index) === true && 
-  param_set_over === true
+  is_async(bt_index) === true
  ) { 
   found_async = true;
-  return back_track_arrow(bt_index);
- } else { 
-  return bt_arrow_parameter_string.join();
+  return { 
+    continue: true
+  }
  }
 
  /*
-  found equals, append and look for the name
+  the first character found after the parameter set suggests not async and not equals... get out.. dont need to set to false
  */
 
  if(
-  data.charAt(bt_index) === '=' && 
-  found_equals === false && 
-  param_set_over === true
- )  { 
-  found_equals = true;
-  bt_arrow_parameter_string.unshift('=')
-  bt_index = bt_index - 1;
-  return back_track_arrow(bt_index);
- } 
+  found_async === false && 
+  data.charAt(bt_index) !== 'c' && 
+  data.charAt(bt_index) !== ' ' && 
+  data.charAt(bt_index) !== '\n' && 
+  data.charAt(bt_index) !== '='
+ ) { 
+  found_async = false;
+  return { 
+    continue: false
+  }
+ }
 
  /*
-  push all spaces and new lines before and after p set.. when in the p set, this wont hit
+  the first character found after the parameter set is an equals sign, continue to get the name. found_equals set to true in the next function
  */
 
  if(
-  data.charAt(bt_index) === ' ' || 
-  data.charAt(bt_index) === '\n'
+  found_async === false && 
+  data.charAt(bt_index) === '='
+ ) { 
+  found_async = false;
+  return { 
+    continue: true
+  }
+ }
+
+ /*
+  if arrow function is formatted correctly, this statement will not be hit
+ */
+
+ throw new error(
+ "async set error:\n" +
+ "The async set conditions are ordered for this statement to be unreachable."
+ )
+
+}
+
+/*
+ append equals if it exists
+*/
+
+function append_possible_equals(bt_index) { 
+
+ /*
+  append spaces before finding first real character
+ */
+
+ if(
+  (data.charAt(bt_index) === ' ' || data.charAt(bt_index) === '\n') && 
+  found_equals === false
  ) {
   bt_arrow_parameter_string.unshift(data.charAt(bt_index))
   bt_index = bt_index - 1;
-  return back_track_arrow(bt_index);
+  return append_possible_equals(bt_index);
  }
 
  /*
-  have not found equals and not an equals sign, end.. should work because of async
+  the first character found after async is not an equals sign, or a space
  */
 
  if(
   found_equals === false && 
-  (data.charAt(bt_index) !== ' ' && data.charAt(bt_index) !== '\n' && data.charAt(bt_index) !== '=') && 
-  param_set_over === true
+  data.charAt(bt_index) !== ' ' && 
+  data.charAt(bt_index) !== '\n' && 
+  data.charAt(bt_index) !== '='
  ) { 
-  return bt_arrow_parameter_string.join();
+  found_equals = false;
+  return { 
+    continue: false
+  }
  }
 
  /*
-  found equals and pushing name then checking type.. after checking type... end
+  found equals
  */
 
  if(
-  found_equals === true && 
-  bt_index_drop_off_alphabet.test(data.charAt(bt_index)) === true && 
-  param_set_over === true
- ) {
-  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
-  bt_index = bt_index - 1;
-  recurse_name(bt_index);
-  return bt_arrow_parameter_string.join();
+  found_equals === false && 
+  data.charAt(bt_index) === '='
+ ) { 
+  found_equals = true;
+  return { 
+    continue: true
+  }
  }
 
  /*
-  should not hit
+  if arrow function is formatted correctly, this statement will not be hit
  */
 
- console.log('error arrow');
- bt_index = bt_index - 1; 
- return back_track_arrow(bt_index);
+ throw new error(
+ "equals set error:\n" +
+ "The equals set conditions are ordered for this statement to be unreachable."
+ )
+
+}
+
+/*
+ append function name and possibly the type
+*/
+
+function append_name_and_possible_type(bt_index) { 
+
+ /*
+  append spaces before finding first real character for the name
+ */
+
+ if(
+  (data.charAt(bt_index) === ' ' || data.charAt(bt_index) === '\n') && 
+  found_name === false
+ ) {
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index))
+  bt_index = bt_index - 1;
+  return append_possible_equals(bt_index);
+ }
+
+ /*
+  found the first character that sugests the name
+ */
+  
+ if(
+  found_name === false && 
+  bt_index_drop_off_alphabet.test(data.charAt(bt_index)) === true
+ ) {
+  found_name = true;
+  bt_arrow_parameter_string.unshift(data.charAt(bt_index));
+  bt_index = bt_index - 1;
+  recurse_name(bt_index);
+  return;
+ }
+
+ /*
+  if arrow function is formatted correctly, this statement will not be hit. if unknown character for name most likely
+ */
+
+ throw new error(
+ "name and type set error:\n" +
+ "The name set conditions are ordered for this statement to be unreachable."
+ )
 
 }
 
@@ -226,11 +375,11 @@ function is_async(bt_index) {
   bt_arrow_parameter_string.unshift('y');
   bt_arrow_parameter_string.unshift('s');
   bt_arrow_parameter_string.unshift('a');
-  if(data.charAt(bt_index-5) === ' ' || data.charAt(bt_index-5) === '\n') { //maintains focus on other three characters in recursive set
+  if(data.charAt(bt_index-5) === ' ' || data.charAt(bt_index-5) === '\n') { 
    bt_arrow_parameter_string.unshift(data.charAt(bt_index-5));
    bt_index = bt_index - 1;
   }
-  bt_index = bt_index - 5;
+  bt_index = bt_index - 5; //starts on an index thats an actual character for equals sign
   return true;
  }
  return false;
@@ -243,7 +392,7 @@ function is_async(bt_index) {
 function recurse_name(bt_index) { 
  if(
   bt_index_drop_off_alphabet.test(data.charAt(bt_index)) === true && 
-  found_name === false
+  end_name === false
  ) {
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
@@ -252,7 +401,7 @@ function recurse_name(bt_index) {
   data.charAt(bt_index) === '\n' || 
   data.charAt(bt_index) === ' '
  ) { 
-  found_name = true
+  end_name = true
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return recurse_name(bt_index);
@@ -263,7 +412,7 @@ function recurse_name(bt_index) {
   check_type(bt_index);
   return;
  } else { 
-  return;
+  return; //implies no type
  }
 }
 
