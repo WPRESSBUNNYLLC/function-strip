@@ -727,7 +727,10 @@
     index: function_index, 
     filepath: fp, 
     line_number: function_line_number + 1,
-    function_: build_string
+    function_: build_string, 
+    is_async: false, 
+    has_name: false, 
+    parameters: 'going to add this in'
   });
  }
  

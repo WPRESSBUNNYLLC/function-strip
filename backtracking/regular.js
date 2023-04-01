@@ -20,24 +20,63 @@ var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/;
 */
 
 function initiate_regular(d, data_index) { 
+
  data = d;
+
  bt_index = data_index - 1;
+
  bt_regular_parameter_string = [];
+
  found_equals = false;
+
  found_async = false;
+
  found_name = false;
- //append_first_one_or_two_characters.. -, ~, +, !, (,
- //append_possible_async
- //append_equals
- //append_name_and_type
- //vs
- back_track_regular(bt_index); //possibly change this to above for clarity
+
+ try {
+
+  append_first_one_or_two_characters(bt_index);
+
+  var a = append_possible_async(bt_index);
+
+  if(a.continue === false) { 
+   return bt_regular_parameter_string.join();
+  }
+
+  var b = append_equals(bt_index);
+
+  if(b.continue === false) { 
+   return bt_regular_parameter_string.join();
+  }
+
+  append_name_and_possibly_type(bt_index);
+
+ } catch(err) { 
+
+  console.log(err.message);
+
+ }
 
 }
 
-function back_track_regular(bt_index) { 
+/*
+ if the first character is a (, append and get out.. if its a  -,+,~,!, continue to seatch for ( and if found, get out... if not found get out. if neither is found, get the fuck out
+*/
 
- 
+function append_first_one_or_two_characters(bt_index) { 
+
+}
+
+function append_possible_async(bt_index) { 
+
+}
+
+function append_equals(bt_index) { 
+
+}
+
+function append_name_and_possibly_type(bt_index) { 
+
 }
 
 

@@ -40,6 +40,8 @@ function initiate_arrow(d, data_index) {
 
  found_name = false;
 
+ end_name = false;
+
  found_async = false;
 
  in_parameter_set = false;
@@ -54,15 +56,15 @@ function initiate_arrow(d, data_index) {
 
   append_parameter_set(bt_index);
 
-  var b = append_possible_async(bt_index);
+  var a = append_possible_async(bt_index);
 
-  if(b.continue === false) {
+  if(a.continue === false) {
    return bt_arrow_parameter_string.join();
   }
 
-  var c = append_possible_equals(bt_index);
+  var b = append_possible_equals(bt_index);
 
-  if(c.continue === false) {
+  if(b.continue === false) {
    return bt_arrow_parameter_string.join();
   }
 
@@ -379,7 +381,7 @@ function is_async(bt_index) {
    bt_arrow_parameter_string.unshift(data.charAt(bt_index-5));
    bt_index = bt_index - 1;
   }
-  bt_index = bt_index - 5; //starts on an index thats an actual character for equals sign
+  bt_index = bt_index - 5; //starts on an index thats an actual character for equals sign etc
   return true;
  }
  return false;
