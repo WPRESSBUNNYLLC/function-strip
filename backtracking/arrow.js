@@ -8,7 +8,6 @@
  * @param {end_name} name has ended check for the type
  * @param {in_parameter_set} if in a parameter set, i cannot count a = sign as real
  * @param {in_string_in_parameter_set} if in a string in a parameter set, i cannot count ( as real
- * @param {param_set_over} just to make sure im out.
 */
 
 var data = '';
@@ -21,7 +20,6 @@ var end_name = false
 var in_parameter_set = false;
 var in_string_in_parameter_set = false;
 var in_string_in_parameter_set_ = [];
-var param_set_over = false; //backup
 var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/; //function name
 
 /*
@@ -45,8 +43,6 @@ function initiate_arrow(d, data_index) {
  found_async = false;
 
  in_parameter_set = false;
-
- param_set_over = false;
 
  in_string_in_parameter_set = false;
 
@@ -75,6 +71,7 @@ function initiate_arrow(d, data_index) {
  } catch(err) { 
 
   console.log(err.message);
+  return ''
 
  }
 
@@ -120,7 +117,8 @@ function append_parameter_set(bt_index) {
  if(
   (in_parameter_set === true && in_string_in_parameter_set === true) && 
   in_string_in_parameter_set_.length > 1 && 
-  in_string_in_parameter_set_[in_string_in_parameter_set_.length - 1] === in_string_in_parameter_set_[0]
+  in_string_in_parameter_set_[in_string_in_parameter_set_.length - 1] === in_string_in_parameter_set_[0] && 
+  data.charAt(bt_index-1) !== "\\"
  ) { 
   in_string_in_parameter_set_ = [];
   in_string_in_parameter_set = false;

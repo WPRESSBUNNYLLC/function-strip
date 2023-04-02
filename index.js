@@ -15,7 +15,9 @@
    TODO:
    https://blog.sessionstack.com/how-javascript-works-the-different-ways-of-declaring-a-function-5-best-practices-8a0324c06fe2
    make sure to recurse on if a function is invokable (); - do this at the end after push function
-   possibly redo the checking to a set of recursive functions where a, b, c, async, then equals, name/type... where each check is its own function 
+   check for escaped strings - check and comments if comments can be escaped. not sure
+   add in additional characters in addition to new line and " " if necessary. i dont think it is
+   add when in and out of a regular expression
 
    backtracking
    the only thing to check for is an equals sign in the backtracking set... when an equals sign is found, you know the function has a name and possibly a type. 
@@ -67,6 +69,7 @@
  
    /*
    * outside the function
+   * @param {string_began_outside_function_for_reading_escape} for reading same string types which are escaped
    * @param {in_string_outside_of_function} the array denoting when a string starts and stopes outside a function
    * @param {in_string_outside_of_function_} compliment of above. on or off signifies not to execute some conditions
    * @param {in_comment_outside_function_single} denoting if i am in a single line comment outide the function
@@ -78,6 +81,7 @@
    * @param {in_string_inside_of_html_script_} compliment of above. on or off signifies not to execute some conditions
    */
  
+   var string_began_outside_function_for_reading_escape = false;
    var in_string_outside_of_function = [];
    var in_string_outside_of_function_ = false;
    var in_comment_outside_function_single = false;
@@ -423,6 +427,7 @@
    in_comment_type_outside_function_multi === false &&
    in_string_outside_of_function.length > 1 && 
    in_string_outside_of_function[in_string_outside_of_function.length - 1] === in_string_outside_of_function[0] && 
+   data.charAt(data_index-1) !== "\\" &&
    in_function === false
   ) { 
    in_string_outside_of_function = [];
@@ -432,7 +437,7 @@
   }
  
   /* 
-   enter into a string outside the function
+   enter into a string outside the function.. add a parameter for escaping
   */
  
   if(
@@ -484,7 +489,7 @@
    in_function = true;
    is_arrow = false;
    function_line_number = line_number;
-   build_string = initiate_regular(data, data_index); 
+   build_string = initiate_regular(data, data_index) + " function "; 
    data_index = data_index + 8; 
    return iterate_through_file_text(data_index);
   }
@@ -504,7 +509,7 @@
    in_function = true;
    function_line_number = line_number;
    is_arrow = true;
-   build_string = initiate_arrow(data, data_index);
+   build_string = initiate_arrow(data, data_index) + " => ";
    data_index = data_index + 2;
    return iterate_through_file_text(data_index);
   }
@@ -606,6 +611,7 @@
    in_comment_type_inside_function_multi === false &&
    in_string_inside_of_function.length > 1 && 
    in_string_inside_of_function[in_string_inside_of_function.length - 1] === in_string_inside_of_function[0] && 
+   data.charAt(data_index-1) !== "\\" &&
    in_function === true
   ) { 
    in_string_inside_of_function = [];
@@ -699,6 +705,15 @@
    data_index = data_index + 1;
    return iterate_through_file_text(data_index);
   } 
+
+  /*
+   this statement should not execute
+  */
+
+  throw new error(
+   "in function error:\n" +
+   "The in function conditions are ordered for this statement to be unreachable."
+  )
  
  }
  
