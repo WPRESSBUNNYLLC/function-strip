@@ -9,6 +9,7 @@
  * @param {in_parameter_set} if in a parameter set, i cannot count a = sign as real
  * @param {in_string_in_parameter_set} if in a string in a parameter set, i cannot count ( as real
  * make sure to count opening and closing parentheses
+ * backtracking regular expresssions and template literals for counting is impossible im pretty sure.
 */
 
 var data = '';
@@ -50,6 +51,10 @@ function initiate_arrow(d, data_index) {
  in_string_in_parameter_set = false;
 
  in_string_in_parameter_set_ = [];
+
+ opening_parameter_count = 0;
+
+ closing_parameter_count = 0;
 
  try {
 
@@ -133,7 +138,7 @@ function append_parameter_set(bt_index) {
 
  if(
   (in_string_in_parameter_set === false) && 
-  (data.charAt(bt_index) === '"' || data.charAt(bt_index) === '`' || data.charAt(bt_index) === `'`)
+  (data.charAt(bt_index) === '"' || data.charAt(bt_index) === '`' || data.charAt(bt_index) === `'`) //(error on ` ... if `${reg(`)}`) ...cannot determine when in a template literal coming from the right side... need to track entering and exiting the template literal outside the function in main...
  ) { 
   in_string_in_parameter_set_.unshift(data.charAt(bt_index)); 
   in_string_in_parameter_set = true;
