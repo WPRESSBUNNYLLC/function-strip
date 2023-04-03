@@ -18,11 +18,11 @@
    check for escaped strings - check and comments if comments can be escaped. not sure
    add in additional characters in addition to new line and " " if necessary. i dont think it is
    add when in and out of a regular expression outside a string for counting/entering and inside a string for counting .... console.log(`The value of lastIndex is ${/d(b+```)d/g.lastIndex}`); vs const re = /^(?:\d{3}|\(\d{3}\))([-/.])\d{3}\1\d{4}$/; ...
+   counting opening and closing ( and ) in the arrow parameter set is impossible because of regex and regex in template literals.. just find the index outside and use that as the ending inside if possible
 
    backtracking
    the only thing to check for is an equals sign in the backtracking set... when an equals sign is found, you know the function has a name and possibly a type. 
    this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
-   every definition you find, there will be a single character or set of characters like the equal sign, that will help define the ending of the beginning of that definition. which now is an arrow and regular function but could be other things.
    
   */
 
@@ -116,6 +116,12 @@
    var in_string_inside_of_function_ = false;
    var in_comment_inside_function_single = false;
    var in_comment_type_inside_function_multi = false;
+
+ /* 
+   * every time an = sign or a : or , is found reset this so to push ( 
+ */
+
+  var arrow_last_opening_index = [];
  
  /* 
    * search folders, files and get all arrow functions with and without brackets regular functions with brackets. line numbers, filepaths, function names.
@@ -416,6 +422,8 @@
    debug.push('1B SINGLE');
    return iterate_through_file_text(data_index);
   }
+
+  //regular expressions
  
   /*
    exit a string outside the function
@@ -441,8 +449,8 @@
   */
  
   if(
-   (in_string_outside_of_function_ === false || in_string_outside_of_function_ === true) &&
-   (in_comment_outside_function_single === false && in_comment_type_outside_function_multi === false) &&
+  //  (in_string_outside_of_function_ === false || in_string_outside_of_function_ === true) &&
+   (in_comment_outside_function_single === false && in_comment_type_outside_function_multi === false) && //not in a regular expression
    (data.charAt(data_index) === '"' || data.charAt(data_index) === '`' || data.charAt(data_index) === `'`) && 
    in_function === false
   ) { 
@@ -460,7 +468,7 @@
   if(
    (in_comment_type_outside_function_multi === true || 
    in_comment_outside_function_single === true || 
-   in_string_outside_of_function_ === true) && 
+   in_string_outside_of_function_ === true) && //also add regular expressions
    in_function === false
   ) {
    data_index = data_index + 1; 
@@ -625,7 +633,7 @@
   */
  
   if(
-   (in_string_inside_of_function_ === false || in_string_inside_of_function_ === true) &&
+  //  (in_string_inside_of_function_ === false || in_string_inside_of_function_ === true) &&
    (in_comment_inside_function_single === false && in_comment_type_inside_function_multi === false) &&
    (data.charAt(data_index) === '"' || data.charAt(data_index) === '`' || data.charAt(data_index) === `'`) && 
    in_function === true

@@ -8,8 +8,6 @@
  * @param {end_name} name has ended check for the type
  * @param {in_parameter_set} if in a parameter set, i cannot count a = sign as real
  * @param {in_string_in_parameter_set} if in a string in a parameter set, i cannot count ( as real
- * make sure to count opening and closing parentheses
- * backtracking regular expresssions and template literals for counting is impossible im pretty sure.
 */
 
 var data = '';
@@ -102,10 +100,10 @@ function append_parameter_set(bt_index) {
  }
 
  /*
-  entering the parameter set -- above finished and this is finished
+  entering the parameter set -- 
  */
 
- if(data.charAt(bt_index) === ')') { 
+ if(data.charAt(bt_index) === ')') { //
   if(in_parameter_set === false) { 
     in_parameter_set = true; 
   }
@@ -118,7 +116,7 @@ function append_parameter_set(bt_index) {
  } 
 
  /*
-  exit a string inside of a parameter set.. for determing real ( ...character already pushed below
+  exit a string inside of a parameter set.. for determing real ( ...character already pushed below     var a = /[(fd']/g)
  */
 
  if(
@@ -152,7 +150,7 @@ function append_parameter_set(bt_index) {
  */ 
 
  if(data.charAt(bt_index) === '(') { 
-  if(in_string_in_parameter_set === false) {
+  if(in_string_in_parameter_set === false) { //would also need to determine if in a regular expression / template literal
    opening_parameter_count += 1;
   }
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
