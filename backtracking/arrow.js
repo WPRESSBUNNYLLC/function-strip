@@ -8,6 +8,7 @@
  * @param {end_name} name has ended check for the type
  * @param {in_parameter_set} if in a parameter set, i cannot count a = sign as real
  * @param {in_string_in_parameter_set} if in a string in a parameter set, i cannot count ( as real
+ * make sure to count opening and closing parentheses
 */
 
 var data = '';
@@ -20,6 +21,8 @@ var end_name = false
 var in_parameter_set = false;
 var in_string_in_parameter_set = false;
 var in_string_in_parameter_set_ = [];
+var opening_parameter_count = 0; 
+var closing_parameter_count = 0;
 var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/; //function name
 
 /*
@@ -87,10 +90,7 @@ function append_parameter_set(bt_index) {
   append spaces before reaching the parameter set
  */
 
- if(
-  (data.charAt(bt_index) === ' ' || data.charAt(bt_index) === '\n') && 
-  in_parameter_set === false
- ) {
+ if((data.charAt(bt_index) === ' ' || data.charAt(bt_index) === '\n')) {
   bt_arrow_parameter_string.unshift(data.charAt(bt_index))
   bt_index = bt_index - 1;
   return append_parameter_set(bt_index);
@@ -100,11 +100,13 @@ function append_parameter_set(bt_index) {
   entering the parameter set -- above finished and this is finished
  */
 
- if(
-  in_parameter_set === false && 
-  data.charAt(bt_index) === ')'
- ) { 
-  in_parameter_set = true;
+ if(data.charAt(bt_index) === ')') { 
+  if(in_parameter_set === false) { 
+    in_parameter_set = true; 
+  }
+  if(in_string_in_parameter_set === false) { 
+   closing_parameter_count += 1;
+  }
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return append_parameter_set(bt_index); 
@@ -115,7 +117,7 @@ function append_parameter_set(bt_index) {
  */
 
  if(
-  (in_parameter_set === true && in_string_in_parameter_set === true) && 
+  in_string_in_parameter_set === true && 
   in_string_in_parameter_set_.length > 1 && 
   in_string_in_parameter_set_[in_string_in_parameter_set_.length - 1] === in_string_in_parameter_set_[0] && 
   data.charAt(bt_index-1) !== "\\"
@@ -130,10 +132,10 @@ function append_parameter_set(bt_index) {
  */
 
  if(
-  (in_parameter_set === true && in_string_in_parameter_set === false) && 
+  (in_string_in_parameter_set === false) && 
   (data.charAt(bt_index) === '"' || data.charAt(bt_index) === '`' || data.charAt(bt_index) === `'`)
  ) { 
-  in_string_in_parameter_set_.push(data.charAt(bt_index)); 
+  in_string_in_parameter_set_.unshift(data.charAt(bt_index)); 
   in_string_in_parameter_set = true;
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
@@ -141,30 +143,32 @@ function append_parameter_set(bt_index) {
  }
 
  /*
-  exiting the parameter set...
+  exiting the parameter set or appending a (...
  */ 
 
- if(
-  in_parameter_set === true && 
-  data.charAt(bt_index) === '(' && 
-  in_string_in_parameter_set === false
- ) { 
-  in_parameter_set = false;
+ if(data.charAt(bt_index) === '(') { 
+  if(in_string_in_parameter_set === false) {
+   opening_parameter_count += 1;
+  }
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
-  return;
+  if(opening_parameter_count === closing_parameter_count) { 
+    in_parameter_set = false;
+    return;
+  }
+  return append_parameter_set(bt_index);
  }
 
  /*
-  pushing every character when in the parameter set.. must come last for proper conditions to take place
+  pushing every character when in the parameter set.. must come last for other conditions to execute.. dont need condition but helps for error
  */
 
- if(in_parameter_set === true) { 
+ if(in_parameter_set === true) {
   bt_arrow_parameter_string.unshift(data.charAt(bt_index));
   bt_index = bt_index - 1;
   return append_parameter_set(bt_index);
  }
-
+ 
  /*
   if arrow function is formatted correctly, this statement will not be hit
  */

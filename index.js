@@ -17,7 +17,7 @@
    make sure to recurse on if a function is invokable (); - do this at the end after push function
    check for escaped strings - check and comments if comments can be escaped. not sure
    add in additional characters in addition to new line and " " if necessary. i dont think it is
-   add when in and out of a regular expression
+   add when in and out of a regular expression outside a string for counting/entering and inside a string for counting .... console.log(`The value of lastIndex is ${/d(b+)d/g.lastIndex}`); vs const re = /^(?:\d{3}|\(\d{3}\))([-/.])\d{3}\1\d{4}$/; ...
 
    backtracking
    the only thing to check for is an equals sign in the backtracking set... when an equals sign is found, you know the function has a name and possibly a type. 
@@ -489,7 +489,7 @@
    in_function = true;
    is_arrow = false;
    function_line_number = line_number;
-   build_string = initiate_regular(data, data_index) + " function "; 
+   build_string = initiate_regular(data, data_index) + " function"; 
    data_index = data_index + 8; 
    return iterate_through_file_text(data_index);
   }
@@ -509,7 +509,7 @@
    in_function = true;
    function_line_number = line_number;
    is_arrow = true;
-   build_string = initiate_arrow(data, data_index) + " => ";
+   build_string = initiate_arrow(data, data_index) + " =>";
    data_index = data_index + 2;
    return iterate_through_file_text(data_index);
   }
