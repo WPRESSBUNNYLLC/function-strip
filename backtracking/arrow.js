@@ -8,6 +8,7 @@
  * @param {end_name} name has ended check for the type
  * @param {in_parameter_set} if in a parameter set, i cannot count a = sign as real
  * @param {in_string_in_parameter_set} if in a string in a parameter set, i cannot count ( as real
+ * have to use the index boundries set before for counting real '(' ... setting opening and closing index boundries when entering and exiting things in main, using that here for counting... only way for arrow
 */
 
 var data = '';
