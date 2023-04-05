@@ -19,6 +19,12 @@
    add in additional characters in addition to new line and " " if necessary. i dont think it is
    add when in and out of a regular expression outside a string for counting/entering and inside a string for counting .... console.log(`The value of lastIndex is ${/d(b+```)d/g.lastIndex}`); vs const re = /^(?:\d{3}|\(\d{3}\))([-/.])\d{3}\1\d{4}$/; ...
    counting opening and closing ( and ) in the arrow parameter set is impossible because of regex and regex in template literals.. just find the index outside and use that as the ending inside if possible
+   make sure to add in regular expressions and template literals for counting
+   whenenever you are in something, just track it... it doesnt matter what it is... then for counting backwards on the backtracking, use the in-between boundries to not push ( on the backtracking arrow parameter set
+   make file types a wrapper condition. 
+   
+   when i go into a function, every consditional variable for outside the function should already be reset.
+   when i leave a function, every consditional variable for inside the function should be reset
 
    backtracking
    the only thing to check for is an equals sign in the backtracking set... when an equals sign is found, you know the function has a name and possibly a type. 
@@ -69,7 +75,6 @@
  
    /*
    * outside the function
-   * @param {string_began_outside_function_for_reading_escape} for reading same string types which are escaped
    * @param {in_string_outside_of_function} the array denoting when a string starts and stopes outside a function
    * @param {in_string_outside_of_function_} compliment of above. on or off signifies not to execute some conditions
    * @param {in_comment_outside_function_single} denoting if i am in a single line comment outide the function
@@ -81,9 +86,17 @@
    * @param {in_string_inside_of_html_script_} compliment of above. on or off signifies not to execute some conditions
    */
  
-   var string_began_outside_function_for_reading_escape = false;
    var in_string_outside_of_function = [];
    var in_string_outside_of_function_ = false;
+   var string_type_outside_function = '';
+
+   //using this to toggle when in and ot of things when in a template literal consisdering console.log(`${console.log(`${console.log(regex(`))}`)}`)
+   var in_single_quote_inside_template_literal = false;
+   var in_double_quote_inside_template_literal = false;
+   var in_template_quote_inside_template_literal = false;
+   var in_template_literal_inside_template_literal = false;
+   var in_regular_expresssion_inside_template_literal = false;
+
    var in_comment_outside_function_single = false;
    var in_comment_type_outside_function_multi = false;
    var in_html_script = false;
@@ -91,6 +104,7 @@
    var html_end_script_data_index_two = 0;
    var in_string_inside_of_html_script = [];
    var in_string_inside_of_html_script_ = false;
+   var in_regular_expression_outside_function = false;
  
    /*
    * inside the function. Strings, single line and multiline comments are used to determine wheter a bracket should be added. Brackets determine function end.
@@ -116,12 +130,13 @@
    var in_string_inside_of_function_ = false;
    var in_comment_inside_function_single = false;
    var in_comment_type_inside_function_multi = false;
+   var in_regular_expression_inside_function = false;
 
  /* 
-   * every time an = sign or a : or , is found reset this so to push ( 
+   * track the opening and closing indexes for counting the correct amount of '(' in arrow function parameter set
  */
 
-  var arrow_last_opening_index = [];
+  var arrow_indexes_template_literals_and_regular_expressions = [];
  
  /* 
    * search folders, files and get all arrow functions with and without brackets regular functions with brackets. line numbers, filepaths, function names.
@@ -352,6 +367,8 @@
    return iterate_through_file_text(data_index);
   }
  
+  //just focus on the below right now
+
   /*
    enter into a multiline comment outside the function
   */
@@ -423,52 +440,100 @@
    return iterate_through_file_text(data_index);
   }
 
-  //regular expressions
- 
   /*
-   exit a string outside the function
+   entering and exiting regular expressions outside of functions
   */
- 
-  if(
-   in_string_outside_of_function_ === true &&
-   in_comment_outside_function_single === false &&
-   in_comment_type_outside_function_multi === false &&
-   in_string_outside_of_function.length > 1 && 
-   in_string_outside_of_function[in_string_outside_of_function.length - 1] === in_string_outside_of_function[0] && 
-   data.charAt(data_index-1) !== "\\" &&
-   in_function === false
-  ) { 
-   in_string_outside_of_function = [];
-   in_string_outside_of_function_ = false;
-   debug.push('1B STRING MANY');
-   return iterate_through_file_text(data_index);
-  }
- 
+
+  //  if(regular expression outside of ... code here) { 
+
+  //  }
+
   /* 
-   enter into a string outside the function.. add a parameter for escaping
+   enter into a string outside the function... whatever type of string it is
   */
  
   if(
-  //  (in_string_outside_of_function_ === false || in_string_outside_of_function_ === true) &&
-   (in_comment_outside_function_single === false && in_comment_type_outside_function_multi === false) && //not in a regular expression
+   in_comment_outside_function_single === false && 
+   in_comment_type_outside_function_multi === false && 
+   in_string_outside_of_function_ === false && 
    (data.charAt(data_index) === '"' || data.charAt(data_index) === '`' || data.charAt(data_index) === `'`) && 
    in_function === false
   ) { 
-   in_string_outside_of_function.push(data.charAt(data_index)); 
+   string_type_outside_function = data.charAt(data_index) === '"' ? 'double_quote' : data.charAt(data_index) === '`' ? 'template_quote' : data.charAt(data_index) === `'` ? 'single_quote' : 'ahh fook mate';
    in_string_outside_of_function_ = true;
    data_index = data_index + 1;
    debug.push('1A STRING MANY');
    return iterate_through_file_text(data_index);
   }
+
+  /* 
+   ended a double or single quote string
+  */
+
+  if(
+   in_string_outside_of_function_ === true &&
+   in_comment_outside_function_single === false &&
+   in_comment_type_outside_function_multi === false &&
+   ((string_type_outside_function === 'double_quote' && data.charAt(data_index) === '"') || (string_type_outside_function === 'single_quote' && data.charAt(data_index) === "'")) &&
+   data.charAt(data_index-1) !== "\\" &&
+   in_function === false
+  ) { 
+   in_string_outside_of_function_ = false;
+   string_type_outside_function = '';
+   data_index = data_index + 1;
+   debug.push('1B STRING MANY');
+   return iterate_through_file_text(data_index);
+  }
+
+  /* 
+   if in a template literal... tracking being inside and outside certain characters in the template literal
+  */
+
+  if(
+   in_string_outside_of_function_ === true && 
+   in_comment_outside_function_single === false &&
+   in_comment_type_outside_function_multi === false &&
+   string_type_outside_function === 'template_quote' &&
+   ((data.charAt(data_index) === '"' || data.charAt(data_index) === '`' || data.charAt(data_index) === "'" ) || (data.charAt(data_index) === "$" && data.charAt(data_index+1) === "{") || (data.charAt(data_index) === "}")) && //add or the beginng and the end of a regular expression 
+   in_function === false
+  ) { 
+   
+   in_string_outside_of_function.push(data.charAt(data_index)); 
+   data_index = data_index + 1;
+   debug.push('1A STRING MANY');
+   return iterate_through_file_text(data_index);
+  }
+
+  /*
+   exit a string outside the function which is a template string... three strings and template literals taken into consideration... above template literal and regular expression taken into consideration
+  */
+
+  // if(
+  //  in_string_outside_of_function_ === true &&
+  //  in_comment_outside_function_single === false &&
+  //  in_comment_type_outside_function_multi === false &&
+  //  in_string_outside_of_function.length > 1 && 
+  //  in_string_outside_of_function[in_string_outside_of_function.length - 1] === in_string_outside_of_function[0] && 
+  //  string_type_outside_function === 'template_quote' && //this would mean the last and first regardless if they match wold not count... how would you be able to determine when in a regular expression within a template literal so to know when the template literal ends
+  //  data.charAt(data_index-1) !== "\\" &&
+  //  in_function === false
+  // ) { 
+  //  in_string_outside_of_function = [];
+  //  in_string_outside_of_function_ = false;
+  //  debug.push('1B STRING MANY');
+  //  return iterate_through_file_text(data_index);
+  // }
+
  
   /* 
-   if in a string, multiline comment, or single line comment outside of the function, recurse up and dont build a function. Only one should be true
+   if in a string, regular expression, multiline comment, or single line comment outside of the function, recurse up and dont build a function. Only one should be true
   */  
  
   if(
    (in_comment_type_outside_function_multi === true || 
    in_comment_outside_function_single === true || 
-   in_string_outside_of_function_ === true) && //also add regular expressions
+   in_string_outside_of_function_ === true) &&
+   //also add regular expressions
    in_function === false
   ) {
    data_index = data_index + 1; 
@@ -492,7 +557,6 @@
    (data.charAt(data_index+8) === '\n' || data.charAt(data_index+8) === ' ' || data.charAt(data_index+8) === '(') &&
    in_function === false && 
    function_types.regular === true
-   //add file types here and each of the other conditions or just make this as a wrapper
   ) {
    in_function = true;
    is_arrow = false;
@@ -629,11 +693,11 @@
   }
  
   /* 
-   enter into a string inside the function
+   enter into a string inside the function //  (in_string_inside_of_function_ === false || in_string_inside_of_function_ === true) &&
+
   */
  
   if(
-  //  (in_string_inside_of_function_ === false || in_string_inside_of_function_ === true) &&
    (in_comment_inside_function_single === false && in_comment_type_inside_function_multi === false) &&
    (data.charAt(data_index) === '"' || data.charAt(data_index) === '`' || data.charAt(data_index) === `'`) && 
    in_function === true
