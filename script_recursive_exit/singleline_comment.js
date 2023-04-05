@@ -8,10 +8,11 @@ var data_index_ = 0;
 var in_function_ = false, in_function_build_string = '';
 var line_number_ = 0;
 
-function singleline(data, data_index, in_function, line_number) { 
+function singleline(data, data_index, in_function, line_number, build_string) { 
  data_ = data;
  data_index_ = data_index;
  in_function_ = in_function;
+ in_function_build_string = build_string;
  line_number_ = line_number;
  return recurse(data_index_);
 }
@@ -22,7 +23,7 @@ function recurse(data_index_) {
   return {
    data_index: data_index_, 
    line_number: line_number_,
-   if_in_function: '' // if in function add all the characters and return back
+   build_string: '' // if in function add all the characters and return back
   }
  }
 
@@ -38,7 +39,7 @@ function recurse(data_index_) {
   return {
     data_index: data_index_, 
     line_number: line_number_,
-    if_in_function: '' // if in function add all the characters and return back
+    build_string: '' // if in function add all the characters and return back
    }
  }
 

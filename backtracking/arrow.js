@@ -24,12 +24,15 @@ var in_string_in_parameter_set_ = [];
 var opening_parameter_count = 0; 
 var closing_parameter_count = 0;
 var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/; //function name
+var boundries = [];
 
 /*
  initiate the beginning of the arrow function... use the unshifted bt_arrow parameter array for ordering... (look over code and run it)
 */
 
-function initiate_arrow(d, data_index) {
+function initiate_arrow(d, data_index, b) {
+
+ boundries = b;
 
  data = d;
 

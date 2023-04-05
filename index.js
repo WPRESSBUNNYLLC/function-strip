@@ -33,16 +33,13 @@
   */
 
    var fs = require('file-system');
-
    var initiate_arrow = require('./backtracking/arrow');
    var initiate_regular = require('./backtracking/regular');
-
    var html_enter_script = require('./html_recursive_exit/html_enter_script');
    var html_end_script = require('./html_recursive_exit/html_end_script'); 
    var html_bad_closing_tag = require('./html_recursive_exit/html_bad_closing_tag');
    var html_bad_opening_tag = require('./html_recursive_exit/html_bad_opening_tag');
    var html_comment = require('./html_recursive_exit/html_comment');
-
    var double_quote_string = require('./script_recursive_exit/double_quote_string');
    var multiline_comment = require('./script_recursive_exit/multiline_comment');
    var regex = require('./script_recursive_exit/regex');
@@ -73,7 +70,6 @@
    var line_number = 0;
    var function_line_number = 0;
    var folders = [];
-   var debug = [];
    var file_type = '';
    var function_types = {
      regular: true,
@@ -237,26 +233,14 @@
  */
 
  function run_from_html(data_index) { 
-
-  /*
-   leave file on data length
-  */
  
   if(data_index >= data_length) { 
    return;
   }
  
-  /*
-   increase line number for file description in build_string
-  */
- 
   if(data.charAt(data_index) === '\n') { 
    line_number = line_number + 1;
   }
-  
-  /*
-   enter and exit an html comment
-  */
  
   if(
    data.charAt(data_index) === '<' && 
@@ -271,10 +255,6 @@
    return run_from_html(data_index);
   }
  
-  /*
-   enter into an html script and exit in the main file
-  */
-
   data_index_and_line_number_update = html_enter_script(data_index);
   if(data_index_and_line_number_update.in_script === true) { 
    data_index = data_index_and_line_number_update.data_index;
@@ -283,40 +263,24 @@
    return run_from_html(data_index);
   }
 
-  /*
-   continue through the html document
-  */
-
   data_index = data_index + 1; 
   return run_from_html(data_index);
   
  }
  
  /*
-  recursing on every condition while turning things on and off, making things easier to read. When a definition for a function is found, backtracking to start the build string with the correct beginning value of the function.
+  When a definition for a function is found, backtracking to start the build string with the correct beginning value of the function.
  */
  
  function iterate_through_file_text(data_index) {
- 
-  /*
-   leave file on data length
-  */
  
   if(data_index >= data_length) { 
    return;
   }
  
-  /*
-   increase line number for file description in build_string
-  */
- 
   if(data.charAt(data_index) === '\n') { 
    line_number = line_number + 1;
   }
-
-  /*
-   if the html script has ended, get out and continue through the html document until another script found
-  */
 
   if(file_type === 'html') {
    data_index_and_line_number_update = html_end_script(data_index);
@@ -326,10 +290,6 @@
     return;
    }
   }
- 
-  /*
-   enter and exit a multiline comment
-  */
 
   if(
    data.charAt(data_index) === '/' &&
@@ -337,16 +297,15 @@
   ) { 
    arrow_index_parameter_boundries.push({boundry_type: 'multiline_comment', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 2; 
-   data_index_and_line_number_update = multiline_comment(data, data_index, in_function, line_number);
+   data_index_and_line_number_update = multiline_comment(data, data_index, in_function, line_number, in_function === true ? build_string : '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
+   if(in_function === true) {
+    build_string += data_index_and_line_number_update.build_string;
+   }
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    return iterate_through_file_text(data_index);
   }
-
-  /*
-   enter and exit a single line comment
-  */
 
   if(
    data.charAt(data_index) === '/' &&
@@ -354,61 +313,57 @@
   ) { 
    arrow_index_parameter_boundries.push({boundry_type: 'singleline_comment', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 2; 
-   data_index_and_line_number_update = singleline_comment(data, data_index, in_function, line_number);
+   data_index_and_line_number_update = singleline_comment(data, data_index, in_function, line_number, in_function === true ? build_string : '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
+   if(in_function === true) {
+    build_string += data_index_and_line_number_update.build_string;
+   }
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    return iterate_through_file_text(data_index);
   }
-
-  /* 
-   enter and exit a double quote string
-  */
 
   if(data.charAt(data_index) === '"') { 
    arrow_index_parameter_boundries.push({boundry_type: 'double_quote', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 1; 
-   data_index_and_line_number_update = double_quote_string(data, data_index, in_function, line_number);
+   data_index_and_line_number_update = double_quote_string(data, data_index, in_function, line_number, in_function === true ? build_string : '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
+   if(in_function === true) {
+    build_string += data_index_and_line_number_update.build_string;
+   }
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    return iterate_through_file_text(data_index);
   }
-
-  /* 
-   enter and exit a single quote
-  */
 
   if(data.charAt(data_index) === "'") { 
    arrow_index_parameter_boundries.push({boundry_type: 'double_quote', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 1; 
-   data_index_and_line_number_update = single_quote_string(data, data_index, in_function, line_number);
+   data_index_and_line_number_update = single_quote_string(data, data_index, in_function, line_number, in_function === true ? build_string : '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
+   if(in_function === true) {
+    build_string += data_index_and_line_number_update.build_string;
+   }
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    return iterate_through_file_text(data_index);
   }
-
-  /* 
-   enter and exit a template literal string
-  */
 
   if(data.charAt(data_index) === '`') { 
    arrow_index_parameter_boundries.push({boundry_type: 'template_quote', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 1; 
-   data_index_and_line_number_update = template_string(data, data_index, in_function, line_number);
+   data_index_and_line_number_update = template_string(data, data_index, in_function, line_number, in_function === true ? build_string : '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
+   if(in_function === true) {
+    build_string += data_index_and_line_number_update.build_string;
+   }
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    return iterate_through_file_text(data_index);
   }
  
-  /* 
-   Enter into a regular function and start the build string.
-  */
- 
   if(
-   ((data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ',' || data.charAt(data_index-1) === ':') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === ',' || data.charAt(data_index-2) === ':'))) &&
+   check_beginning_regular() &&
    data.charAt(data_index  ) === 'f' && 
    data.charAt(data_index+1) === 'u' &&  
    data.charAt(data_index+2) === 'n' && 
@@ -417,7 +372,7 @@
    data.charAt(data_index+5) === 'i' && 
    data.charAt(data_index+6) === 'o' && 
    data.charAt(data_index+7) === 'n' && 
-   (data.charAt(data_index+8) === '\n' || data.charAt(data_index+8) === ' ' || data.charAt(data_index+8) === '(') &&
+   check_ending_regular() &&
    in_function === false && 
    function_types.regular === true
   ) {
@@ -429,29 +384,25 @@
    return iterate_through_file_text(data_index);
   }
  
-  /*
-   enter into an arrow function and start the build string
-  */
- 
   if(
-   (data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') && 
-   data.charAt(data_index  ) ===  '='  && 
-   data.charAt(data_index+1) ===  '>'  && 
-   (data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{') &&
+   check_beginning_arrow() && 
+   data.charAt(data_index  ) ===  '=' && 
+   data.charAt(data_index+1) ===  '>' && 
+   check_ending_arrow() &&
    in_function === false && 
    function_types.arrow === true
   ) {
    in_function = true;
    function_line_number = line_number;
    is_arrow = true;
-   build_string = initiate_arrow(data, data_index) + " =>";
+   build_string = initiate_arrow(data, data_index, arrow_index_parameter_boundries) + " =>";
    arrow_index_parameter_boundries = []; //only used here
    data_index = data_index + 2;
    return iterate_through_file_text(data_index);
   }
  
   /*
-   if in a function and a bracket..increase count
+   if in a function and a bracket..when in the above things, i avoid counting bad brackets
   */
  
   if(
@@ -484,7 +435,7 @@
   */
  
   if(
-   ((is_arrow === true && has_bracket === false && data.charAt(data_index) === '\n') || 
+   ((is_arrow === true && has_bracket === false && data.charAt(data_index) === '\n') || //is arrow and has bracket needs to be checked above
    (opening_bracket === closing_bracket && opening_bracket > 0)) && 
    in_function === true
   ) { 
@@ -511,32 +462,43 @@
    data_index = data_index + 1;
    return iterate_through_file_text(data_index);
   }
-
-  /*
-   this statement should not execute
-  */
-
-  throw new error(
-   "in function error:\n" +
-   "The in function conditions are ordered for this statement to be unreachable."
-  )
  
  }
  
  /*
-  CHECK BEGINNING OF HTML SCRIPT ------------------------------------------- just check for strings here
+  CHECK BEGINNING and ending of funtions
  */
  
- function recurse_check_script(html_end_script_data_index) { 
-  
+ function check_beginning_regular() { 
+  if((data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ',' || data.charAt(data_index-1) === ':') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === ',' || data.charAt(data_index-2) === ':'))) {
+    return true
+  } else { 
+    return false
+  }
  }
- 
- /*
-  CHECK ENDING HTML SCRIPT
- */
- 
- function recurse_check_end_script(html_end_script_data_index_two) { 
- 
+
+ function check_ending_regular() { 
+  if((data.charAt(data_index+8) === '\n' || data.charAt(data_index+8) === ' ' || data.charAt(data_index+8) === '(')) { 
+   return true
+  } else { 
+   return false
+  }
+ }
+
+function check_beginning_arrow() { 
+  if(data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') { 
+   return true
+  } else { 
+   return false
+  }
+ }
+
+function check_ending_arrow() { 
+  if(data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{') { 
+   return true
+  } else { 
+   return false
+  }
  }
  
  /*
