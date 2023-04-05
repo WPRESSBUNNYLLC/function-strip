@@ -5,10 +5,13 @@
 
 var data_ = '';
 var data_index_ = 0;
+var in_function_ = false;
 
-function template_string(data, data_index) { 
+function template_string(data, data_index, in_function) { 
  data_ = data;
  data_index_ = data_index;
+ in_function_ = in_function;
+ in_function_ = in_function;
  recurse(data_index_);
 }
 

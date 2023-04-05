@@ -39,9 +39,20 @@
    var initiate_arrow = require('./backtracking/arrow');
    var initiate_regular = require('./backtracking/regular');
 
-   //recursive exits
+   var html_enter_script = require('./html_recursive_exit/html_enter_script');
+   var html_end_script = require('./html_recursive_exit/html_end_script'); 
+   var html_bad_closing_tag = require('./html_recursive_exit/html_bad_closing_tag');
+   var html_bad_opening_tag = require('./html_recursive_exit/html_bad_opening_tag');
+   var html_comment = require('./html_recursive_exit/html_comment');
 
+   var double_quote_string = require('./script_recursive_exit/double_quote_string');
+   var multiline_comment = require('./script_recursive_exit/multiline_comment');
+   var regex = require('./script_recursive_exit/regex');
+   var single_quote_string = require('./script_recursive_exit/single_quote_string');
+   var singleline_comment = require('./script_recursive_exit/singleline_comment');
+   var template_string = require('./script_recursive_exit/template_string');
 
+   var data_index_and_line_number_update = {};
 
    /* 
    * data about the file. line_number and fp used in the build string description
@@ -97,7 +108,7 @@
    var in_string_outside_of_function_ = false;
    var string_type_outside_function = '';
 
-   //using this to toggle when in and ot of things when in a template literal consisdering console.log(`${console.log(`${console.log(regex(`))}`)}`)
+   //do all this in the main file
    var in_single_quote_inside_template_literal = false;
    var in_double_quote_inside_template_literal = false;
    var in_template_quote_inside_template_literal = false;
@@ -259,7 +270,11 @@
       has_bracket = false;
       in_comment_inside_function_single = false;
       in_comment_type_inside_function_multi = false; 
-      iterate_through_file_text(data_index); 
+      if(file_type === 'html') { 
+        run_from_html(data_index);
+      } else { 
+        iterate_through_file_text(data_index);
+      }
      }
  
     }
@@ -271,9 +286,70 @@
   return exported_functions;
  
  }
+
+ /*
+  when in an html script, find out when in a script tag and run the script function.... make sure to add bad opening and closing tags on this
+ */
+
+ function run_from_html(data_index) { 
+
+  /*
+   leave file on data length
+  */
+ 
+  if(data_index >= data_length) { 
+   return;
+  }
+ 
+  /*
+   increase line number for file description in build_string
+  */
+ 
+  if(data.charAt(data_index) === '\n') { 
+   line_number = line_number + 1;
+  }
+  
+  /*
+   enter and exit an html comment
+  */
+ 
+  if(
+   data.charAt(data_index) === '<' && 
+   data.charAt(data_index + 1) === '!' && 
+   data.charAt(data_index + 2) === '-' && 
+   data.charAt(data_index + 3) === '-' 
+  ) { 
+   data_index = data_index + 4; 
+   data_index_and_line_number_update = html_comment(data, data_index, false, line_number);
+   data_index = data_index_and_line_number_update.data_index;
+   line_number = data_index_and_line_number_update.line_number;
+   return run_from_html(data_index);
+  }
+ 
+  /*
+   enter into an html script and exit in the main file
+  */
+
+  data_index_and_line_number_update = html_enter_script(data_index);
+  if(data_index_and_line_number_update.in_script === true) { 
+   data_index = data_index_and_line_number_update.data_index;
+   line_number = data_index_and_line_number_update.line_number
+   iterate_through_file_text(data_index);
+   return run_from_html(data_index);
+  }
+
+  /*
+   continue through the html document
+  */
+
+  data_index = data_index + 1; 
+  return run_from_html(data_index);
+  
+ }
  
  /*
   recursing on every condition while turning things on and off, making things easier to read. When a definition for a function is found, backtracking to start the build string with the correct beginning value of the function.
+  when in the function, count the brackets at the end and get rid of the below checks
  */
  
  function iterate_through_file_text(data_index) {
@@ -293,218 +369,100 @@
   if(data.charAt(data_index) === '\n') { 
    line_number = line_number + 1;
   }
- 
-  /*
-   enter into an html comment
-  */
- 
-  if(
-   file_type === 'html' && 
-   in_html_script === false && 
-   in_html_comment === false && 
-   data.charAt(data_index) === '<' && 
-   data.charAt(data_index + 1) === '!' && 
-   data.charAt(data_index + 2) === '-' && 
-   data.charAt(data_index + 3) === '-'
-  ) { 
-   in_html_comment = true;
-   data_index = data_index + 4; 
-   return iterate_through_file_text(data_index);
-  }
- 
-  /*
-   exit an html comment
-  */
- 
-  if(
-   file_type === 'html' && 
-   in_html_script === false && 
-   in_html_comment === true && 
-   data.charAt(data_index) === '-' && 
-   data.charAt(data_index + 1) === '-' && 
-   data.charAt(data_index + 2) === '>'
-  ) { 
-   in_html_comment = false;
-   data_index = data_index + 3; 
-   return iterate_through_file_text(data_index);
-  }
-
-  //check all other tags using a set of recursive calls for each tag.. this is so script isnt found in a specific string within a tag... if a script was in another tag not in a string, there would be an error
-  // <p wow = "<script> </script>"></p> ...just make sure to denote when in an opening and closing tag
 
   /*
-   enter into an html script
+   if the html script has ended, get out and continue through the html document until another script found
   */
- 
-  if(
-   file_type === 'html' && 
-   in_html_comment === false && //and not in all other types of stirngs inside of scripts 
-   in_html_script === false && 
-   recurse_check_script(data_index) === true
-  ) { 
-   in_html_script = true;
-   data_index = html_end_script_data_index;
-   return iterate_through_file_text(data_index);
-  }
- 
-  /*
-   exit an html script
-  */
- 
-  if(
-   file_type === 'html' && 
-   in_html_comment === false &&
-   in_html_script === true && 
-   recurse_check_end_script(data_index) === true
-  ) { 
-   in_html_script = false;
-   data_index = html_end_script_data_index_two;
-   return iterate_through_file_text(data_index);
-  }
- 
-  /*
-   if not in a script and in an html doc, move next
-  */
- 
-  if(
-   file_type === 'html' && 
-   in_html_script === false 
-  ) { 
-   data_index = data_index + 1; 
-   return iterate_through_file_text(data_index);
-  }
- 
-  //just focus on the below right now
 
-  /*
-   enter into a multiline comment outside the function
-  */
+  data_index_and_line_number_update = html_end_script(data_index);
+  if(data_index_and_line_number_update.end_script === true) { 
+   data_index = data_index_and_line_number_update.data_index;
+   line_number = data_index_and_line_number_update.line_number
+   return;
+  }
  
+  /*
+   enter and exit a multiline comment
+  */
+
   if(
-   in_comment_type_outside_function_multi === false &&
-   in_comment_outside_function_single === false && 
-   in_string_outside_of_function_ === false &&
    data.charAt(data_index) === '/' &&
-   data.charAt(data_index + 1) === '*' && 
-   in_function === false
+   data.charAt(data_index + 1) === '*'
   ) { 
-   arrow_index_parameter_boundries.push({boundry_type: 'multiline_comment', first_index: data_index, last_index: 'to be determined'}); //make the before and after boundries before and after the recursive exit
-   in_comment_type_outside_function_multi = true;
-   data_index = data_index + 2;
-   debug.push('1A MULTI');
-   //create a variable, recurse in file and pass the data index back into this...will avoid you running these conditions
-   return iterate_through_file_text(data_index);
-  }
- 
-  /*
-   exit a multiline comment outside the function --- will delete as soon as i get the chance
-  */
- 
-  if(
-   in_comment_type_outside_function_multi === true && 
-   in_comment_outside_function_single === false && 
-   in_string_outside_of_function_ === false &&
-   data.charAt(data_index) === '*' &&
-   data.charAt(data_index + 1) === '/' && 
-   in_function === false
-  ) { 
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index + 1;
-   in_comment_type_outside_function_multi = false;
+   arrow_index_parameter_boundries.push({boundry_type: 'multiline_comment', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 2; 
-   debug.push('1B MULTI');
+   data_index_and_line_number_update = multiline_comment(data, data_index, false, line_number);
+   data_index = data_index_and_line_number_update.data_index;
+   line_number = data_index_and_line_number_update.line_number;
+   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    return iterate_through_file_text(data_index);
   }
- 
+
   /*
-   enter into a single line comment outside the function
+   enter and exit a single line comment
   */
- 
+
   if(
-   in_comment_outside_function_single === false &&
-   in_comment_type_outside_function_multi === false &&
-   in_string_outside_of_function_ === false &&
    data.charAt(data_index) === '/' &&
-   data.charAt(data_index + 1) === '/' && 
-   in_function === false
+   data.charAt(data_index + 1) === '/'
   ) { 
    arrow_index_parameter_boundries.push({boundry_type: 'singleline_comment', first_index: data_index, last_index: 'to be determined'});
-   in_comment_outside_function_single = true;
-   data_index = data_index + 2;
-   debug.push('1A SINGLE');
-   //create a variable, recurse in file and pass the data index back into this...will avoid you running these conditions
-   return iterate_through_file_text(data_index);
-  }
- 
-  /*
-   exit a single line comment outside the function -- will delete this as soon as i get the chance
-  */
- 
-  if(
-   in_comment_outside_function_single === true &&
-   in_comment_type_outside_function_multi === false &&
-   in_string_outside_of_function_ === false &&
-   data.charAt(data_index) === '\n' && 
-   in_function === false
-  ) { 
+   data_index = data_index + 2; 
+   data_index_and_line_number_update = singleline_comment(data, data_index, false, line_number);
+   data_index = data_index_and_line_number_update.data_index;
+   line_number = data_index_and_line_number_update.line_number;
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
-   in_comment_outside_function_single = false;
-   data_index = data_index + 1; 
-   debug.push('1B SINGLE');
-   //create a variable, recurse in file and pass the data index back into this...will avoid you running these conditions
    return iterate_through_file_text(data_index);
   }
 
   /*
-   entering and exiting regular expressions outside of functions
+   entering and exiting regular expression
   */
 
-  //  if(regular expression outside of ... code here) { 
+  // if(regular expression outside of ... code here) { 
 
-  //  }
+  // }
 
-  /*
-   exiting a regular expression outside of functions
-  */
 
   /* 
    enter into a string outside the function... whatever type of string it is
   */
  
-  if(
-   in_comment_outside_function_single === false && 
-   in_comment_type_outside_function_multi === false && 
-   in_string_outside_of_function_ === false && 
-   (data.charAt(data_index) === '"' || data.charAt(data_index) === '`' || data.charAt(data_index) === `'`) && 
-   in_function === false
-  ) { 
-   arrow_index_parameter_boundries.push({boundry_type: 'string', first_index: data_index, last_index: 'to be determined'});
-   string_type_outside_function = data.charAt(data_index) === '"' ? 'double_quote' : data.charAt(data_index) === '`' ? 'template_quote' : data.charAt(data_index) === `'` ? 'single_quote' : 'ahh fook mAte';
-   in_string_outside_of_function_ = true;
-   data_index = data_index + 1;
-   debug.push('1A STRING MANY');
-   //create a variable, recurse in file and pass the data index back into this...will avoid you running these conditions (two files to point to here)
-   return iterate_through_file_text(data_index);
-  }
+  // if(
+  //  in_comment_outside_function_single === false && 
+  //  in_comment_type_outside_function_multi === false && 
+  //  in_string_outside_of_function_ === false && 
+  //  (data.charAt(data_index) === '"' || data.charAt(data_index) === '`' || data.charAt(data_index) === `'`) && 
+  //  in_function === false
+  // ) { 
+  //  arrow_index_parameter_boundries.push({boundry_type: 'string', first_index: data_index, last_index: 'to be determined'});
+  //  string_type_outside_function = data.charAt(data_index) === '"' ? 'double_quote' : data.charAt(data_index) === '`' ? 'template_quote' : data.charAt(data_index) === `'` ? 'single_quote' : 'ahh fook mAte';
+  //  in_string_outside_of_function_ = true;
+  //  data_index = data_index + 1;
+  //  debug.push('1A STRING MANY');
+  //  //create a variable, recurse in file and pass the data index back into this...will avoid you running these conditions (two files to point to here)
+  //  return iterate_through_file_text(data_index);
+  // }
 
   /* 
    ended a double or single quote string --- will get rid of this
   */
 
-  if(
-   in_string_outside_of_function_ === true &&
-   in_comment_outside_function_single === false &&
-   in_comment_type_outside_function_multi === false &&
-   ((string_type_outside_function === 'double_quote' && data.charAt(data_index) === '"') || (string_type_outside_function === 'single_quote' && data.charAt(data_index) === "'")) &&
-   data.charAt(data_index-1) !== "\\" &&
-   in_function === false
-  ) { 
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
-   in_string_outside_of_function_ = false;
-   string_type_outside_function = '';
-   data_index = data_index + 1;
-   debug.push('1B STRING MANY');
-   return iterate_through_file_text(data_index);
-  }
+  // if(
+  //  in_string_outside_of_function_ === true &&
+  //  in_comment_outside_function_single === false &&
+  //  in_comment_type_outside_function_multi === false &&
+  //  ((string_type_outside_function === 'double_quote' && data.charAt(data_index) === '"') || (string_type_outside_function === 'single_quote' && data.charAt(data_index) === "'")) &&
+  //  data.charAt(data_index-1) !== "\\" &&
+  //  in_function === false
+  // ) { 
+  //  arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
+  //  in_string_outside_of_function_ = false;
+  //  string_type_outside_function = '';
+  //  data_index = data_index + 1;
+  //  debug.push('1B STRING MANY');
+  //  return iterate_through_file_text(data_index);
+  // }
 
   /* 
    if in a template literal... tracking being inside and outside certain characters in the template literal
@@ -549,17 +507,17 @@
    if in a string, regular expression, multiline comment, or single line comment outside of the function, recurse up and dont build a function. Only one should be true
   */  
  
-  if(
-   (in_comment_type_outside_function_multi === true || 
-   in_comment_outside_function_single === true || 
-   in_string_outside_of_function_ === true || //this gets funky with template strings
-   in_regular_expression_outside_function === true
-   ) &&
-   in_function === false
-  ) {
-   data_index = data_index + 1; 
-   return iterate_through_file_text(data_index);
-  }
+  // if(
+  //  (in_comment_type_outside_function_multi === true || 
+  //  in_comment_outside_function_single === true || 
+  //  in_string_outside_of_function_ === true || //this gets funky with template strings
+  //  in_regular_expression_outside_function === true
+  //  ) &&
+  //  in_function === false
+  // ) {
+  //  data_index = data_index + 1; 
+  //  return iterate_through_file_text(data_index);
+  // }
  
   /* 
    Enter into a regular function and start the build string.
