@@ -85,7 +85,7 @@ function initiate_arrow(d, data_index) {
 }
 
 /*
- append the guarenteed parameter set
+ append the guarenteed parameter set .... this is going to change and include the boundries set in main... didnt realize it would be impossible counting (
 */
 
 function append_parameter_set(bt_index) { 

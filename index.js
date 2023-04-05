@@ -23,6 +23,7 @@
    whenenever you are in something, just track it... it doesnt matter what it is... then for counting backwards on the backtracking, use the in-between boundries to not push ( on the backtracking arrow parameter set
    make file types a wrapper condition. 
    add files for exiting
+   add an updater for whether or not to pass in data if its the same file... just so the entire data isnt passed more than once
    
    when i go into a function, every consditional variable for outside the function should already be reset.
    when i leave a function, every consditional variable for inside the function should be reset

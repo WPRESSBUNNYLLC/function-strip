@@ -1,6 +1,6 @@
 
 /*
- returns the end of a template string
+ determines the exit of a template string... gets very funky
 */
 
 var data_ = '';
