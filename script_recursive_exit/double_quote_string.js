@@ -5,7 +5,7 @@
 
 var data_ = '';
 var data_index_ = 0;
-var in_function_ = false;
+var in_function_ = false, in_function_build_string = '';
 var line_number_ = 0;
 
 function double_quote_string(data, data_index, in_function, line_number) { 

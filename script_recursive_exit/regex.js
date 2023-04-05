@@ -5,7 +5,7 @@
 
 var data_ = '';
 var data_index_ = 0;
-var in_function_ = false;
+var in_function_ = false, in_function_build_string = '';
 
 function regex(data, data_index, in_function) { 
  data_ = data;
