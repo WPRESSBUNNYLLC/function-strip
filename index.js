@@ -22,6 +22,7 @@
    make sure to add in regular expressions and template literals for counting
    whenenever you are in something, just track it... it doesnt matter what it is... then for counting backwards on the backtracking, use the in-between boundries to not push ( on the backtracking arrow parameter set
    make file types a wrapper condition. 
+   add files for exiting
    
    when i go into a function, every consditional variable for outside the function should already be reset.
    when i leave a function, every consditional variable for inside the function should be reset
@@ -33,8 +34,13 @@
   */
 
    var fs = require('file-system');
+
    var initiate_arrow = require('./backtracking/arrow');
    var initiate_regular = require('./backtracking/regular');
+
+   //recursive exits
+
+
 
    /* 
    * data about the file. line_number and fp used in the build string description
@@ -133,10 +139,10 @@
    var in_regular_expression_inside_function = false;
 
  /* 
-   * track the opening and closing indexes for counting the correct amount of '(' in arrow function parameter set
+   * track the opening and closing indexes for counting the correct amount of '(' in arrow function parameter set... reset when entering arrow function... will be called someting more general if another type of function needs to be backtracked for parameters
  */
 
-  var arrow_indexes_template_literals_and_regular_expressions = [];
+  var arrow_index_parameter_boundries = [];
  
  /* 
    * search folders, files and get all arrow functions with and without brackets regular functions with brackets. line numbers, filepaths, function names.
@@ -381,14 +387,16 @@
    data.charAt(data_index + 1) === '*' && 
    in_function === false
   ) { 
+   arrow_index_parameter_boundries.push({boundry_type: 'multiline_comment', first_index: data_index, last_index: 'to be determined'}); //make the before and after boundries before and after the recursive exit
    in_comment_type_outside_function_multi = true;
    data_index = data_index + 2;
    debug.push('1A MULTI');
+   //create a variable, recurse in file and pass the data index back into this...will avoid you running these conditions
    return iterate_through_file_text(data_index);
   }
  
   /*
-   exit a multiline comment outside the function
+   exit a multiline comment outside the function --- will delete as soon as i get the chance
   */
  
   if(
@@ -399,6 +407,7 @@
    data.charAt(data_index + 1) === '/' && 
    in_function === false
   ) { 
+   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index + 1;
    in_comment_type_outside_function_multi = false;
    data_index = data_index + 2; 
    debug.push('1B MULTI');
@@ -417,14 +426,16 @@
    data.charAt(data_index + 1) === '/' && 
    in_function === false
   ) { 
+   arrow_index_parameter_boundries.push({boundry_type: 'singleline_comment', first_index: data_index, last_index: 'to be determined'});
    in_comment_outside_function_single = true;
    data_index = data_index + 2;
    debug.push('1A SINGLE');
+   //create a variable, recurse in file and pass the data index back into this...will avoid you running these conditions
    return iterate_through_file_text(data_index);
   }
  
   /*
-   exit a single line comment outside the function
+   exit a single line comment outside the function -- will delete this as soon as i get the chance
   */
  
   if(
@@ -434,9 +445,11 @@
    data.charAt(data_index) === '\n' && 
    in_function === false
   ) { 
+   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    in_comment_outside_function_single = false;
    data_index = data_index + 1; 
    debug.push('1B SINGLE');
+   //create a variable, recurse in file and pass the data index back into this...will avoid you running these conditions
    return iterate_through_file_text(data_index);
   }
 
@@ -447,6 +460,10 @@
   //  if(regular expression outside of ... code here) { 
 
   //  }
+
+  /*
+   exiting a regular expression outside of functions
+  */
 
   /* 
    enter into a string outside the function... whatever type of string it is
@@ -459,15 +476,17 @@
    (data.charAt(data_index) === '"' || data.charAt(data_index) === '`' || data.charAt(data_index) === `'`) && 
    in_function === false
   ) { 
-   string_type_outside_function = data.charAt(data_index) === '"' ? 'double_quote' : data.charAt(data_index) === '`' ? 'template_quote' : data.charAt(data_index) === `'` ? 'single_quote' : 'ahh fook mate';
+   arrow_index_parameter_boundries.push({boundry_type: 'string', first_index: data_index, last_index: 'to be determined'});
+   string_type_outside_function = data.charAt(data_index) === '"' ? 'double_quote' : data.charAt(data_index) === '`' ? 'template_quote' : data.charAt(data_index) === `'` ? 'single_quote' : 'ahh fook mAte';
    in_string_outside_of_function_ = true;
    data_index = data_index + 1;
    debug.push('1A STRING MANY');
+   //create a variable, recurse in file and pass the data index back into this...will avoid you running these conditions (two files to point to here)
    return iterate_through_file_text(data_index);
   }
 
   /* 
-   ended a double or single quote string
+   ended a double or single quote string --- will get rid of this
   */
 
   if(
@@ -478,6 +497,7 @@
    data.charAt(data_index-1) !== "\\" &&
    in_function === false
   ) { 
+   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    in_string_outside_of_function_ = false;
    string_type_outside_function = '';
    data_index = data_index + 1;
@@ -489,20 +509,19 @@
    if in a template literal... tracking being inside and outside certain characters in the template literal
   */
 
-  if(
-   in_string_outside_of_function_ === true && 
-   in_comment_outside_function_single === false &&
-   in_comment_type_outside_function_multi === false &&
-   string_type_outside_function === 'template_quote' &&
-   ((data.charAt(data_index) === '"' || data.charAt(data_index) === '`' || data.charAt(data_index) === "'" ) || (data.charAt(data_index) === "$" && data.charAt(data_index+1) === "{") || (data.charAt(data_index) === "}")) && //add or the beginng and the end of a regular expression 
-   in_function === false
-  ) { 
-   
-   in_string_outside_of_function.push(data.charAt(data_index)); 
-   data_index = data_index + 1;
-   debug.push('1A STRING MANY');
-   return iterate_through_file_text(data_index);
-  }
+  // if(
+  //  in_string_outside_of_function_ === true && 
+  //  in_comment_outside_function_single === false &&
+  //  in_comment_type_outside_function_multi === false &&
+  //  string_type_outside_function === 'template_quote' &&
+  //  ((data.charAt(data_index) === '"' || data.charAt(data_index) === '`' || data.charAt(data_index) === "'" ) || (data.charAt(data_index) === "$" && data.charAt(data_index+1) === "{") || (data.charAt(data_index) === "}")) && //add or the beginng and the end of a regular expression 
+  //  in_function === false
+  // ) { 
+  //  in_string_outside_of_function.push(data.charAt(data_index)); 
+  //  data_index = data_index + 1;
+  //  debug.push('1A STRING MANY');
+  //  return iterate_through_file_text(data_index);
+  // }
 
   /*
    exit a string outside the function which is a template string... three strings and template literals taken into consideration... above template literal and regular expression taken into consideration
@@ -532,8 +551,9 @@
   if(
    (in_comment_type_outside_function_multi === true || 
    in_comment_outside_function_single === true || 
-   in_string_outside_of_function_ === true) &&
-   //also add regular expressions
+   in_string_outside_of_function_ === true || //this gets funky with template strings
+   in_regular_expression_outside_function === true
+   ) &&
    in_function === false
   ) {
    data_index = data_index + 1; 
