@@ -15,8 +15,8 @@
   */
 
    var fs = require('file-system');
-   var initiate_arrow = require('./backtracking/arrow');
-   var initiate_regular = require('./backtracking/regular');
+   var initiate_arrow = require('generate/backtracking_beginning_build_string/arrow');
+   var initiate_regular = require('generate/backtracking_beginning_build_string_one/regular');
    var html_enter_script = require('./html_recursive_exit/html_enter_script');
    var html_end_script = require('./html_recursive_exit/html_end_script'); 
    var html_bad_closing_tag = require('./html_recursive_exit/html_bad_closing_tag');
@@ -371,6 +371,7 @@
    function_line_number = line_number;
    build_string = initiate_regular(data, data_index) + " function"; 
    data_index = data_index + 8; 
+   //possibly call a build regular function in here and pass back the data index when complete
    return iterate_through_file_text(data_index);
   }
  
@@ -388,11 +389,12 @@
    build_string = initiate_arrow(data, data_index, arrow_index_parameter_boundries) + " =>";
    arrow_index_parameter_boundries = []; //only used here
    data_index = data_index + 2;
+   //possibly call a build arrow in here and pass the data index here
    return iterate_through_file_text(data_index);
   }
  
   /*
-   if in a function and a bracket..when in the above things, i avoid counting bad brackets
+   if in a function and a bracket..when in the above things, i avoid counting bad brackets --- maybe make all these bottom parts into their own seperate files... ..which would be backtracking beginning first then building the function secoond
   */
  
   if(
