@@ -4,31 +4,13 @@
    Title: generate
 
    Description: 
-   strips every chosen type of function in .html, .js, .ts files using character sets and backtracking arrays. Supports react. capable of additional languages using the file type as an extra condition wrapped in the main function. assumeds documents has no errors
+   strips a varierty of functions in .html, .js, .ts files using character sets, backtracking arrays and the addition of a build string (no ast). 
    does not strip functions that are found inside strings("'`), single line comments and multline comments and outside of script tags in html documents. 
    Includes the line number, filepath and function name for each function.
    Includes a list of function types to strip. All configurable.
 
    Author: Alexander
    License: MIT
-
-   TODO:
-   https://blog.sessionstack.com/how-javascript-works-the-different-ways-of-declaring-a-function-5-best-practices-8a0324c06fe2
-   make sure to recurse on if a function is invokable (); - do this at the end after push function
-   check for escaped strings - check and comments if comments can be escaped. not sure
-   add in additional characters in addition to new line and " " if necessary. i dont think it is
-   add when in and out of a regular expression outside a string for counting/entering and inside a string for counting .... console.log(`The value of lastIndex is ${/d(b+```)d/g.lastIndex}`); vs const re = /^(?:\d{3}|\(\d{3}\))([-/.])\d{3}\1\d{4}$/; ...
-   take regular expressions outside and indide into consideration and template literals for counting
-   make file types a wrapper condition. 
-   add files for exiting
-   add an updater for whether or not to pass in data if its the same file... just so the entire data isnt passed more than once
-   
-   when i go into a function, every consditional variable for outside the function should already be reset.
-   when i leave a function, every consditional variable for inside the function should be reset
-
-   backtracking
-   the only thing to check for is an equals sign in the backtracking set... when an equals sign is found, you know the function has a name and possibly a type. 
-   this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
    
   */
 
@@ -254,6 +236,10 @@
    line_number = data_index_and_line_number_update.line_number;
    return run_from_html(data_index);
   }
+
+  //add opening bad tag check 
+
+  //add closing bad tag check
  
   data_index_and_line_number_update = html_enter_script(data_index);
   if(data_index_and_line_number_update.in_script === true) { 
@@ -323,6 +309,8 @@
    return iterate_through_file_text(data_index);
   }
 
+  //add regular expression here
+
   if(data.charAt(data_index) === '"') { 
    arrow_index_parameter_boundries.push({boundry_type: 'double_quote', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 1; 
@@ -362,6 +350,8 @@
    return iterate_through_file_text(data_index);
   }
  
+  //organize this bottom part possibly into seperate files... 
+
   if(
    check_beginning_regular() &&
    data.charAt(data_index  ) === 'f' && 

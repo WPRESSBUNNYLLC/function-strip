@@ -1,6 +1,6 @@
 
 /*
- determines when to end a regular expression
+ determines when to end a regular expression... gets funky
 */
 
 var data_ = '';
