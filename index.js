@@ -163,13 +163,6 @@
       data_length = data.length;
       fp = filepath;
       line_number = 0;
-      function_line_number = 0;
-      in_function = false;
-      opening_bracket = 0;
-      closing_bracket = 0;
-      build_string = '';
-      is_arrow = false;
-      has_bracket = false;
       if(file_type === 'html') { 
         run_from_html(data_index);
       } else { 
@@ -281,7 +274,6 @@
   }
 
   //add regular expression here
-  //var a = /^dkkdl[12]/g;
 
   if(data.charAt(data_index) === '"') { 
    arrow_index_parameter_boundries.push({boundry_type: 'double_quote', first_index: data_index, last_index: 'to be determined'});

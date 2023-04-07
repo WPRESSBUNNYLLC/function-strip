@@ -16,7 +16,7 @@ var build_body_of_function = require('./regular_body');
 
    var beginning_function_ = build_beginning_of_function(data, data_index); //line number doesnt increase here... only decreases so not necessary
 
-   return_object.build_string = beginning_function_.build_string;
+   return_object.build_string = beginning_function_.build_string + "function";
    return_object.is_async = beginning_function_.is_async;
    return_object.has_name = beginning_function_.has_name;
 
