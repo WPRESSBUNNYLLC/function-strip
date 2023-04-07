@@ -4,7 +4,7 @@
    Title: generate
 
    Description: 
-   strips a varierty of functions in .html, .js, .ts files using character sets, backtracking arrays and the addition of a build string (no ast). 
+   strips a varierty of functions in .html, .js, .ts files using character sets, backtracking arrays and the addition of a build string (no ast). entering into a function when not in a template literal, single quote, double quote, multiline comment, single line comment, regular expression. counting brackets within each function file using the same script recursive exit.
    does not strip functions that are found inside strings("'`), single line comments and multline comments and outside of script tags in html documents. 
    Includes the line number, filepath and function name for each function.
    Includes a list of function types to strip. All configurable.
@@ -40,58 +40,32 @@
    * @param {exported_functions} the long string of functions placed in file
    * @param {fp} the file path of the function
    * @param {line_number} the current line number
-   * @param {function_line_number} the line number of the function
+   * @param {function_index} the index for each function
    * @param {folders} folders of all the files to test
    * @param {file_type} whether a .html, .js or .ts file. Used for determining certain types of functions and when to check for functions. example <script
-   * @param {debug} array of specific actions to make sure things are kept in order
    * @param {function_types} types of functions being stripped
+   * @param {arrow_index_parameter_boundries} track the opening and closing indexes for counting the correct amount of '(' in arrow function parameter set... reset when entering arrow function... will be called someting more general if another type of function needs to be backtracked for parameters... not sure what else i can use this for counting
+   * @param {data_index_and_line_number_update} used to copy index and line number back over from other file to main
+   * @param {function_types} the different functions to execute
    */
  
    var data_index = 0;
+   var arrow_index_parameter_boundries = [];
+   var data_index_and_line_number_update = {}; 
+   var function_index = 1;
+   var possibly_push_arrow;
+   var possibly_push_regular;
    var data = '';
    var data_length = 0;
    var exported_functions = [];
    var fp = '';
    var line_number = 0;
-   var function_line_number = 0;
    var folders = [];
    var file_type = '';
    var function_types = {
      regular: true,
      arrow: true, 
    }
- 
-   /*
-   * denoting inside or outside the function, for reading and acting.. can rid some conditions here
-   * @param {in_function} if in function or not in function for operations
-   */
- 
-   var in_function = false;
- 
-   /*
-   * inside the function. Strings, single line and multiline comments are used to determine wheter a bracket should be added. Brackets determine function end.
-   * @param {opening_bracket} used to note when a function with brackets ends. could use count instead
-   * @param {closing_bracket} used to note when a function with brackets ends. could use count instead
-   * @param {build_string} the function being built
-   * @param {function_index} index of the function
-   * @param {in_arrow} if in an arrow function
-   * @param {has_bracket} if the function contains an opening bracket. for arrow function (above)
-   */
- 
-   var opening_bracket = 0;
-   var closing_bracket = 0;
-   var build_string = '';
-   var function_index = 1;
-   var is_arrow = false;
-   var has_bracket = false;
-
- /* 
-   * track the opening and closing indexes for counting the correct amount of '(' in arrow function parameter set... reset when entering arrow function... will be called someting more general if another type of function needs to be backtracked for parameters... not sure what else i can use this for counting
-   * used to copy index and line number back over from other file to main
- */
-
-  var arrow_index_parameter_boundries = [];
-  var data_index_and_line_number_update = {};
  
  /* 
    * search folders, files and get all arrow functions with and without brackets regular functions with brackets. line numbers, filepaths, function names.
@@ -339,9 +313,11 @@
    return iterate_through_file_text(data_index);
   }
 
-  var possibly_push_regular = initiate_regular(data, data_index, line_number); 
+  if(function_types.regular === true) {
 
-  if(possibly_push_regular.is_function === true) { 
+   possibly_push_regular = initiate_regular(data, data_index, line_number); 
+
+   if(possibly_push_regular.is_function === true) { 
 
     exported_functions.push({ 
      index: function_index, 
@@ -359,11 +335,15 @@
 
     return iterate_through_file_text(data_index);
 
+   }
+
   }
 
-  var possibly_push_arrow = initiate_arrow(data, data_index, line_number, arrow_index_parameter_boundries);
+  if(function_types.arrow === true) {
 
-  if(possibly_push_arrow.is_function === true) { 
+   possibly_push_arrow = initiate_arrow(data, data_index, line_number, arrow_index_parameter_boundries);
+
+   if(possibly_push_arrow.is_function === true) { 
 
     exported_functions.push({ 
      index: function_index, 
@@ -382,7 +362,12 @@
 
     return iterate_through_file_text(data_index);
 
+   }
+
   }
+
+  data_index = data_index + 1; 
+  return iterate_through_file_text(data_index);
  
  }
  
