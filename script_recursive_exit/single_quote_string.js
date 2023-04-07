@@ -39,11 +39,11 @@ function recurse(data_index_) {
  if(data_.charAt(data_index_) === "'") { 
   data_index_ = data_index_ + 1; 
   return {
-    data_index: data_index_, 
-    line_number: line_number_,
-    build_string: in_function_build_string_,
-    exit_document: false
-   }
+   data_index: data_index_, 
+   line_number: line_number_,
+   build_string: in_function_build_string_,
+   exit_document: false
+  }
  }
 
  data_index_ = data_index_ + 1; 

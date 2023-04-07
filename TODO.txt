@@ -9,7 +9,7 @@
    add files for exiting
    add an updater for whether or not to pass in data if its the same file... just so the entire data isnt passed more than once
    make sure indexes are set correclty
-   possibly use a library for checking syntax errors or some web browser, use the window function to get errors in the document and move next
+   possibly use a library for checking syntax errors or some web browser, use the window function to get errors in the document and move next.. eslint or somethings
    
    when i go into a function, every consditional variable for outside the function should already be reset.
    when i leave a function, every consditional variable for inside the function should be reset

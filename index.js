@@ -15,13 +15,16 @@
   */
 
    var fs = require('file-system');
-   var initiate_arrow = require('generate/backtracking_beginning_build_string/arrow');
-   var initiate_regular = require('generate/backtracking_beginning_build_string_one/regular');
+
+   var initiate_arrow = require('./functions/arrow/arrow_main');
+   var initiate_regular = require('./functions/regular/regular_main');
+
    var html_enter_script = require('./html_recursive_exit/html_enter_script');
    var html_end_script = require('./html_recursive_exit/html_end_script'); 
    var html_bad_closing_tag = require('./html_recursive_exit/html_bad_closing_tag');
    var html_bad_opening_tag = require('./html_recursive_exit/html_bad_opening_tag');
    var html_comment = require('./html_recursive_exit/html_comment');
+
    var double_quote_string = require('./script_recursive_exit/double_quote_string');
    var multiline_comment = require('./script_recursive_exit/multiline_comment');
    var regex = require('./script_recursive_exit/regex');
@@ -286,9 +289,6 @@
    data_index_and_line_number_update = multiline_comment(data, data_index, in_function, line_number, in_function === true ? build_string : '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   if(in_function === true) {
-    build_string += data_index_and_line_number_update.build_string;
-   }
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    return iterate_through_file_text(data_index);
   }
@@ -302,14 +302,12 @@
    data_index_and_line_number_update = singleline_comment(data, data_index, in_function, line_number, in_function === true ? build_string : '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   if(in_function === true) {
-    build_string += data_index_and_line_number_update.build_string;
-   }
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    return iterate_through_file_text(data_index);
   }
 
   //add regular expression here
+  //var a = /^dkkdl[12]/g;
 
   if(data.charAt(data_index) === '"') { 
    arrow_index_parameter_boundries.push({boundry_type: 'double_quote', first_index: data_index, last_index: 'to be determined'});
@@ -317,9 +315,6 @@
    data_index_and_line_number_update = double_quote_string(data, data_index, in_function, line_number, in_function === true ? build_string : '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   if(in_function === true) {
-    build_string += data_index_and_line_number_update.build_string;
-   }
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    return iterate_through_file_text(data_index);
   }
@@ -330,9 +325,6 @@
    data_index_and_line_number_update = single_quote_string(data, data_index, in_function, line_number, in_function === true ? build_string : '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   if(in_function === true) {
-    build_string += data_index_and_line_number_update.build_string;
-   }
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    return iterate_through_file_text(data_index);
   }
@@ -343,170 +335,55 @@
    data_index_and_line_number_update = template_string(data, data_index, in_function, line_number, in_function === true ? build_string : '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   if(in_function === true) {
-    build_string += data_index_and_line_number_update.build_string;
-   }
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
    return iterate_through_file_text(data_index);
   }
- 
-  //organize this bottom part possibly into seperate files... 
 
-  if(
-   check_beginning_regular() &&
-   data.charAt(data_index  ) === 'f' && 
-   data.charAt(data_index+1) === 'u' &&  
-   data.charAt(data_index+2) === 'n' && 
-   data.charAt(data_index+3) === 'c' && 
-   data.charAt(data_index+4) === 't' && 
-   data.charAt(data_index+5) === 'i' && 
-   data.charAt(data_index+6) === 'o' && 
-   data.charAt(data_index+7) === 'n' && 
-   check_ending_regular() &&
-   in_function === false && 
-   function_types.regular === true
-  ) {
-   in_function = true;
-   is_arrow = false;
-   function_line_number = line_number;
-   build_string = initiate_regular(data, data_index) + " function"; 
-   data_index = data_index + 8; 
-   //possibly call a build regular function in here and pass back the data index when complete
-   return iterate_through_file_text(data_index);
-  }
- 
-  if(
-   check_beginning_arrow() && 
-   data.charAt(data_index  ) ===  '=' && 
-   data.charAt(data_index+1) ===  '>' && 
-   check_ending_arrow() &&
-   in_function === false && 
-   function_types.arrow === true
-  ) {
-   in_function = true;
-   function_line_number = line_number;
-   is_arrow = true;
-   build_string = initiate_arrow(data, data_index, arrow_index_parameter_boundries) + " =>";
-   arrow_index_parameter_boundries = []; //only used here
-   data_index = data_index + 2;
-   //possibly call a build arrow in here and pass the data index here
-   return iterate_through_file_text(data_index);
-  }
- 
-  /*
-   if in a function and a bracket..when in the above things, i avoid counting bad brackets --- maybe make all these bottom parts into their own seperate files... ..which would be backtracking beginning first then building the function secoond
-  */
- 
-  if(
-   data.charAt(data_index) === '{' && 
-   in_function === true
-  ) {
-   opening_bracket = opening_bracket + 1; 
-   has_bracket = true; //has bracket needs to be noted above too or not
-   build_string += data.charAt(data_index);
-   data_index = data_index + 1;
-   return iterate_through_file_text(data_index);
-  } 
- 
-  /*
-   if not in a comment or string, keeping count of ending bracket to know when to end the function
-  */
-  
-  if(
-   data.charAt(data_index) === '}' && 
-   in_function === true
-  ) {
-   closing_bracket = closing_bracket + 1;
-   build_string += data.charAt(data_index);
-   data_index = data_index + 1;
-   return iterate_through_file_text(data_index);
-  }
- 
-  /* 
-   end creating the function.. this condition should hit one time then going out of the function.
-  */
- 
-  if(
-   ((is_arrow === true && has_bracket === false && data.charAt(data_index) === '\n') || //is arrow and has bracket needs to be checked above
-   (opening_bracket === closing_bracket && opening_bracket > 0)) && 
-   in_function === true
-  ) { 
-   push_function();
-   function_index = function_index + 1;
-   build_string = '';
-   has_bracket = false;
-   in_function = false;
-   opening_bracket = 0; 
-   closing_bracket = 0;
-   data_index = data_index + 1;
-   return iterate_through_file_text(data_index);
-  }
- 
-  /* 
-   pushing every character when in the function... the build string is also in the other files copied over.... if not in the function, just moving next
-  */
-  
-  if(in_function === true) { 
-   build_string += data.charAt(data_index);
-   data_index = data_index + 1;
-   return iterate_through_file_text(data_index);
-  } else { 
-   data_index = data_index + 1;
-   return iterate_through_file_text(data_index);
-  }
- 
- }
- 
- /*
-  CHECK BEGINNING and ending of funtions
- */
- 
- function check_beginning_regular() { 
-  if((data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ',' || data.charAt(data_index-1) === ':') || ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === ',' || data.charAt(data_index-2) === ':'))) {
-    return true
-  } else { 
-    return false
-  }
- }
+  var possibly_push_regular = initiate_regular(data, data_index, line_number); 
 
- function check_ending_regular() { 
-  if((data.charAt(data_index+8) === '\n' || data.charAt(data_index+8) === ' ' || data.charAt(data_index+8) === '(')) { 
-   return true
-  } else { 
-   return false
-  }
- }
+  if(possibly_push_regular.is_function === true) { 
 
-function check_beginning_arrow() { 
-  if(data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') { 
-   return true
-  } else { 
-   return false
-  }
- }
+    exported_functions.push({ 
+     index: function_index, 
+     filepath: fp, 
+     line_number: possibly_push_regular.line_number,
+     function_: possibly_push_regular.build_string, 
+     is_async: possibly_push_regular.is_async, 
+     has_name: possibly_push_regular.has_name, 
+     parameters: possibly_push_regular.parameters
+    });
 
-function check_ending_arrow() { 
-  if(data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{') { 
-   return true
-  } else { 
-   return false
+    line_number = possibly_push_regular.line_number;
+    data_index = possibly_push_regular.data_index;
+    function_index = function_index + 1;
+
+    return iterate_through_file_text(data_index);
+
   }
- }
+
+  var possibly_push_arrow = initiate_arrow(data, data_index, line_number, arrow_index_parameter_boundries);
+
+  if(possibly_push_arrow.is_function === true) { 
+
+    exported_functions.push({ 
+     index: function_index, 
+     filepath: fp, 
+     line_number: possibly_push_arrow.line_number,
+     function_: possibly_push_arrow.build_string, 
+     is_async: possibly_push_arrow.is_async, 
+     has_name: possibly_push_arrow.has_name, 
+     parameters: possibly_push_arrow.parameters
+    });
+
+    line_number = possibly_push_arrow.line_number;
+    data_index = possibly_push_arrow.data_index;
+    function_index = function_index + 1;
+    arrow_index_parameter_boundries = [];
+
+    return iterate_through_file_text(data_index);
+
+  }
  
- /*
-  PUSH THE FUNCTION ----------------------------------------------------- make this an array of objects with has_name etc
- */
- 
- function push_function() {
-  exported_functions.push({ 
-    index: function_index, 
-    filepath: fp, 
-    line_number: function_line_number + 1,
-    function_: build_string, 
-    is_async: false, 
-    has_name: false, 
-    parameters: 'going to add this in'
-  });
  }
  
  module.exports = generate;
