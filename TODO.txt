@@ -10,6 +10,7 @@
    add an updater for whether or not to pass in data if its the same file... just so the entire data isnt passed more than once
    make sure indexes are set correclty
    possibly use a library for checking syntax errors or some web browser, use the window function to get errors in the document and move next.. eslint or somethings
+   parameter boundries still need to be set within each function... or just checks for counting real whatevers.... this is the shares recursive exit
    
    when i go into a function, every consditional variable for outside the function should already be reset.
    when i leave a function, every consditional variable for inside the function should be reset

@@ -260,7 +260,7 @@
   ) { 
    arrow_index_parameter_boundries.push({boundry_type: 'multiline_comment', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 2; 
-   data_index_and_line_number_update = multiline_comment(data, data_index, in_function, line_number, in_function === true ? build_string : '');
+   data_index_and_line_number_update = multiline_comment(data, data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
@@ -273,7 +273,7 @@
   ) { 
    arrow_index_parameter_boundries.push({boundry_type: 'singleline_comment', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 2; 
-   data_index_and_line_number_update = singleline_comment(data, data_index, in_function, line_number, in_function === true ? build_string : '');
+   data_index_and_line_number_update = singleline_comment(data, data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
@@ -286,7 +286,7 @@
   if(data.charAt(data_index) === '"') { 
    arrow_index_parameter_boundries.push({boundry_type: 'double_quote', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 1; 
-   data_index_and_line_number_update = double_quote_string(data, data_index, in_function, line_number, in_function === true ? build_string : '');
+   data_index_and_line_number_update = double_quote_string(data, data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
@@ -296,7 +296,7 @@
   if(data.charAt(data_index) === "'") { 
    arrow_index_parameter_boundries.push({boundry_type: 'double_quote', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 1; 
-   data_index_and_line_number_update = single_quote_string(data, data_index, in_function, line_number, in_function === true ? build_string : '');
+   data_index_and_line_number_update = single_quote_string(data, data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
@@ -306,7 +306,7 @@
   if(data.charAt(data_index) === '`') { 
    arrow_index_parameter_boundries.push({boundry_type: 'template_quote', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 1; 
-   data_index_and_line_number_update = template_string(data, data_index, in_function, line_number, in_function === true ? build_string : '');
+   data_index_and_line_number_update = template_string(data, data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
@@ -314,11 +314,8 @@
   }
 
   if(function_types.regular === true) {
-
    possibly_push_regular = initiate_regular(data, data_index, line_number); 
-
    if(possibly_push_regular.is_function === true) { 
-
     exported_functions.push({ 
      index: function_index, 
      filepath: fp, 
@@ -328,23 +325,16 @@
      has_name: possibly_push_regular.has_name, 
      parameters: possibly_push_regular.parameters
     });
-
     line_number = possibly_push_regular.line_number;
     data_index = possibly_push_regular.data_index;
     function_index = function_index + 1;
-
     return iterate_through_file_text(data_index);
-
    }
-
   }
 
   if(function_types.arrow === true) {
-
    possibly_push_arrow = initiate_arrow(data, data_index, line_number, arrow_index_parameter_boundries);
-
    if(possibly_push_arrow.is_function === true) { 
-
     exported_functions.push({ 
      index: function_index, 
      filepath: fp, 
@@ -354,16 +344,12 @@
      has_name: possibly_push_arrow.has_name, 
      parameters: possibly_push_arrow.parameters
     });
-
     line_number = possibly_push_arrow.line_number;
     data_index = possibly_push_arrow.data_index;
     function_index = function_index + 1;
     arrow_index_parameter_boundries = [];
-
     return iterate_through_file_text(data_index);
-
    }
-
   }
 
   data_index = data_index + 1; 

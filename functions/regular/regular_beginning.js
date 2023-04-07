@@ -13,7 +13,7 @@ var bt_regular_parameter_string = [];
 var found_equals = false;
 var found_async = false;
 var found_name = false;
-var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/;
+var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/; //just copy async one without the whatever.
 
 /*
  initiate the beginning of the regular function... 

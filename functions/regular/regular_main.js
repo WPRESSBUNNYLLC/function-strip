@@ -1,74 +1,36 @@
 
-//import check 
-//import beginning
-//return build string if check passes
+var check_if_function = require('./regular_check');
+var build_beginning_of_function = require('./regular_beginning');
+var build_body_of_function = require('./regular_body');
 
-  var build_string = '';
-  var has_name = false; 
-  var is_async = false;
+ function initiate_regular(data, data_index, line_number) { 
 
-  function initiate_regular() { 
+   var return_object = {};
+
+   if(check_if_function(data, data_index) === false) { 
+    return_object.is_function = false;
+    return return_object;
+   }
+
+   return_object.is_function = true;
+
+   var beginning_function_ = build_beginning_of_function(data, data_index); //line number doesnt increase here... only decreases so not necessary
+
+   return_object.build_string = beginning_function_.build_string;
+   return_object.is_async = beginning_function_.is_async;
+   return_object.has_name = beginning_function_.has_name;
+
+   data_index = data_index + 8; 
+
+   var body_of_function = build_body_of_function(data, data_index, line_number); //line number will increase here
+
+   return_object.build_string += body_of_function.build_string;
+   return_object.parameters = body_of_function.parameters;
+   return_object.line_number = body_of_function.line_number;
+   return_object.data_index = body_of_function.data_index;
+
+   return return_object;
 
   }
 
-  /*
-   if in a function and a bracket..when in the above things, i avoid counting bad brackets --- maybe make all these bottom parts into their own seperate files... ..which would be backtracking beginning first then building the function secoond
-  */
- 
-  if(
-   data.charAt(data_index) === '{' && 
-   in_function === true
-  ) {
-   opening_bracket = opening_bracket + 1; 
-   has_bracket = true; //has bracket needs to be noted above too or not
-   build_string += data.charAt(data_index);
-   data_index = data_index + 1;
-   return iterate_through_file_text(data_index);
-  } 
- 
-  /*
-   if not in a comment or string, keeping count of ending bracket to know when to end the function
-  */
-  
-  if(
-   data.charAt(data_index) === '}' && 
-   in_function === true
-  ) {
-   closing_bracket = closing_bracket + 1;
-   build_string += data.charAt(data_index);
-   data_index = data_index + 1;
-   return iterate_through_file_text(data_index);
-  }
- 
-  /* 
-   end creating the function.. this condition should hit one time then going out of the function.
-  */
- 
-  if(
-   ((is_arrow === true && has_bracket === false && data.charAt(data_index) === '\n') || //is arrow and has bracket needs to be checked above
-   (opening_bracket === closing_bracket && opening_bracket > 0)) && 
-   in_function === true
-  ) { 
-   push_function();
-   function_index = function_index + 1;
-   build_string = '';
-   has_bracket = false;
-   in_function = false;
-   opening_bracket = 0; 
-   closing_bracket = 0;
-   data_index = data_index + 1;
-   return iterate_through_file_text(data_index);
-  }
- 
-  /* 
-   pushing every character when in the function... the build string is also in the other files copied over.... if not in the function, just moving next
-  */
-  
-  if(in_function === true) { 
-   build_string += data.charAt(data_index);
-   data_index = data_index + 1;
-   return iterate_through_file_text(data_index);
-  } else { 
-   data_index = data_index + 1;
-   return iterate_through_file_text(data_index);
-  }
+ module.exports = initiate_regular;
