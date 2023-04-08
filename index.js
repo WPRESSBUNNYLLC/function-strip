@@ -238,15 +238,6 @@
    line_number = line_number + 1;
   }
 
-  if(file_type === 'html') {
-   data_index_and_line_number_update = html_end_script(data_index);
-   if(data_index_and_line_number_update.end_script === true) { 
-    data_index = data_index_and_line_number_update.data_index;
-    line_number = data_index_and_line_number_update.line_number
-    return;
-   }
-  }
-
   if(
    data.charAt(data_index) === '/' &&
    data.charAt(data_index + 1) === '*'
@@ -273,7 +264,15 @@
    return iterate_through_file_text(data_index);
   }
 
-  //add regular expression here
+  if(data.charAt(data_index) === '/') { 
+   arrow_index_parameter_boundries.push({boundry_type: 'regular_expression', first_index: data_index, last_index: 'to be determined'});
+   data_index = data_index + 1; 
+   data_index_and_line_number_update = regex(data, data_index, false, line_number, '');
+   data_index = data_index_and_line_number_update.data_index;
+   line_number = data_index_and_line_number_update.line_number;
+   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
+   return iterate_through_file_text(data_index);
+  }
 
   if(data.charAt(data_index) === '"') { 
    arrow_index_parameter_boundries.push({boundry_type: 'double_quote', first_index: data_index, last_index: 'to be determined'});
@@ -286,7 +285,7 @@
   }
 
   if(data.charAt(data_index) === "'") { 
-   arrow_index_parameter_boundries.push({boundry_type: 'double_quote', first_index: data_index, last_index: 'to be determined'});
+   arrow_index_parameter_boundries.push({boundry_type: 'single_quote', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 1; 
    data_index_and_line_number_update = single_quote_string(data, data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
@@ -305,19 +304,29 @@
    return iterate_through_file_text(data_index);
   }
 
+  if(file_type === 'html') {
+   data_index_and_line_number_update = html_end_script(data_index);
+   if(data_index_and_line_number_update.end_script === true) { 
+    data_index = data_index_and_line_number_update.data_index;
+    line_number = data_index_and_line_number_update.line_number
+    return;
+   }
+  }
+
   if(function_types.regular === true) {
    possibly_push_regular = initiate_regular(data, data_index, line_number); 
    if(possibly_push_regular.is_function === true) { 
     exported_functions.push({ 
      index: function_index, 
      filepath: fp, 
-     line_number: possibly_push_regular.line_number,
+     beginning_line_number: possibly_push_regular.beginning_line_number,
+     ending_line_number: possibly_push_regular.ending_line_number,
      function_: possibly_push_regular.build_string, 
      is_async: possibly_push_regular.is_async, 
      has_name: possibly_push_regular.has_name, 
      parameters: possibly_push_regular.parameters
     });
-    line_number = possibly_push_regular.line_number;
+    line_number = possibly_push_regular.ending_line_number;
     data_index = possibly_push_regular.data_index;
     function_index = function_index + 1;
     return iterate_through_file_text(data_index);
@@ -330,13 +339,14 @@
     exported_functions.push({ 
      index: function_index, 
      filepath: fp, 
-     line_number: possibly_push_arrow.line_number,
+     beginning_line_number: possibly_push_arrow.beginning_line_number,
+     ending_line_number: possibly_push_arrow.ending_line_number,
      function_: possibly_push_arrow.build_string, 
      is_async: possibly_push_arrow.is_async, 
      has_name: possibly_push_arrow.has_name, 
      parameters: possibly_push_arrow.parameters
     });
-    line_number = possibly_push_arrow.line_number;
+    line_number = possibly_push_arrow.ending_line_number;
     data_index = possibly_push_arrow.data_index;
     function_index = function_index + 1;
     arrow_index_parameter_boundries = [];

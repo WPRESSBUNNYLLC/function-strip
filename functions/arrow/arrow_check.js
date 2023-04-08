@@ -8,7 +8,7 @@
  }
 
 function check_beginning_arrow(data, data_index) { 
-  if(data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') { 
+ if(data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ')') { 
    return true
   } else { 
    return false
@@ -16,7 +16,7 @@ function check_beginning_arrow(data, data_index) {
  }
 
 function check_ending_arrow(data, data_index) { 
-  if(data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{') { 
+ if(data.charAt(data_index+2) === '\n' || data.charAt(data_index+2) === ' ' || data.charAt(data_index+2) === '{') { 
    return true
   } else { 
    return false
