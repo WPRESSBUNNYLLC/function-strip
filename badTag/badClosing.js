@@ -1,4 +1,4 @@
-var bad_opening_tags = ['</a','</abbr','</acronym>','</address','</applet','</area','</article','</aside','</audio','</b','</base',
+var bad_closing_tags = ['</a','</abbr','</acronym>','</address','</applet','</area','</article','</aside','</audio','</b','</base',
 '</basefont','</bdi','</bdo','</big','</blockquote','</body','</br','</button','</canvas','</caption','</center','</cite','</code',
 '</col','</colgroup','</data','</datalist','</dd','</del','</details','</dfn','</dialog','</dir','</div','</dl','</dt',
 '</em','</embed','</fieldset','</figcaption','</figure','</font','</footer','</form','</frame','</frameset','</h1',
@@ -9,8 +9,8 @@ var bad_opening_tags = ['</a','</abbr','</acronym>','</address','</applet','</ar
 '</template','</textarea','</tfoot','</th','</thead','</time','</title','</tr','</track','</tt','</u','</ul','</var','</video',
 ];
 
-function is_bad_closing_tag(string_) {
- if(bad_opening_tags.includes(string_)) { 
+function is_bad_closing_tag(string_) { //obviously i could use an object. you are not cool
+ if(bad_closing_tags.includes(string_)) { 
   return true
  } else { 
   return false;

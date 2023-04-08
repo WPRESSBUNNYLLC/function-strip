@@ -18,8 +18,4 @@ function recurse(data_index_) {
 
 }
 
-const wow = dkksl => { 
-    console.log('hello world')
-} 
-
 module.exports = html_end_script;
