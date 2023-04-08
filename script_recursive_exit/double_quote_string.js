@@ -36,7 +36,10 @@ function recurse(data_index_) {
   line_number_ = line_number_ + 1;
  }
 
- if(data_.charAt(data_index_) === '"') { 
+ if(
+  data_.charAt(data_index_) === '"' && 
+  data_.charAt(data_index_) !== '\\'
+ ) { 
   data_index_ = data_index_ + 1; 
   return {
     data_index: data_index_, 

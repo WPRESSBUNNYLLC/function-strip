@@ -12,6 +12,8 @@
    possibly use a library for checking syntax errors or some web browser, use the window function to get errors in the document and move next.. eslint or somethings
    parameter boundries still need to be set within each function... or just checks for counting real whatevers.... this is the shares recursive exit
    dont need to recurse on <script> ...so i can delete those files i guess just need <script then </script and canuse the regular strings and all that jazz in the body
+   make sure to add if a regular name in arrow function in case there are no parameters const wow = jkj => { }
+   seperate iterate through file text into different programming languages
 
    when i go into a function, every consditional variable for outside the function should already be reset.
    when i leave a function, every consditional variable for inside the function should be reset
