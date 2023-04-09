@@ -16,7 +16,7 @@ function html_comment(data, data_index, line_number) {
 
 function recurse(data_index_) { 
 
- if(data_index_ === data_.length) { 
+ if(data_index_ >= data_.length) { 
   return {
    data_index: data_index_, 
    line_number: line_number_

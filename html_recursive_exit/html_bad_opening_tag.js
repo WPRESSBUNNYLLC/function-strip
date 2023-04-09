@@ -11,7 +11,7 @@ function html_bad_opening_tag(data, data_index, line_number) {
  data_ = data;
  data_index_ = data_index;
  line_number_ = line_number;
- recurse(data_index_);
+ return recurse(data_index_);
 }
 
 function recurse(data_index_) { 

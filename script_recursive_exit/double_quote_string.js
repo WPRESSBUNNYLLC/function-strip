@@ -14,7 +14,7 @@ function double_quote_string(data, data_index, in_function, line_number, build_s
  in_function_ = in_function;
  in_function_build_string_ = build_string;
  line_number_ = line_number;
- recurse(data_index_);
+ return recurse(data_index_);
 }
 
 function recurse(data_index_) { 
@@ -23,7 +23,7 @@ function recurse(data_index_) {
   in_function_build_string_ += data_.charAt(data_index_);
  }
 
- if(data_index_ === data_.length) {
+ if(data_index_ >= data_.length) {
   return {
    data_index: data_index_, 
    line_number: line_number_, 

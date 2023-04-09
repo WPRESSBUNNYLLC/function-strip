@@ -23,7 +23,7 @@ function recurse(data_index_) {
   in_function_build_string_ += data_.charAt(data_index_);
  }
 
- if(data_index_ === data_.length) {
+ if(data_index_ >= data_.length) {
   return {
    data_index: data_index_, 
    line_number: line_number_,

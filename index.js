@@ -277,7 +277,7 @@
    return iterate_through_file_text(data_index);
   }
 
-  if(data.charAt(data_index) === '/') { 
+  if(data.charAt(data_index) === '/') { //add some additional checks here.. for what the next character is alowed to be.. use a regular expression
    arrow_index_parameter_boundries.push({boundry_type: 'regular_expression', first_index: data_index, last_index: 'to be determined'});
    data_index = data_index + 1; 
    data_index_and_line_number_update = regex(data, data_index, false, line_number, '');
