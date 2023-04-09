@@ -21,8 +21,8 @@
 
    var html_enter_script = require('./html_recursive_exit/html_enter_script');
    var html_end_script = require('./html_recursive_exit/html_end_script'); 
-   var html_bad_closing_tag = require('./html_recursive_exit/html_bad_closing_tag');
-   var html_bad_opening_tag = require('./html_recursive_exit/html_bad_opening_tag');
+   var html_bad_opening_tag = require('./html_recursive_exit/badTag/badOpening');
+   var html_bad_closing_tag = require('./html_recursive_exit/badTag/badClosing');
    var html_comment = require('./html_recursive_exit/html_comment');
 
    var double_quote_string = require('./script_recursive_exit/double_quote_string');
@@ -48,12 +48,13 @@
    * @param {data_index_and_line_number_update} used to copy index and line number back over from other file to main
    * @param {function_types} the different functions to execute
    */
+
+   var LEX = [];
+   var currently_lloking_for_ending_tag = ''; //update this to looking for even though some scripts might be mispelled ... might just delete this
  
    var data_index = 0;
    var arrow_index_parameter_boundries = [];
    var data_index_and_line_number_update = {}; 
-   var opening_tag_string_for_check = '';
-   var closing_tag_string_for_check = '';
    var function_index = 1;
    var possibly_push_arrow = {};
    var possibly_push_regular = {};
@@ -209,12 +210,6 @@
    return run_from_html(data_index);
   }
 
-  //add opening bad tag check -- this can be a regular tag
-
-  //add closing bad tag check -- this can be a regular tag ....dont really need closing tag but will add anyway
-
-  //change this below to something else...
-
   if(
    data.charAt(data_index) === '<' && 
    data.charAt(data_index + 1) === 's' && 
@@ -229,7 +224,24 @@
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    iterate_through_file_text(data_index); 
-   return run_from_html(data_index); //data index will update in other function
+   return run_from_html(data_index);
+  }
+
+  if(data.charAt(data_index) === '<') { 
+   data_index_and_line_number_update = html_bad_opening_tag(data, data_index, line_number);
+   data_index = data_index_and_line_number_update.data_index;
+   line_number = data_index_and_line_number_update.line_number;
+   return run_from_html(data_index);
+  }
+
+  if(
+   data.charAt(data_index) === '<' && 
+   data.charAt(data_index + 1) === '/'
+  ) { 
+   data_index_and_line_number_update = html_bad_closing_tag(data, data_index, line_number);
+   data_index = data_index_and_line_number_update.data_index;
+   line_number = data_index_and_line_number_update.line_number;
+   return run_from_html(data_index);
   }
 
   data_index = data_index + 1; 

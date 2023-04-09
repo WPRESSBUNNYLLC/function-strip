@@ -8,9 +8,13 @@
 // '</option','</output','</p','</param','</picture','</pre','</progress','</q','</rp','</rt','</ruby','</s','</samp','</section','</select',
 // '</small','</source','</span','</strike','</strong','</style','</sub','</summary','</sup','</svg','</table','</tbody','</td',
 // '</template','</textarea','</tfoot','</th','</thead','</time','</title','</tr','</track','</tt','</u','</ul','</var','</video',
-// ];
+// ]; could use a single opening 
 
-function is_bad_closing_tag(data, data_index) {
+var html_bad_closing_tag = require('./html_recursive_exit/html_bad_closing_tag');
+
+function is_bad_closing_tag(data, data_index, line_number) {
+
+  //if opening and not a script tag means a random tag thats not listed anywhere... could only use random tags but would be strange to...
 
   if(
    data.charAt(data_index) === '<' && 
