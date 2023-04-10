@@ -220,18 +220,22 @@
    data.charAt(data_index + 6) === 't'
   ) { 
    data_index = data_index + 7; 
-   data_index_and_line_number_update = html_enter_script(data, data_index, line_number);
+   data_index_and_line_number_update = html_enter_script(data, data_index, line_number); //can get rid of this jawn and 
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    iterate_through_file_text(data_index); 
    return run_from_html(data_index);
   }
 
-  if(data.charAt(data_index) === '<' && data.charAt(data_index + 1).test(first_valid_character_html_tag) === true) { 
+  if(
+   data.charAt(data_index) === '<' && 
+   data.charAt(data_index + 1).test(first_valid_character_html_tag) === true
+  ) { 
    data_index = data_index + 2;
    data_index_and_line_number_update = html_bad_tag(data, data_index, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
+   //if tag is script iterate_through file text... jawn is definetely hot
    return run_from_html(data_index);
   }
 
@@ -333,7 +337,7 @@
   }
 
   if(file_type === 'html') { 
-   if(
+   if( //i can make this one tag... file and can get rid of opening and closing script
     data.charAt(data_index) === '<' && 
     data.charAt(data_index + 1) === '/' && 
     data.charAt(data_index + 2) === 's' && 

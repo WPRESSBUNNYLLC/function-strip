@@ -13,6 +13,7 @@ var found_space_identify_name = false;
 var last_character = [];
 var script_name = '';
 var data_index_and_line_number_update = {};
+var valid_character = /^[a-zA-Z]*$/;
 
 function html_bad_tag(data, data_index, line_number) { 
  data_ = data;
@@ -20,7 +21,7 @@ function html_bad_tag(data, data_index, line_number) {
  line_number_ = line_number;
  found_space_identify_name = false;
  last_character = [];
- script_name = '';
+ script_name = ''; //maybe make this one file and use the tag to denote when in a javascript file and if in a javascript file, then do yo thang... which means i can delete html enter and exit script and just keep this
  data_index_and_line_number_update = {};
  return recurse(data_index_);
 }
@@ -91,14 +92,18 @@ function recurse(data_index_) {
  ) {
   if(
    last_character[last_character.length - 1] === '=' && 
-   last_character[last_character.length - 2] === 'a-2'
+   valid_character.test(last_character[last_character.length - 2]) === true
   ) { 
-    data_index_and_line_number_update = double_quote_string(data_, data_index_, line_number_);
-    data_index_ = data_index_and_line_number_update.data_index_;
-    line_number_ = data_index_and_line_number_update.line_number_;
-    return recurse(data_index_);
+   data_index_and_line_number_update = double_quote_string(data_, data_index_, false, line_number_, '');
+   data_index_ = data_index_and_line_number_update.data_index_;
+   line_number_ = data_index_and_line_number_update.line_number_;
+   return recurse(data_index_);
   } else { 
-    throw new error('if beginning a string inside of a script tag, the previous character must be an equals sign and the previous to that must be a letter'); 
+    throw new error(
+     'if beginning a string inside of a script tag,\n' +
+     'the previous character must be an equals sign and the\n' +
+     'previous to that must be a letter'
+    ); 
   }
  }
 
@@ -108,15 +113,19 @@ function recurse(data_index_) {
  ) {
   if(
    last_character[last_character.length - 1] === '=' && 
-   last_character[last_character.length - 2] === 'a-2'
+   valid_character.test(last_character[last_character.length - 2]) === true
   ) { 
-    data_index_and_line_number_update = single_quote_string(data_, data_index_, line_number_);
-    data_index_ = data_index_and_line_number_update.data_index_;
-    line_number_ = data_index_and_line_number_update.line_number_;
-    return recurse(data_index_);
+   data_index_and_line_number_update = single_quote_string(data_, data_index_, false, line_number_, '');
+   data_index_ = data_index_and_line_number_update.data_index_;
+   line_number_ = data_index_and_line_number_update.line_number_;
+   return recurse(data_index_);
   } else { 
-     throw new error('if beginning a string inside of a script tag, the previous character must be an equals sign and the previous to that must be a letter');
-  }
+    throw new error(
+     'if beginning a string inside of a script tag,\n' +
+     'the previous character must be an equals sign and the\n' +
+     'previous to that must be a letter'
+    );   
+   }
  }
 
  if(

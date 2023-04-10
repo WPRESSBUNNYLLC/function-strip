@@ -37,7 +37,7 @@ function recurse(data_index_) {
 
  if(
   data_.charAt(data_index_) === '"' && 
-  data_.charAt(data_index_) !== '\\'
+  data_.charAt(data_index_ - 1) !== '\\'
  ) { 
   data_index_ = data_index_ + 1; 
   return {
