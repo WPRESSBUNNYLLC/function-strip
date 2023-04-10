@@ -338,7 +338,7 @@
     if(data_index_and_line_number_update.script_name.toLowerCase() === 'script') { //should always be script tag
      return;
     } else { 
-     return run_from_html(data_index);
+     return iterate_through_file_text(data_index); //should not be hit ...once in a script tag no use to have another script randomly in a file unless its in a string
     }
    }
   }
