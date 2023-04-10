@@ -1,6 +1,6 @@
 
 /*
- determines the end of an opening script tag, all i have to do is iterate until i find >
+ determines the end of an opening script tag, all i have to do is iterate until i find > 
 */
 
 var data_ = '';

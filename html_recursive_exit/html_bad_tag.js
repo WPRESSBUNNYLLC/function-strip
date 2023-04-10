@@ -6,6 +6,7 @@
 var data_ = '';
 var data_index_ = 0;
 var line_number_ = 0;
+var last_character = ''; //determines last caracter for quoted stirng,,,, to avoid entering <script inside of a string
 
 function html_bad_tag(data, data_index, line_number) { 
  data_ = data;
