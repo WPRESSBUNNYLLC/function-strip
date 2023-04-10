@@ -21,8 +21,7 @@
 
    var html_enter_script = require('./html_recursive_exit/html_enter_script');
    var html_end_script = require('./html_recursive_exit/html_end_script'); 
-   var html_bad_opening_tag = require('./html_recursive_exit/badTag/badOpening');
-   var html_bad_closing_tag = require('./html_recursive_exit/badTag/badClosing');
+   var html_bad_tag = require('./html_recursive_exit/html_bad_tag');
    var html_comment = require('./html_recursive_exit/html_comment');
 
    var double_quote_string = require('./script_recursive_exit/double_quote_string');
@@ -53,6 +52,7 @@
    var currently_lloking_for_ending_tag = ''; //update this to looking for even though some scripts might be mispelled ... might just delete this
  
    var data_index = 0;
+   var first_valid_character_html_tag = /^[a-zA-Z]*$/;
    var arrow_index_parameter_boundries = [];
    var data_index_and_line_number_update = {}; 
    var function_index = 1;
@@ -227,8 +227,8 @@
    return run_from_html(data_index);
   }
 
-  if(data.charAt(data_index) === '<') { 
-   data_index_and_line_number_update = html_bad_opening_tag(data, data_index, line_number);
+  if(data.charAt(data_index) === '<' && data.charAt(data_index + 1).test(first_valid_character_html_tag) === true) { 
+   data_index_and_line_number_update = html_bad_tag(data, data_index, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    return run_from_html(data_index);
@@ -236,9 +236,10 @@
 
   if(
    data.charAt(data_index) === '<' && 
-   data.charAt(data_index + 1) === '/'
+   data.charAt(data_index + 1) === '/' &&
+   data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
   ) { 
-   data_index_and_line_number_update = html_bad_closing_tag(data, data_index, line_number);
+   data_index_and_line_number_update = html_bad_tag(data, data_index, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    return run_from_html(data_index);

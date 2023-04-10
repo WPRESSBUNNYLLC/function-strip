@@ -7,7 +7,7 @@ var data_ = '';
 var data_index_ = 0;
 var line_number_ = 0;
 
-function html_bad_closing_tag(data, data_index, line_number) { 
+function html_bad_tag(data, data_index, line_number) { 
  data_ = data;
  data_index_ = data_index;
  line_number_ = line_number;
@@ -18,4 +18,4 @@ function recurse(data_index_) {
 
 }
 
-module.exports = html_bad_closing_tag;
+module.exports = html_bad_tag;
