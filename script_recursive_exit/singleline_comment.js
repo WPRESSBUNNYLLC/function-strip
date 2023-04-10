@@ -28,7 +28,6 @@ function recurse(data_index_) {
    data_index: data_index_, 
    line_number: line_number_,
    build_string: in_function_build_string_,
-   exit_document: true
   }
  }
 
@@ -39,7 +38,6 @@ function recurse(data_index_) {
     data_index: data_index_, 
     line_number: line_number_,
     build_string: in_function_build_string_,
-    exit_document: false
    }
  }
 

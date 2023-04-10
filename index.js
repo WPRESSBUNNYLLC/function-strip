@@ -228,6 +228,7 @@
   }
 
   if(data.charAt(data_index) === '<' && data.charAt(data_index + 1).test(first_valid_character_html_tag) === true) { 
+   data_index = data_index + 2;
    data_index_and_line_number_update = html_bad_tag(data, data_index, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
@@ -239,6 +240,7 @@
    data.charAt(data_index + 1) === '/' &&
    data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
   ) { 
+   data_index = data_index + 3;
    data_index_and_line_number_update = html_bad_tag(data, data_index, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
