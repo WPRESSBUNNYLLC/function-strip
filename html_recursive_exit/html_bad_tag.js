@@ -1,7 +1,10 @@
 
 /*
- determines the exit of a bad closing tag in an html document... whether opening or closing... this is for strings which contain the function keyword.... might not need this tag... comes from html function
+ determines the exit of a bad closing tag in an html document... mkae usre to look over this again.... im assuming there are going to be some errors
 */
+
+var double_quote_string = require('./script_recursive_exit/double_quote_string');
+var single_quote_string = require('./script_recursive_exit/single_quote_string');
 
 var data_ = '';
 var data_index_ = 0;
@@ -9,6 +12,7 @@ var line_number_ = 0;
 var found_space_identify_name = false;
 var last_character = [];
 var script_name = '';
+var data_index_and_line_number_update = {};
 
 function html_bad_tag(data, data_index, line_number) { 
  data_ = data;
@@ -17,6 +21,7 @@ function html_bad_tag(data, data_index, line_number) {
  found_space_identify_name = false;
  last_character = [];
  script_name = '';
+ data_index_and_line_number_update = {};
  return recurse(data_index_);
 }
 
@@ -25,19 +30,20 @@ function recurse(data_index_) {
  if(data_index_ >= data_.length) { 
   return {
    data_index: data_index_, 
-   line_number: line_number_
+   line_number: line_number_, 
+   script_name: script_name
   }
  }
 
  if(data_.charAt(data_index_) === '\n') { 
   line_number_ = line_number_ + 1;
  }
-
+ 
  if(
   found_space_identify_name === false && 
   data_.charAt(data_index_) !== '\n' &&
   data_.charAt(data_index_) !== ' ' && 
-  data_.charAt(data_index_) !== '>' //maybe use a reguar expression for the correct name but i doubt there will be anything else other than a-z 
+  data_.charAt(data_index_) !== '>'  
  ) {
   last_character.push(data_.charAt(data_index_));
   data_index_ = data_index_ + 1;
@@ -57,7 +63,8 @@ function recurse(data_index_) {
     data_index_ = data_index_ + 1;
     return { 
      data_index: data_index_, 
-     line_number: line_number_
+     line_number: line_number_, 
+     script_name: script_name
     }
   } else {
     data_index_ = data_index_ + 1;
@@ -70,24 +77,57 @@ function recurse(data_index_) {
   data_.charAt(data_index_) !== '"' && 
   data_.charAt(data_index_) !== "'" &&
   data_.charAt(data_index_) !== "\n" &&
-  data_.charAt(data_index_) !== " "
+  data_.charAt(data_index_) !== " " && 
+  data_.charAt(data_index_) !== ">"
  ) { 
   last_character.push(data_.charAt(data_index_)); 
+  data_index_ = data_index_ + 1; 
+  return recurse(data_index_);
  }
 
- if(data_.charAt(data_index_) === '"') {
-  if(last_character[last_character.length - 1] !== '=' ) {  //and one prior not a character
-   //some error or just wrong code i need to check or something else
+ if(
+  data_.charAt(data_index_) === '"' && 
+  found_space_identify_name === true
+ ) {
+  if(
+   last_character[last_character.length - 1] === '=' && 
+   last_character[last_character.length - 2] === 'a-2'
+  ) { 
+    data_index_and_line_number_update = double_quote_string(data_, data_index_, line_number_);
+    data_index_ = data_index_and_line_number_update.data_index_;
+    line_number_ = data_index_and_line_number_update.line_number_;
+    return recurse(data_index_);
   } else { 
-    //run regular
+    throw new error('if beginning a string inside of a script tag, the previous character must be an equals sign and the previous to that must be a letter'); 
   }
  }
 
- if(data_.charAt(data_index_) === "'") {
-  if(last_character[last_character.length - 1] !== '=') { //and one prior not a character
-    //some error or just wrong code i need to check or something else
+ if(
+  data_.charAt(data_index_) === "'" &&
+  found_space_identify_name === true
+ ) {
+  if(
+   last_character[last_character.length - 1] === '=' && 
+   last_character[last_character.length - 2] === 'a-2'
+  ) { 
+    data_index_and_line_number_update = single_quote_string(data_, data_index_, line_number_);
+    data_index_ = data_index_and_line_number_update.data_index_;
+    line_number_ = data_index_and_line_number_update.line_number_;
+    return recurse(data_index_);
   } else { 
-    //run regular
+     throw new error('if beginning a string inside of a script tag, the previous character must be an equals sign and the previous to that must be a letter');
+  }
+ }
+
+ if(
+  data_.charAt(data_index_) === ">" && 
+  found_space_identify_name === true
+ ) {
+  data_index_ = data_index_ + 1; 
+  return { 
+   data_index: data_index_, 
+   line_number: line_number_,
+   script_name: script_name
   }
  }
 
