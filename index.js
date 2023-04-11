@@ -48,7 +48,7 @@
 
    var LEX = []; //little lex over here down the street
    var scripts = []; //tracks opening and closing scripts
-   var temp_data_index = 0;
+   var temp_line_number = 0;
    var data_index = 0;
    var first_valid_character_html_tag = /^[a-zA-Z]*$/;
    var arrow_index_parameter_boundries = [];
@@ -212,12 +212,18 @@
    data.charAt(data_index) === '<' && 
    data.charAt(data_index + 1).test(first_valid_character_html_tag) === true
   ) { 
-   temp_data_index = data_index;
+   temp_line_number = line_number;
    data_index = data_index + 2;
    data_index_and_line_number_update = html_tag(data, data_index, line_number, '<' +  data.charAt(data_index + 1));
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   scripts.push({tag_line_number_start: temp_data_index, tag_line_number_end: data_index, type: 'opening', name: data_index_and_line_number_update.script_name.toLowerCase(), tag_string: data_index_and_line_number_update.tag_string}) //add a start and stop index on this if necessary
+   scripts.push({
+    tag_line_number_start: temp_line_number, 
+    tag_line_number_end: line_number, 
+    type: 'opening', 
+    name: data_index_and_line_number_update.script_name.toLowerCase(), 
+    tag_string: data_index_and_line_number_update.tag_string
+   })
    if(data_index_and_line_number_update.script_name.toLowerCase() === 'script') { 
     iterate_through_file_text(data_index);
    } 
@@ -229,12 +235,18 @@
    data.charAt(data_index + 1) === '/' &&
    data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
   ) { 
-   temp_data_index = data_index;
+   temp_line_number = line_number;
    data_index = data_index + 3;
    data_index_and_line_number_update = html_tag(data, data_index, line_number, '<' + data.charAt(data_index + 1) + data.charAt(data_index + 2));
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   scripts.push({tag_line_number_start: temp_data_index, tag_line_number_end: data_index, type: 'closing', name: data_index_and_line_number_update.script_name.toLowerCase(), tag_string: data_index_and_line_number_update.tag_string})
+   scripts.push({
+    tag_line_number_start: temp_line_number, 
+    tag_line_number_end: line_number, 
+    type: 'closing', 
+    name: data_index_and_line_number_update.script_name.toLowerCase(), 
+    tag_string: data_index_and_line_number_update.tag_string
+   })
    return run_from_html(data_index);
   }
 
@@ -261,7 +273,11 @@
    data.charAt(data_index) === '/' &&
    data.charAt(data_index + 1) === '*'
   ) { 
-   arrow_index_parameter_boundries.push({boundry_type: 'multiline_comment', first_index: data_index, last_index: 'to be determined'});
+   arrow_index_parameter_boundries.push({
+    boundry_type: 'multiline_comment', 
+    first_index: data_index, 
+    last_index: 'to be determined'
+   });
    data_index = data_index + 2; 
    data_index_and_line_number_update = multiline_comment(data, data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
@@ -274,7 +290,11 @@
    data.charAt(data_index) === '/' &&
    data.charAt(data_index + 1) === '/'
   ) { 
-   arrow_index_parameter_boundries.push({boundry_type: 'singleline_comment', first_index: data_index, last_index: 'to be determined'});
+   arrow_index_parameter_boundries.push({
+    boundry_type: 'singleline_comment', 
+    first_index: data_index, 
+    last_index: 'to be determined'
+   });
    data_index = data_index + 2; 
    data_index_and_line_number_update = singleline_comment(data, data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
@@ -283,8 +303,12 @@
    return iterate_through_file_text(data_index);
   }
 
-  if(data.charAt(data_index) === '/') { //add some additional checks here.. for what the next character is allowed to be.. use a regular expression
-   arrow_index_parameter_boundries.push({boundry_type: 'regular_expression', first_index: data_index, last_index: 'to be determined'});
+  if(data.charAt(data_index) === '/') {
+   arrow_index_parameter_boundries.push({
+    boundry_type: 'regular_expression', 
+    first_index: data_index, 
+    last_index: 'to be determined'
+   });
    data_index = data_index + 1; 
    data_index_and_line_number_update = regex(data, data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
@@ -294,7 +318,11 @@
   }
 
   if(data.charAt(data_index) === '"') { 
-   arrow_index_parameter_boundries.push({boundry_type: 'double_quote', first_index: data_index, last_index: 'to be determined'});
+   arrow_index_parameter_boundries.push({
+    boundry_type: 'double_quote', 
+    first_index: data_index, 
+    last_index: 'to be determined'
+   });
    data_index = data_index + 1; 
    data_index_and_line_number_update = double_quote_string(data, data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
@@ -304,7 +332,11 @@
   }
 
   if(data.charAt(data_index) === "'") { 
-   arrow_index_parameter_boundries.push({boundry_type: 'single_quote', first_index: data_index, last_index: 'to be determined'});
+   arrow_index_parameter_boundries.push({
+    boundry_type: 'single_quote', 
+    first_index: data_index, 
+    last_index: 'to be determined'
+   });
    data_index = data_index + 1; 
    data_index_and_line_number_update = single_quote_string(data, data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
@@ -314,7 +346,11 @@
   }
 
   if(data.charAt(data_index) === '`') { 
-   arrow_index_parameter_boundries.push({boundry_type: 'template_quote', first_index: data_index, last_index: 'to be determined'});
+   arrow_index_parameter_boundries.push({
+    boundry_type: 'template_quote', 
+    first_index: data_index, 
+    last_index: 'to be determined'
+   });
    data_index = data_index + 1; 
    data_index_and_line_number_update = template_string(data, data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
@@ -329,16 +365,22 @@
     data.charAt(data_index + 1) === '/' &&
     data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
    ) { 
-    temp_data_index = data_index;
+    temp_line_number = line_number;
     data_index = data_index + 3;
     data_index_and_line_number_update = html_tag(data, data_index, line_number, '<' + data.charAt(data_index + 1) + data.charAt(data_index + 2));
     data_index = data_index_and_line_number_update.data_index;
     line_number = data_index_and_line_number_update.line_number;
-    scripts.push({tag_line_number_start: temp_data_index, tag_line_number_end: data_index, type: 'closing', name: data_index_and_line_number_update.script_name.toLowerCase(), tag_string: data_index_and_line_number_update.tag_string})
-    if(data_index_and_line_number_update.script_name.toLowerCase() === 'script') { //should always be script tag
+    scripts.push({
+     tag_line_number_start: temp_line_number, 
+     tag_line_number_end: line_number, 
+     type: 'closing', 
+     name: data_index_and_line_number_update.script_name.toLowerCase(), 
+     tag_string: data_index_and_line_number_update.tag_string
+    })
+    if(data_index_and_line_number_update.script_name.toLowerCase() === 'script') {
      return;
     } else { 
-     return iterate_through_file_text(data_index); //should not be hit ...once in a script tag no use to have another script randomly in a file unless its in a string
+     return iterate_through_file_text(data_index);
     }
    }
   }

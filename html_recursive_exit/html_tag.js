@@ -127,7 +127,7 @@ function recurse(data_index_) {
    last_character[last_character.length - 1] === '=' && 
    valid_character.test(last_character[last_character.length - 2]) === true
   ) { 
-   data_index_and_line_number_update = single_quote_string(data_, data_index_, false, line_number_, '', true); //ending is coming from html tag
+   data_index_and_line_number_update = single_quote_string(data_, data_index_, false, line_number_, '', true);
    data_index_ = data_index_and_line_number_update.data_index_;
    line_number_ = data_index_and_line_number_update.line_number_;
    tag_string += data_index_and_line_number_update.tag_string;
