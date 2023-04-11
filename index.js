@@ -175,7 +175,7 @@
 
  function run_from_html(data_index) { 
  
-  if(data_index >= data_length) { 
+  if(data_index > data_length) { 
    return;
   }
  
@@ -251,7 +251,7 @@
  
  function iterate_through_file_text(data_index) {
  
-  if(data_index >= data_length) { 
+  if(data_index > data_length) { 
    return;
   }
  
