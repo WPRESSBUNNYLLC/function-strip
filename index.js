@@ -133,27 +133,14 @@
  
     if(filename) { 
  
-     file_type = filename.split(''); //just use a regular expression here or a while loop. i know its ugly. shut up
+     file_type = filename.split('.');
+     file_type = file_type[file_type.length - 1].toLowerCase(); //wow
  
-     if(
-      file_type.length >= 2 &&
-      file_type[file_type.length - 1].toLowerCase() === 's' && 
-      file_type[file_type.length - 2].toLowerCase() === 't'
-     ) { 
+     if(file_type === 'ts') { 
       file_type = 'typescript';
-     } else if(
-      file_type.length >= 2 &&
-      file_type[file_type.length - 1].toLowerCase() === 's' && 
-      file_type[file_type.length - 2].toLowerCase() === 'j'
-     ) { 
+     } else if(file_type === 'js') { 
       file_type = 'javascript';
-     } else if(
-      file_type.length >= 4 &&
-      file_type[file_type.length - 1].toLowerCase() === 'l' && 
-      file_type[file_type.length - 2].toLowerCase() === 'm' && 
-      file_type[file_type.length - 3].toLowerCase() === 't' && 
-      file_type[file_type.length - 4].toLowerCase() === 'h'
-     ) {
+     } else if(file_type === 'html') {
       file_type = 'html';
      } else { 
       file_type = '';
