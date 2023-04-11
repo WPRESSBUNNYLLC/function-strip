@@ -1,6 +1,6 @@
 
 /*
- determines the exit of a bad closing tag in an html document... mkae usre to look over this again.... im assuming there are going to be some errors... this determines the script tag as well as other tags... if script enter or exit... if other than just continue
+ determines the exit of a bad closing tag in an html document... mkae usre to look over this again.... im assuming there are going to be some errors... this determines the script tag as well as other tags... if script enter or exit... if other than just continue ... try not to assume with !==, use a regular expression with exact character matches
 */
 
 var double_quote_string = require('./script_recursive_exit/double_quote_string');

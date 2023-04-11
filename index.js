@@ -47,6 +47,7 @@
    */
 
    var LEX = []; //little lex over here down the street
+   var bts = '';
    var scripts = []; //tracks opening and closing scripts
    var temp_line_number = 0;
    var data_index = 0;
@@ -213,8 +214,9 @@
    data.charAt(data_index + 1).test(first_valid_character_html_tag) === true
   ) { 
    temp_line_number = line_number;
+   bts = '<' +  data.charAt(data_index + 1);
    data_index = data_index + 2;
-   data_index_and_line_number_update = html_tag(data, data_index, line_number, '<' +  data.charAt(data_index + 1));
+   data_index_and_line_number_update = html_tag(data, data_index, line_number, bts);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    scripts.push({
@@ -236,8 +238,9 @@
    data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
   ) { 
    temp_line_number = line_number;
+   bts = '<' + data.charAt(data_index + 1) + data.charAt(data_index + 2);
    data_index = data_index + 3;
-   data_index_and_line_number_update = html_tag(data, data_index, line_number, '<' + data.charAt(data_index + 1) + data.charAt(data_index + 2));
+   data_index_and_line_number_update = html_tag(data, data_index, line_number, bts);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    scripts.push({
@@ -366,8 +369,9 @@
     data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
    ) { 
     temp_line_number = line_number;
+    bts = '<' + data.charAt(data_index + 1) + data.charAt(data_index + 2);
     data_index = data_index + 3;
-    data_index_and_line_number_update = html_tag(data, data_index, line_number, '<' + data.charAt(data_index + 1) + data.charAt(data_index + 2));
+    data_index_and_line_number_update = html_tag(data, data_index, line_number, bts);
     data_index = data_index_and_line_number_update.data_index;
     line_number = data_index_and_line_number_update.line_number;
     scripts.push({

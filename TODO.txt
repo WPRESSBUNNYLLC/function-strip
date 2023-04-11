@@ -18,6 +18,7 @@
    add a start and stop index when pushing scripts if necessary
    for the lex add a parameter to the functions for string values.... types and all theat shit will be figured out
    compartmentalize repeated code in index into functions 
+   try not to assume with !==, use regex for character matches
 
    when i go into a function, every consditional variable for outside the function should already be reset.
    when i leave a function, every consditional variable for inside the function should be reset
