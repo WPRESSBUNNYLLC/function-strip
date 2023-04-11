@@ -15,6 +15,7 @@
   */
 
    var fs = require('file-system');
+   var update_function_and_update_data = ('./data');
 
    var initiate_arrow = require('./functions/arrow/arrow_main');
    var initiate_regular = require('./functions/regular/regular_main');
@@ -46,9 +47,9 @@
    * @param {function_types} the different functions to execute
    */
 
-   var LEX = []; //little lex over here down the street
+   var LEX = [];
    var bts = '';
-   var scripts = []; //tracks opening and closing scripts
+   var tags = []; //tracks opening and closing tags
    var temp_line_number = 0;
    var data_index = 0;
    var first_valid_character_html_tag = /^[a-zA-Z]*$/;
@@ -148,7 +149,8 @@
  
      if(file_type !== '') {
       data_index = 0;
-      data = fs.readFileSync(filepath, 'utf8');
+      update_function_and_update_data.update_data(fs.readFileSync(filepath, 'utf8'));
+      data = update_function_and_update_data.data;
       data_length = data.length;
       fp = filepath;
       line_number = 0;
@@ -206,7 +208,7 @@
    data_index_and_line_number_update = html_tag(data, data_index, line_number, bts);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   scripts.push({
+   tags.push({
     tag_line_number_start: temp_line_number, 
     tag_line_number_end: line_number, 
     type: 'opening', 
@@ -230,7 +232,7 @@
    data_index_and_line_number_update = html_tag(data, data_index, line_number, bts);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   scripts.push({
+   tags.push({
     tag_line_number_start: temp_line_number, 
     tag_line_number_end: line_number, 
     type: 'closing', 
@@ -246,7 +248,7 @@
  }
  
  /*
-  When a definition for a function is found, backtracking to start the build string with the correct beginning value of the function. everything implies outside the function body
+  building the function outside of certain things like comment etc
  */
  
  function iterate_through_file_text(data_index) {
@@ -361,7 +363,7 @@
     data_index_and_line_number_update = html_tag(data, data_index, line_number, bts);
     data_index = data_index_and_line_number_update.data_index;
     line_number = data_index_and_line_number_update.line_number;
-    scripts.push({
+    tags.push({
      tag_line_number_start: temp_line_number, 
      tag_line_number_end: line_number, 
      type: 'closing', 

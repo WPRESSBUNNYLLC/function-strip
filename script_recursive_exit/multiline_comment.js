@@ -3,13 +3,15 @@
  determines when ending a multi line comment... 
 */
 
+var update_function_and_update_data = ('./data');
+
 var data_ = '';
 var data_index_ = 0;
 var in_function_ = false, in_function_build_string_ = '';
 var line_number_ = 0;
 
-function multiline(data, data_index, in_function, line_number, build_string) { 
- data_ = data;
+function multiline(data_index, in_function, line_number, build_string) { 
+ data_ = update_function_and_update_data.data;
  data_index_ = data_index;
  in_function_ = in_function;
  in_function_build_string_ = build_string;

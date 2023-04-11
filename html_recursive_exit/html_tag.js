@@ -5,6 +5,7 @@
 
 var double_quote_string = require('./script_recursive_exit/double_quote_string');
 var single_quote_string = require('./script_recursive_exit/single_quote_string');
+var update_function_and_update_data = ('./data');
 
 var data_ = '';
 var data_index_ = 0;
@@ -16,8 +17,8 @@ var data_index_and_line_number_update = {};
 var valid_character = /^[a-zA-Z]*$/;
 var tag_string = '';
 
-function html_tag(data, data_index, line_number, start) { 
- data_ = data;
+function html_tag(data_index, line_number, start) { 
+ data_ = update_function_and_update_data.data;
  data_index_ = data_index;
  line_number_ = line_number;
  found_space_identify_name = false;
@@ -112,7 +113,7 @@ function recurse(data_index_) {
    return recurse(data_index_);
   } else { 
     throw new error(
-     'if beginning a string inside of a script tag,\n' +
+     'if beginning a string inside of a tag,\n' +
      'the previous character must be an equals sign and the\n' +
      'previous to that must be a letter'
     ); 
@@ -134,7 +135,7 @@ function recurse(data_index_) {
    return recurse(data_index_);
   } else { 
     throw new error(
-     'if beginning a string inside of a script tag,\n' +
+     'if beginning a string inside of a tag,\n' +
      'the previous character must be an equals sign and the\n' +
      'previous to that must be a letter'
     );   

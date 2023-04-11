@@ -3,12 +3,14 @@
  determines the end of an html comment... comes from html function
 */
 
+var update_function_and_update_data = ('./data');
+
 var data_ = '';
 var data_index_ = 0;
 var line_number_ = 0;
 
-function html_comment(data, data_index, line_number) { 
- data_ = data;
+function html_comment(data_index, line_number) { 
+ data_ = update_function_and_update_data.data;
  data_index_ = data_index;
  line_number_ = line_number;
  return recurse(data_index_);

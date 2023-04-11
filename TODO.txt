@@ -8,6 +8,8 @@
    make sure to add if a regular name in arrow function in case there are no parameters - const wow = jkj => { }
    add a start and stop index when pushing scripts if necessary
    for the lex, determine with an equals sign at the top making sure not in anything else... backtrack, get name and type... then continue... ... functions will be added in their own thing and additional parameters for strings and lex will be figured out.
+   add additional checks for regular expressions on the reg call in index.js
+   make data accessible everywhere. update at the beginning of each script
 
    
    1. template 
@@ -18,7 +20,7 @@
    6. arrow body 
 
    done 
-   
+
    backtracking
    the only thing to check for is an equals sign in the backtracking set... when an equals sign is found, you know the function has a name and possibly a type. 
    this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function
