@@ -11,6 +11,8 @@ const function_types = {
  arrow: true, 
 }
 
+// add a file types array to this as well... just make it one object in the end
+
 try {
   console.log(generate(folders, file_to_generate, function_types));
 } catch (err) {

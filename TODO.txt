@@ -1,29 +1,24 @@
    TODO:
    https://blog.sessionstack.com/how-javascript-works-the-different-ways-of-declaring-a-function-5-best-practices-8a0324c06fe2
-   make sure to recurse on if a function is invokable (); - do this at the end after push function
-   check for escaped strings - check and comments if comments can be escaped. not sure
-   add in additional characters in addition to new line and " " if necessary. i dont think it is
-   add when in and out of a regular expression outside a string for counting/entering and inside a string for counting .... console.log(`The value of lastIndex is ${/d(b+```)d/g.lastIndex}`); vs const re = /^(?:\d{3}|\(\d{3}\))([-/.])\d{3}\1\d{4}$/; ...
-   take regular expressions outside and indide into consideration and template literals for counting
-   make file types a wrapper condition. 
-   add files for exiting
-   add an updater for whether or not to pass in data if its the same file... just so the entire data isnt passed more than once
-   make sure indexes are set correclty
-   possibly use a library for checking syntax errors or some web browser, use the window function to get errors in the document and move next.. eslint or somethings
-   parameter boundries still need to be set within each function... or just checks for counting real whatevers.... this is the shares recursive exit
-   dont need to recurse on <script> ...so i can delete those files i guess just need <script then </script and canuse the regular strings and all that jazz in the body
-   make sure to add if a regular name in arrow function in case there are no parameters const wow = jkj => { }
-   seperate iterate through file text into different programming languages
-   take } into consideration for one before function
+   make sure to recurse on if a function is invokable (); - do this at the end of each function... make sure the function can be invoked beforehand with a parameter
+   add other languages (below iterate_through_file_text) also add languages as a configuration property to skip over files
+   make sure to use regular expressions instead of many !== in some files... many !== isnt accurate
+   add an exported updated data for every new file to avoid passing
+   possibly use a library for checking syntax errors or some web browser, use the window function to get errors in the document and move next.. eslint or something
+   make sure to add if a regular name in arrow function in case there are no parameters - const wow = jkj => { }
    add a start and stop index when pushing scripts if necessary
-   for the lex add a parameter to the functions for string values.... types and all theat shit will be figured out
-   compartmentalize repeated code in index into functions 
-   try not to assume with !==, use regex for character matches
+   for the lex, determine with an equals sign at the top making sure not in anything else... backtrack, get name and type... then continue... ... functions will be added in their own thing and additional parameters for strings and lex will be figured out.
 
-   when i go into a function, every consditional variable for outside the function should already be reset.
-   when i leave a function, every consditional variable for inside the function should be reset
+   
+   1. template 
+   2. regex 
+   3. regular beginning
+   4. regular body
+   5. arrow beginning 
+   6. arrow body 
 
-
+   done 
+   
    backtracking
    the only thing to check for is an equals sign in the backtracking set... when an equals sign is found, you know the function has a name and possibly a type. 
    this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function

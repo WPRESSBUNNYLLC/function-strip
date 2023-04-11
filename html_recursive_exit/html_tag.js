@@ -16,7 +16,7 @@ var data_index_and_line_number_update = {};
 var valid_character = /^[a-zA-Z]*$/;
 var tag_string = '';
 
-function html_bad_tag(data, data_index, line_number, start) { 
+function html_tag(data, data_index, line_number, start) { 
  data_ = data;
  data_index_ = data_index;
  line_number_ = line_number;
@@ -159,4 +159,4 @@ function recurse(data_index_) {
 
 }
 
-module.exports = html_bad_tag;
+module.exports = html_tag;

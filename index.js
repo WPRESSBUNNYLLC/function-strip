@@ -134,7 +134,7 @@
     if(filename) { 
  
      file_type = filename.split('.');
-     file_type = file_type[file_type.length - 1].toLowerCase(); //wow
+     file_type = file_type[file_type.length - 1].toLowerCase(); 
  
      if(file_type === 'ts') { 
       file_type = 'typescript';
