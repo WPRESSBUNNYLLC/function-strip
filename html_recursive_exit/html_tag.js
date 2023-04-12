@@ -17,7 +17,7 @@ var found_space_identify_name = false;
 var last_character = [];
 var script_name = '';
 var data_index_and_line_number_update = {};
-var valid_character = /^[a-zA-Z0-9]*$/; //valid character is anything but /, ' and " --- if these three are found, must exit the red zone and iterate through again
+var valid_character = /^[a-zA-Z0-9]*$/; //valid character is anything but /, ' and " --- can prob get rid of this expression
 var tag_string = '';
 var end_red_zone = {};
 
@@ -55,6 +55,7 @@ function recurse(data_index_) {
 
  tag_string += data_.charAt(data_index_);
  
+ //push the name
  if(
   found_space_identify_name === false && 
   data_.charAt(data_index_) !== '\n' &&
@@ -66,6 +67,7 @@ function recurse(data_index_) {
   return recurse(data_index_);
  }
 
+ //found name, continue through
  if(
   found_space_identify_name === false && 
   data_.charAt(data_index_) === '\n' || 
@@ -89,6 +91,7 @@ function recurse(data_index_) {
   }
  }
 
+ //found a red string.. determine when to get out
  if(
   found_space_identify_name === true && 
   data_.charAt(data_index_) === "/"
@@ -106,6 +109,7 @@ function recurse(data_index_) {
   }
  }
 
+ //building what might be the name of the string.. if its a valid name, good, if not, red zone
  if(
   found_space_identify_name === true && 
   data_.charAt(data_index_) !== '"' && 
@@ -119,6 +123,7 @@ function recurse(data_index_) {
   return recurse(data_index_);
  }
 
+ //found a string, if the previous two are valid, then look for the ending string character so not to count > ... if not valid, recurse the red zone until out of a red zone... then go again
  if(
   data_.charAt(data_index_) === '"' && 
   found_space_identify_name === true
@@ -149,6 +154,7 @@ function recurse(data_index_) {
   }
  }
 
+ //found a string, if the previous two are valid, then look for the ending string character so not to count > ... if not valid, recurse the red zone until out of a red zone... then go again
  if(
   data_.charAt(data_index_) === "'" &&
   found_space_identify_name === true
@@ -167,13 +173,19 @@ function recurse(data_index_) {
   } else { 
     end_red_zone = red_zone(data_index_);
     if(end_red_zone.end === true)  {
-      return;
+     return { 
+      data_index: data_index_, 
+      line_number: line_number_, 
+      script_name: script_name, 
+      tag_string: tag_string
+     }
     } else { 
       return recurse(data_index_);
     }
    }
  }
 
+ //out of a red zone, out of a string and found > /// the tag has ended
  if(
   data_.charAt(data_index_) === ">" && 
   found_space_identify_name === true
@@ -202,6 +214,7 @@ function red_zone(data_index_) {
 
  tag_string += data_.charAt(data_index_);
 
+ //ending a red zone on a new line.. continue with tag
  if(data_.charAt(data_index_) === '\n') { 
   line_number_ = line_number_ + 1;
   data_index_ = data_index_ + 1;
@@ -210,6 +223,7 @@ function red_zone(data_index_) {
   }
  }
 
+ //ending the red zone to continue with tag
  if(data_.charAt(data_index_) === ' ') { 
   data_index_ = data_index_ + 1;
   return {
@@ -217,6 +231,7 @@ function red_zone(data_index_) {
   }
  }
 
+ //in a red zone and found >, end the tag
  if(data_.charAt(data_index_) === '>') { 
   data_index_ = data_index_ + 1;
   return {
