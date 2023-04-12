@@ -106,7 +106,7 @@ function recurse(data_index_) {
   data_.charAt(data_index_) !== '"' && 
   data_.charAt(data_index_) !== "'" &&
   data_.charAt(data_index_) !== ">" &&
-  data_.charAt(data_index_) !== " " && //should only push characters in a script ioi8ifidoifa=""
+  data_.charAt(data_index_) !== " " && //should only push characters in a script ioi8ifidoifa --> ="   ---- 
   data_.charAt(data_index_) !== "\n"
  ) { 
   last_character.push(data_.charAt(data_index_)); 
@@ -119,13 +119,15 @@ function recurse(data_index_) {
   found_space_identify_name === true
  ) {
   if(
+   last_character.length >= 2 &&
    last_character[last_character.length - 1] === '=' && 
-   valid_character.test(last_character[last_character.length - 2]) === true //anything but ', " and /
+   valid_character.test(last_character[last_character.length - 2]) === true //anything but ', " and / 
   ) { 
    data_index_and_line_number_update = double_quote_string(data_index_, false, line_number_, '', true);
    data_index_ = data_index_and_line_number_update.data_index_;
    line_number_ = data_index_and_line_number_update.line_number_;
    tag_string += data_index_and_line_number_update.tag_string;
+   last_character = [];
    return recurse(data_index_);
   } else { 
     end_red_zone = red_zone(data_index_);
@@ -142,13 +144,15 @@ function recurse(data_index_) {
   found_space_identify_name === true
  ) {
   if(
+   last_character.length >= 2 &&
    last_character[last_character.length - 1] === '=' && 
    valid_character.test(last_character[last_character.length - 2]) === true 
   ) { 
-   data_index_and_line_number_update = single_quote_string(data_index_, false, line_number_, '', true); //back slashes do not matter on this 
+   data_index_and_line_number_update = single_quote_string(data_index_, false, line_number_, '', true);
    data_index_ = data_index_and_line_number_update.data_index_;
    line_number_ = data_index_and_line_number_update.line_number_;
    tag_string += data_index_and_line_number_update.tag_string;
+   last_character = [];
    return recurse(data_index_);
   } else { 
     end_red_zone = red_zone(data_index_);
