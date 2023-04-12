@@ -1,11 +1,14 @@
 
 /*
- determines the exit of a bad closing tag in an html document... mkae usre to look over this again.... im assuming there are going to be some errors... this determines the script tag as well as other tags... if script enter or exit... if other than just continue ... try not to assume with !==, use a regular expression with exact character matches
+ determines the entrance and exit of an opening or closing tag... 
+ there are three red zones 
+ /, ' and " ...   a red zone is exited when a space, > or new line is found.
+
 */
 
 var double_quote_string = require('./script_recursive_exit/double_quote_string');
 var single_quote_string = require('./script_recursive_exit/single_quote_string');
-var update_function_and_update_data = ('./data');
+var update_function_and_update_data = require('../data');
 
 var data_ = '';
 var data_index_ = 0;
@@ -14,9 +17,9 @@ var found_space_identify_name = false;
 var last_character = [];
 var script_name = '';
 var data_index_and_line_number_update = {};
-var valid_character = /^[a-zA-Z0-9]*$/; //any character other than /
+var valid_character = /^[a-zA-Z0-9]*$/; //valid character is anything but /, ' and " --- if these three are found, must exit the red zone and iterate through again
 var tag_string = '';
-var red_zone = false; 
+var end_red_zone = {};
 
 function html_tag(data_index, line_number, start) { 
  data_ = update_function_and_update_data.data;
@@ -35,7 +38,7 @@ function html_tag(data_index, line_number, start) {
  return recurse(data_index_);
 }
 
-function recurse(data_index_) { // /;
+function recurse(data_index_) {
 
  if(data_index_ > data_.length) { 
   return {
@@ -87,16 +90,15 @@ function recurse(data_index_) { // /;
  }
 
  if(
-  found_space_identify_name === true &&
-  data_.charAt(data_index_) === '\n' || //wrong... needs to be all tags except ' and " 
-  data_.charAt(data_index_) === ' '
-  ) { 
-  red_zone = false;
- } else if(
-  found_space_identify_name === true &&
+  found_space_identify_name === true && 
   data_.charAt(data_index_) === "/"
  ) { 
-  red_zone = true;
+  end_red_zone = red_zone(data_index_);
+  if(end_red_zone.end === true)  {
+    return;
+  } else { 
+    return recurse(data_index_);
+  }
  }
 
  if(
@@ -104,8 +106,8 @@ function recurse(data_index_) { // /;
   data_.charAt(data_index_) !== '"' && 
   data_.charAt(data_index_) !== "'" &&
   data_.charAt(data_index_) !== ">" &&
-  data_.charAt(data_index_) !== " " && //for index - 2 (ignore if confused)
-  data_.charAt(data_index_) !== "\n"  //for index - 2
+  data_.charAt(data_index_) !== " " && //should only push characters in a script ioi8ifidoifa=""
+  data_.charAt(data_index_) !== "\n"
  ) { 
   last_character.push(data_.charAt(data_index_)); 
   data_index_ = data_index_ + 1; 
@@ -114,12 +116,11 @@ function recurse(data_index_) { // /;
 
  if(
   data_.charAt(data_index_) === '"' && 
-  found_space_identify_name === true && 
-  red_zone === false
+  found_space_identify_name === true
  ) {
   if(
    last_character[last_character.length - 1] === '=' && 
-   valid_character.test(last_character[last_character.length - 2]) === true 
+   valid_character.test(last_character[last_character.length - 2]) === true //anything but ', " and /
   ) { 
    data_index_and_line_number_update = double_quote_string(data_index_, false, line_number_, '', true);
    data_index_ = data_index_and_line_number_update.data_index_;
@@ -127,34 +128,35 @@ function recurse(data_index_) { // /;
    tag_string += data_index_and_line_number_update.tag_string;
    return recurse(data_index_);
   } else { 
-    throw new error(
-     'if beginning a string inside of a tag,\n' +
-     'the previous character must be an equals sign and the\n' +
-     'previous to that must be a letter'
-    ); 
+    end_red_zone = red_zone(data_index_);
+    if(end_red_zone.end === true)  {
+      return;
+    } else { 
+      return recurse(data_index_);
+    }
   }
  }
 
  if(
   data_.charAt(data_index_) === "'" &&
-  found_space_identify_name === true && 
-  red_zone === false
+  found_space_identify_name === true
  ) {
   if(
    last_character[last_character.length - 1] === '=' && 
    valid_character.test(last_character[last_character.length - 2]) === true 
   ) { 
-   data_index_and_line_number_update = single_quote_string(data_index_, false, line_number_, '', true);
+   data_index_and_line_number_update = single_quote_string(data_index_, false, line_number_, '', true); //back slashes do not matter on this 
    data_index_ = data_index_and_line_number_update.data_index_;
    line_number_ = data_index_and_line_number_update.line_number_;
    tag_string += data_index_and_line_number_update.tag_string;
    return recurse(data_index_);
   } else { 
-    throw new error(
-     'if beginning a string inside of a tag,\n' +
-     'the previous character must be an equals sign and the\n' +
-     'previous to that must be a letter, number or some random character. prob will delete this'
-    );   
+    end_red_zone = red_zone(data_index_);
+    if(end_red_zone.end === true)  {
+      return;
+    } else { 
+      return recurse(data_index_);
+    }
    }
  }
 
@@ -173,6 +175,10 @@ function recurse(data_index_) { // /;
 
  data_index_ = data_index_ + 1; 
  return recurse(data_index_);
+
+}
+
+function red_zone(data_index_) { //go through the red zone until a space, new line or > is found... then either end the tag or continue in regular fashion... make sure to build the tag as well in this
 
 }
 

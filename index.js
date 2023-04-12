@@ -15,7 +15,7 @@
   */
 
    var fs = require('file-system');
-   var update_function_and_update_data = ('./data');
+   var update_function_and_update_data = require('./data');
 
    var initiate_arrow = require('./functions/arrow/arrow_main');
    var initiate_regular = require('./functions/regular/regular_main');
@@ -47,7 +47,7 @@
    * @param {function_types} the different functions to execute
    */
 
-   var LEXIE = []; //ooo im tellin /;
+   var LEX = [];
    var bts = '';
    var tags = [];
    var temp_line_number = 0;

@@ -10,9 +10,9 @@
    for the lex, determine with an equals sign at the top making sure not in anything else... backtrack, get name and type... then continue... ... functions will be added in their own thing and additional parameters for strings and lex will be figured out.
    add additional checks for regular expressions on the reg call in index.js
    make data accessible everywhere. update at the beginning of each script
-   look into html tag again... look for '/' set a red zone and when a space set to false. if false then i can enter a string, if true, i cant enter a string. regardless of false or true, if > then end the tag
-   just do html_tag again Jesus. the red zone is weird
-   
+   just do html_tag again. recurse through the bad character set for red zone
+   for arrow function, before => check for characters and set a condition to avoid counting brackets if character (arrow_check and arrow_beginning)
+
    1. template 
    2. regex 
    3. regular beginning

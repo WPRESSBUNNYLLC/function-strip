@@ -3,7 +3,7 @@
  determines when ending a single quote string
 */
 
-var update_function_and_update_data = ('./data');
+var update_function_and_update_data = require('../data');
 
 var data_ = '';
 var data_index_ = 0;
@@ -47,8 +47,8 @@ function recurse(data_index_) {
  }
 
  if(
-  data_.charAt(data_index_) === '"' && 
-  data_.charAt(data_index_ - 1) !== '\\'
+  (data_.charAt(data_index_) === '"' && data_.charAt(data_index_ - 1) !== '\\' && in_tag_ === false) ||
+  (data_.charAt(data_index_) === '"' && in_tag_ === true)
  ) { 
   data_index_ = data_index_ + 1; 
   return {

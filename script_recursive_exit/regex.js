@@ -3,7 +3,7 @@
  determines when to end a regular expression... gets funky
 */
 
-var update_function_and_update_data = ('./data');
+var update_function_and_update_data = require('../data');
 
 var data_ = '';
 var data_index_ = 0;
