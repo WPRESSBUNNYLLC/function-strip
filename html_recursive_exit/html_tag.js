@@ -88,7 +88,7 @@ function recurse(data_index_) { // /;
 
  if(
   found_space_identify_name === true &&
-  data_.charAt(data_index_) === '\n' || 
+  data_.charAt(data_index_) === '\n' || //wrong... needs to be all tags except ' and " 
   data_.charAt(data_index_) === ' '
   ) { 
   red_zone = false;
