@@ -95,7 +95,12 @@ function recurse(data_index_) {
  ) { 
   end_red_zone = red_zone(data_index_);
   if(end_red_zone.end === true)  {
-    return;
+    return { 
+     data_index: data_index_, 
+     line_number: line_number_, 
+     script_name: script_name, 
+     tag_string: tag_string
+    }
   } else { 
     return recurse(data_index_);
   }
@@ -119,7 +124,7 @@ function recurse(data_index_) {
   found_space_identify_name === true
  ) {
   if(
-   last_character.length >= 2 &&
+   last_character.length >= 2 && //could use tag string but spaces and new lines are included so this would be easier
    last_character[last_character.length - 1] === '=' && 
    valid_character.test(last_character[last_character.length - 2]) === true //anything but ', " and / 
   ) { 
@@ -132,7 +137,12 @@ function recurse(data_index_) {
   } else { 
     end_red_zone = red_zone(data_index_);
     if(end_red_zone.end === true)  {
-      return;
+     return { 
+      data_index: data_index_, 
+      line_number: line_number_, 
+      script_name: script_name, 
+      tag_string: tag_string
+     }
     } else { 
       return recurse(data_index_);
     }
@@ -182,7 +192,40 @@ function recurse(data_index_) {
 
 }
 
-function red_zone(data_index_) { //go through the red zone until a space, new line or > is found... then either end the tag or continue in regular fashion... make sure to build the tag as well in this
+function red_zone(data_index_) { 
+
+ if(data_index_ > data_.length) { 
+  return { 
+   end: true
+  }
+ }
+
+ tag_string += data_.charAt(data_index_);
+
+ if(data_.charAt(data_index_) === '\n') { 
+  line_number_ = line_number_ + 1;
+  data_index_ = data_index_ + 1;
+  return {
+    end: false
+  }
+ }
+
+ if(data_.charAt(data_index_) === ' ') { 
+  data_index_ = data_index_ + 1;
+  return {
+    end: false
+  }
+ }
+
+ if(data_.charAt(data_index_) === '>') { 
+  data_index_ = data_index_ + 1;
+  return {
+    end: true
+  }
+ }
+
+ data_index_ = data_index_ + 1;
+ return recurse(data_index_);
 
 }
 
