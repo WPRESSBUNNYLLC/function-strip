@@ -47,12 +47,12 @@
    * @param {function_types} the different functions to execute
    */
 
-   var LEX = [];
+   var LEXIE = []; //ooo im tellin /;
    var bts = '';
-   var tags = []; //tracks opening and closing tags
+   var tags = [];
    var temp_line_number = 0;
    var data_index = 0;
-   var first_valid_character_html_tag = /^[a-zA-Z]*$/;
+   var first_valid_character_html_tag = /^[a-zA-Z0-9]*$/;
    var arrow_index_parameter_boundries = [];
    var data_index_and_line_number_update = {}; 
    var function_index = 1;
@@ -172,7 +172,7 @@
  }
 
  /*
-  when in an html script, find out when in a script tag and run the script function.... make sure to add bad opening and closing tags on this
+  when in an html file, find script tag and run the script function
  */
 
  function run_from_html(data_index) { 
@@ -192,7 +192,7 @@
    data.charAt(data_index + 3) === '-' 
   ) { 
    data_index = data_index + 4; 
-   data_index_and_line_number_update = html_comment(data, data_index, false, line_number);
+   data_index_and_line_number_update = html_comment(data_index, false, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    return run_from_html(data_index);
@@ -205,7 +205,7 @@
    temp_line_number = line_number;
    bts = '<' +  data.charAt(data_index + 1);
    data_index = data_index + 2;
-   data_index_and_line_number_update = html_tag(data, data_index, line_number, bts);
+   data_index_and_line_number_update = html_tag(data_index, line_number, bts);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    tags.push({
@@ -229,7 +229,7 @@
    temp_line_number = line_number;
    bts = '<' + data.charAt(data_index + 1) + data.charAt(data_index + 2);
    data_index = data_index + 3;
-   data_index_and_line_number_update = html_tag(data, data_index, line_number, bts);
+   data_index_and_line_number_update = html_tag(data_index, line_number, bts);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    tags.push({
@@ -248,7 +248,7 @@
  }
  
  /*
-  building the function outside of certain things like comment etc
+  building the function outside of certain things like comments etc
  */
  
  function iterate_through_file_text(data_index) {
@@ -271,7 +271,7 @@
     last_index: 'to be determined'
    });
    data_index = data_index + 2; 
-   data_index_and_line_number_update = multiline_comment(data, data_index, false, line_number, '');
+   data_index_and_line_number_update = multiline_comment(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
@@ -288,7 +288,7 @@
     last_index: 'to be determined'
    });
    data_index = data_index + 2; 
-   data_index_and_line_number_update = singleline_comment(data, data_index, false, line_number, '');
+   data_index_and_line_number_update = singleline_comment(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
@@ -302,7 +302,7 @@
     last_index: 'to be determined'
    });
    data_index = data_index + 1; 
-   data_index_and_line_number_update = regex(data, data_index, false, line_number, '');
+   data_index_and_line_number_update = regex(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
@@ -316,7 +316,7 @@
     last_index: 'to be determined'
    });
    data_index = data_index + 1; 
-   data_index_and_line_number_update = double_quote_string(data, data_index, false, line_number, '');
+   data_index_and_line_number_update = double_quote_string(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
@@ -330,7 +330,7 @@
     last_index: 'to be determined'
    });
    data_index = data_index + 1; 
-   data_index_and_line_number_update = single_quote_string(data, data_index, false, line_number, '');
+   data_index_and_line_number_update = single_quote_string(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
@@ -344,7 +344,7 @@
     last_index: 'to be determined'
    });
    data_index = data_index + 1; 
-   data_index_and_line_number_update = template_string(data, data_index, false, line_number, '');
+   data_index_and_line_number_update = template_string(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
@@ -360,7 +360,7 @@
     temp_line_number = line_number;
     bts = '<' + data.charAt(data_index + 1) + data.charAt(data_index + 2);
     data_index = data_index + 3;
-    data_index_and_line_number_update = html_tag(data, data_index, line_number, bts);
+    data_index_and_line_number_update = html_tag(data_index, line_number, bts);
     data_index = data_index_and_line_number_update.data_index;
     line_number = data_index_and_line_number_update.line_number;
     tags.push({
@@ -379,7 +379,7 @@
   }
 
   if(function_types.regular === true) {
-   possibly_push_regular = initiate_regular(data, data_index, line_number); 
+   possibly_push_regular = initiate_regular(data_index, line_number); 
    if(possibly_push_regular.is_function === true) { 
     exported_functions.push({ 
      index: function_index, 
@@ -399,7 +399,7 @@
   }
 
   if(function_types.arrow === true) {
-   possibly_push_arrow = initiate_arrow(data, data_index, line_number, arrow_index_parameter_boundries);
+   possibly_push_arrow = initiate_arrow(data_index, line_number, arrow_index_parameter_boundries);
    if(possibly_push_arrow.is_function === true) { 
     exported_functions.push({ 
      index: function_index, 

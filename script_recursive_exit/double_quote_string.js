@@ -34,12 +34,12 @@ function recurse(data_index_) {
   }
  }
 
- if(in_function_ === true) { 
-  in_function_build_string_ += data_.charAt(data_index_);
- }
-
  if(data_.charAt(data_index_) === '\n') { 
   line_number_ = line_number_ + 1;
+ }
+
+ if(in_function_ === true) { 
+  in_function_build_string_ += data_.charAt(data_index_);
  }
 
  if(in_tag_ === true) { 

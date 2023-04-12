@@ -14,8 +14,9 @@ var found_space_identify_name = false;
 var last_character = [];
 var script_name = '';
 var data_index_and_line_number_update = {};
-var valid_character = /^[a-zA-Z]*$/;
+var valid_character = /^[a-zA-Z0-9]*$/; //any character other than /
 var tag_string = '';
+var red_zone = false; 
 
 function html_tag(data_index, line_number, start) { 
  data_ = update_function_and_update_data.data;
@@ -34,7 +35,7 @@ function html_tag(data_index, line_number, start) {
  return recurse(data_index_);
 }
 
-function recurse(data_index_) { 
+function recurse(data_index_) { // /;
 
  if(data_index_ > data_.length) { 
   return {
@@ -86,12 +87,25 @@ function recurse(data_index_) {
  }
 
  if(
+  found_space_identify_name === true &&
+  data_.charAt(data_index_) === '\n' || 
+  data_.charAt(data_index_) === ' '
+  ) { 
+  red_zone = false;
+ } else if(
+  found_space_identify_name === true &&
+  data_.charAt(data_index_) === "/"
+ ) { 
+  red_zone = true;
+ }
+
+ if(
   found_space_identify_name === true && 
   data_.charAt(data_index_) !== '"' && 
   data_.charAt(data_index_) !== "'" &&
-  data_.charAt(data_index_) !== "\n" &&
-  data_.charAt(data_index_) !== " " && 
-  data_.charAt(data_index_) !== ">"
+  data_.charAt(data_index_) !== ">" &&
+  data_.charAt(data_index_) !== " " && //for index - 2 (ignore if confused)
+  data_.charAt(data_index_) !== "\n"  //for index - 2
  ) { 
   last_character.push(data_.charAt(data_index_)); 
   data_index_ = data_index_ + 1; 
@@ -100,13 +114,14 @@ function recurse(data_index_) {
 
  if(
   data_.charAt(data_index_) === '"' && 
-  found_space_identify_name === true
+  found_space_identify_name === true && 
+  red_zone === false
  ) {
   if(
    last_character[last_character.length - 1] === '=' && 
-   valid_character.test(last_character[last_character.length - 2]) === true
+   valid_character.test(last_character[last_character.length - 2]) === true 
   ) { 
-   data_index_and_line_number_update = double_quote_string(data_, data_index_, false, line_number_, '', true);
+   data_index_and_line_number_update = double_quote_string(data_index_, false, line_number_, '', true);
    data_index_ = data_index_and_line_number_update.data_index_;
    line_number_ = data_index_and_line_number_update.line_number_;
    tag_string += data_index_and_line_number_update.tag_string;
@@ -122,13 +137,14 @@ function recurse(data_index_) {
 
  if(
   data_.charAt(data_index_) === "'" &&
-  found_space_identify_name === true
+  found_space_identify_name === true && 
+  red_zone === false
  ) {
   if(
    last_character[last_character.length - 1] === '=' && 
-   valid_character.test(last_character[last_character.length - 2]) === true
+   valid_character.test(last_character[last_character.length - 2]) === true 
   ) { 
-   data_index_and_line_number_update = single_quote_string(data_, data_index_, false, line_number_, '', true);
+   data_index_and_line_number_update = single_quote_string(data_index_, false, line_number_, '', true);
    data_index_ = data_index_and_line_number_update.data_index_;
    line_number_ = data_index_and_line_number_update.line_number_;
    tag_string += data_index_and_line_number_update.tag_string;
@@ -137,7 +153,7 @@ function recurse(data_index_) {
     throw new error(
      'if beginning a string inside of a tag,\n' +
      'the previous character must be an equals sign and the\n' +
-     'previous to that must be a letter'
+     'previous to that must be a letter, number or some random character. prob will delete this'
     );   
    }
  }
