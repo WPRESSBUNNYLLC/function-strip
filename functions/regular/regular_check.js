@@ -1,6 +1,7 @@
 
 var update_function_and_update_data = require('../../data');
 var data = '';
+var in_html = false; //used for the other types of functions
  
  function check_regular(data_index) {
   data = update_function_and_update_data.data;
@@ -24,11 +25,17 @@ var data = '';
 
  function check_beginning_regular(data_index) { 
   if(
-   (data.charAt(data_index-1) === '\n' || data.charAt(data_index-1) === ' ' || data.charAt(data_index-1) === ',' || data.charAt(data_index-1) === ':' || data.charAt(data_index-1) === '}') || 
-   ((data.charAt(data_index-1) === '=' || data.charAt(data_index-1) === '(' || data.charAt(data_index-1) === '+' || data.charAt(data_index-1) === '-' || data.charAt(data_index-1) === '~' || data.charAt(data_index-1) === '!') && (data.charAt(data_index-2) === ' ' || data.charAt(data_index-2) === '\n' || data.charAt(data_index-2) === ',' || data.charAt(data_index-2) === ':' || data.charAt(data_index-2) === '}'))) {
-    return true
+   data.charAt(data_index-1) === '\n' || 
+   data.charAt(data_index-1) === ' ' || 
+   data.charAt(data_index-1) === ',' || 
+   data.charAt(data_index-1) === ':' || 
+   data.charAt(data_index-1) === '}' || 
+   data.charAt(data_index-1) === '=' || 
+   data.charAt(data_index-1) === '('
+  ) {
+   return true
   } else { 
-    return false
+   return false
   }
  }
 

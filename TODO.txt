@@ -12,6 +12,7 @@
    make data accessible everywhere. update at the beginning of each script
    just do html_tag again. recurse through the bad character set for red zone
    for arrow function, before => check for characters and set a condition to avoid counting brackets if character (arrow_check and arrow_beginning)
+   check for / as the last character before the space in tags html_tag
 
    1. template 
    2. regex 

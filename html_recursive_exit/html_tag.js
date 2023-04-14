@@ -2,7 +2,10 @@
 /*
  determines the entrance and exit of an opening or closing tag... 
  there are three red zones 
- /, ' and " ...   a red zone is exited when a space, > or new line is found.
+ /, ' and " ...   a red zone is exited when a space, > or new line is found. 
+ must add array of tags and when find tag, note 
+
+ find all the cases and figure it out
 
 */
 
@@ -19,7 +22,6 @@ var script_name = '';
 var data_index_and_line_number_update = {};
 var valid_character = /^[a-zA-Z0-9]*$/; //valid character is anything but /, ' and " --- can prob get rid of this expression
 var tag_string = '';
-var end_red_zone = {};
 
 function html_tag(data_index, line_number, start) { 
  data_ = update_function_and_update_data.data;
@@ -60,19 +62,22 @@ function recurse(data_index_) {
   found_space_identify_name === false && 
   data_.charAt(data_index_) !== '\n' &&
   data_.charAt(data_index_) !== ' ' && 
-  data_.charAt(data_index_) !== '>'  
+  data_.charAt(data_index_) !== '>' &&  //add in additional parameters here 
+  //add in all additional characters here ... because the script name could end on ) or something else
+  data_.charAt(data_index_) !== ')'  
  ) {
   last_character.push(data_.charAt(data_index_));
+  //if tag name in list of allowed tag names... set a condition and continue
   data_index_ = data_index_ + 1;
   return recurse(data_index_);
  }
 
- //found name, continue through
+ //found name, continue through ... try and make this an if else if
  if(
   found_space_identify_name === false && 
-  data_.charAt(data_index_) === '\n' || 
-  data_.charAt(data_index_) === ' ' || 
-  data_.charAt(data_index_) === '>'
+  // data_.charAt(data_index_) === '\n' || 
+  // data_.charAt(data_index_) === ' ' || 
+  // data_.charAt(data_index_) === '>' //also add other characters
  ) {
   found_space_identify_name = true;
   script_name = last_character.join();
@@ -96,8 +101,7 @@ function recurse(data_index_) {
   found_space_identify_name === true && 
   data_.charAt(data_index_) === "/"
  ) { 
-  end_red_zone = red_zone(data_index_);
-  if(end_red_zone.end === true)  {
+  if(red_zone(data_index_) === true)  {
     return { 
      data_index: data_index_, 
      line_number: line_number_, 
@@ -109,7 +113,7 @@ function recurse(data_index_) {
   }
  }
 
- //building what might be the name of the string.. if its a valid name, good, if not, red zone
+ //building what might be the name of the string.. if its a valid name, good, if not, red zone --- can just push this to the bottom
  if(
   found_space_identify_name === true && 
   data_.charAt(data_index_) !== '"' && 
@@ -140,8 +144,7 @@ function recurse(data_index_) {
    last_character = [];
    return recurse(data_index_);
   } else { 
-    end_red_zone = red_zone(data_index_);
-    if(end_red_zone.end === true)  {
+    if(red_zone(data_index_) === true)  {
      return { 
       data_index: data_index_, 
       line_number: line_number_, 
@@ -171,8 +174,7 @@ function recurse(data_index_) {
    last_character = [];
    return recurse(data_index_);
   } else { 
-    end_red_zone = red_zone(data_index_);
-    if(end_red_zone.end === true)  {
+    if(red_zone(data_index_) === true)  {
      return { 
       data_index: data_index_, 
       line_number: line_number_, 
@@ -207,9 +209,7 @@ function recurse(data_index_) {
 function red_zone(data_index_) { 
 
  if(data_index_ > data_.length) { 
-  return { 
-   end: true
-  }
+  return true
  }
 
  tag_string += data_.charAt(data_index_);
@@ -218,25 +218,19 @@ function red_zone(data_index_) {
  if(data_.charAt(data_index_) === '\n') { 
   line_number_ = line_number_ + 1;
   data_index_ = data_index_ + 1;
-  return {
-    end: false
-  }
+  return false;
  }
 
  //ending the red zone to continue with tag
  if(data_.charAt(data_index_) === ' ') { 
   data_index_ = data_index_ + 1;
-  return {
-    end: false
-  }
+  return false;
  }
 
  //in a red zone and found >, end the tag
  if(data_.charAt(data_index_) === '>') { 
   data_index_ = data_index_ + 1;
-  return {
-    end: true
-  }
+  return true;
  }
 
  data_index_ = data_index_ + 1;
