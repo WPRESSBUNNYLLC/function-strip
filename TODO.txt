@@ -13,6 +13,11 @@
    just do html_tag again. recurse through the bad character set for red zone
    for arrow function, before => check for characters and set a condition to avoid counting brackets if character (arrow_check and arrow_beginning)
    check for / as the last character before the space in tags html_tag
+   just figure out the cases for tags 
+   add inside functions as an array to the outermost function 
+   add template literal functions
+   figure out correct beginning and end of regular and arrow function
+
 
    1. template 
    2. regex 

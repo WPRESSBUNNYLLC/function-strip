@@ -274,7 +274,7 @@
    data_index_and_line_number_update = multiline_comment(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
+   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
 
@@ -291,7 +291,7 @@
    data_index_and_line_number_update = singleline_comment(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
+   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
 
@@ -305,7 +305,7 @@
    data_index_and_line_number_update = regex(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
+   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
 
@@ -319,7 +319,7 @@
    data_index_and_line_number_update = double_quote_string(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
+   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
 
@@ -333,7 +333,7 @@
    data_index_and_line_number_update = single_quote_string(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
+   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
 
@@ -347,7 +347,7 @@
    data_index_and_line_number_update = template_string(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index;
+   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
 
@@ -423,5 +423,5 @@
   return iterate_through_file_text(data_index);
  
  }
- 
+
  module.exports = generate;

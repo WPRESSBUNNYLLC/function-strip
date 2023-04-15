@@ -46,8 +46,7 @@ function recurse(data_index_) {
  }
 
  if(
-  (data_.charAt(data_index_) === "'" && data_.charAt(data_index_ - 1) !== '\\' && in_tag_ === false) ||
-  (data_.charAt(data_index_) === "'" && in_tag_ === true)
+  data_.charAt(data_index_) === "'" && ((data_.charAt(data_index_ - 1) !== '\\' && in_tag_ === false) || in_tag_ === true)
  ) { 
   data_index_ = data_index_ + 1; 
   return {

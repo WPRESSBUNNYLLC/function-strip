@@ -5,7 +5,7 @@
  /, ' and " ...   a red zone is exited when a space, > or new line is found. 
  must add array of tags and when find tag, note 
 
- find all the cases and figure it out
+ find all the cases and figure it out after everything else
 
 */
 

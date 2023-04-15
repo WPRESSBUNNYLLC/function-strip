@@ -7,7 +7,7 @@ var in_html = false; //used for the other types of functions
   data = update_function_and_update_data.data;
   if(
    check_beginning_regular(data_index) && 
-   data.charAt(data_index) === 'f' && 
+   data.charAt(data_index) ===   'f' && 
    data.charAt(data_index+1) === 'u' &&  
    data.charAt(data_index+2) === 'n' && 
    data.charAt(data_index+3) === 'c' && 
@@ -31,7 +31,8 @@ var in_html = false; //used for the other types of functions
    data.charAt(data_index-1) === ':' || 
    data.charAt(data_index-1) === '}' || 
    data.charAt(data_index-1) === '=' || 
-   data.charAt(data_index-1) === '('
+   data.charAt(data_index-1) === '(' || 
+   data.charAt(data_index-1) === ';'
   ) {
    return true
   } else { 

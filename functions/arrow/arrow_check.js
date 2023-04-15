@@ -21,7 +21,7 @@ function check_beginning_arrow(data_index) {
  if(
   data.charAt(data_index-1) === '\n' || 
   data.charAt(data_index-1) === ' ' || 
-  data.charAt(data_index-1) === ')'
+  data.charAt(data_index-1) === ')' //or  a character for minice 2
  ) {
    return true
   } else { 
