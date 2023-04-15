@@ -88,21 +88,21 @@ function recurse(data_index_) {
   recursive_counter_literal = recursive_counter_literal + 1; 
   in_function_ === true ? in_function_build_string_ += data_.charAt(data_index_ + 1) : '';
   data_index_ = data_index_ + 2; 
-  recurse(data_index_);
+  return recurse(data_index_);
  }
 
  if(currently_inside_of === 'literal' && data_.charAt(data_index_) === '}') {
   currently_inside_of = 'template'; 
   recursive_counter_literal = recursive_counter_literal - 1;
   data_index_ = data_index_ + 1;
-  recurse(data_index_);
+  return recurse(data_index_);
  }
 
  if(currently_inside_of === 'literal' && data_.charAt(data_index_) === '`') {
   currently_inside_of = 'template'; 
   recursive_counter_template = recursive_counter_template + 1;
   data_index_ = data_index_ + 1;
-  recurse(data_index_);
+  return recurse(data_index_);
  }
 
  if(currently_inside_of === 'template' && data_.charAt(data_index_) === '`') {
@@ -118,7 +118,7 @@ function recurse(data_index_) {
     build_string: in_function_build_string_,
    }
   }
-  recurse(data_index_);
+  return recurse(data_index_);
  }
 
  data_index_ = data_index_ + 1; 
