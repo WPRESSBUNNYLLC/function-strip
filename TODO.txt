@@ -15,8 +15,8 @@
    check for / as the last character before the space in tags html_tag
    just figure out the cases for tags 
    add inside functions as an array to the outermost function 
-   add template literal functions
-   figure out correct beginning and end of regular and arrow function
+   add template literal functions if necessary underneath the set of conditions that are related to index in template_string -- dont need recursive_counter_literal === 0 on the end.. assumed zero
+   figure out correct beginning and end of regular and arrow function   
 
 
    1. template 

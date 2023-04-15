@@ -12,12 +12,12 @@ var line_number_ = 0;
 var in_tag_ = false;
 var in_tag_string = '';
 
-function single_quote_string(data_index, in_function, line_number, build_string, in_tag) { 
+function single_quote_string(data_index, in_function, line_number, in_tag) { 
  data_ = update_function_and_update_data.data;
  data_index_ = data_index;
  in_function_ = in_function;
- in_function_build_string_ = build_string;
  line_number_ = line_number;
+ in_function_build_string_ = '';
  in_tag_ = in_tag;
  in_tag_string = '';
  return recurse(data_index_);
