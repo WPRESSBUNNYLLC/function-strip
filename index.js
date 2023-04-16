@@ -171,11 +171,6 @@
  
  }
 
- var a = /*
- */
-'hello world'; 
-console.log(a);
-
  /*
   when in an html file, find script tag and run the script function
  */
@@ -266,7 +261,7 @@ console.log(a);
    line_number = line_number + 1;
   }
 
-  //could do an equals sign here, store the beginning name, async type then the next time im in one of the below data structures append this equals (last) to it... to avoid building the beginning in each data structure thing... 
+  //could add an equals sign here (add as last beginning anf for next data structure pre-append) 
 
   if(
    data.charAt(data_index) === '/' &&
@@ -301,6 +296,8 @@ console.log(a);
    arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
+
+  var a = 3889 + 'awesome';
 
   if(data.charAt(data_index) === '/') {
    arrow_index_parameter_boundries.push({
