@@ -47,15 +47,16 @@ function recurse(data_index_) {
  }
 
  if(
-  data_.charAt(data_index_) === '"' && ((data_.charAt(data_index_ - 1) !== '\\' && in_tag_ === false) || in_tag_ === true)
+  data_.charAt(data_index_) === '"' && 
+  ((data_.charAt(data_index_ - 1) !== '\\' && in_tag_ === false) || in_tag_ === true)
  ) { 
   data_index_ = data_index_ + 1; 
   return {
-    data_index: data_index_, 
-    line_number: line_number_,
-    build_string: in_function_build_string_,
-    tag_string: in_tag_string
-   }
+   data_index: data_index_, 
+   line_number: line_number_,
+   build_string: in_function_build_string_,
+   tag_string: in_tag_string
+  }
  }
 
  data_index_ = data_index_ + 1; 

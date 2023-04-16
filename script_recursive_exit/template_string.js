@@ -3,10 +3,9 @@
  determines the exit of a template string... gets very funky
  ",',//,/* <-- handled inside of template literal via outside functions 
  `, ${ handled with a recursive counter and single boolean value for what i am immediately inside of
+ console.log(`${`${`//`}` + console.log('hello '+ 'world') + ``}`); 
+ a1-b1-a2-b2-a3-a2-b1-a1                            a2-a1-b0-a0
 */
-
-console.log(`${`${``}` + console.log('hello '+ 'world') + ``}`);
-//     a1-b1-a2-b2-a3-a2-b1-a1                         a2-a1-b0-a0
 
 var update_function_and_update_data = require('../data');
 var double_quote_string = require('./script_recursive_exit/double_quote_string');
@@ -54,37 +53,56 @@ function recurse(data_index_) {
   line_number_ = line_number_ + 1;
  }
 
- if(currently_inside_of === 'literal' && data_.charAt(data_index_) === '"') {
+ if(
+  currently_inside_of === 'literal' && 
+  data_.charAt(data_index_) === '"'
+ ) {
   data_index_and_line_number_update = double_quote_string(data_index_, in_function_, line_number_, false);
   update();
   return recurse(data_index_);
  }
 
- if(currently_inside_of === 'literal' && data_.charAt(data_index_) === "'") {
+ if(
+  currently_inside_of === 'literal' && 
+  data_.charAt(data_index_) === "'"
+ ) {
   data_index_and_line_number_update = single_quote_string(data_index_, in_function_, line_number_, false);
   update();
   return recurse(data_index_);
  }
 
- if(currently_inside_of === 'literal' && data_.charAt(data_index_) === '//') {
+ if(
+  currently_inside_of === 'literal' && 
+  data_.charAt(data_index_) === '//'
+ ) {
   data_index_and_line_number_update = singleline_comment(data_index_, in_function_, line_number_);
   update();
   return recurse(data_index_);
  }
 
- if(currently_inside_of === 'literal' && data_.charAt(data_index_) === '/*') {
+ if(
+  currently_inside_of === 'literal' && 
+  data_.charAt(data_index_) === '/*'
+ ) {
   data_index_and_line_number_update = multiline_comment(data_index_, in_function_, line_number_);
   update();
   return recurse(data_index_);
  }
 
- if(currently_inside_of === 'literal' && data_.charAt(data_index_) === '/') {
+ if(
+  currently_inside_of === 'literal' && 
+  data_.charAt(data_index_) === '/'
+ ) {
   data_index_and_line_number_update = regex(data_index_, in_function_, line_number_);
   update();
   return recurse(data_index_);
  }
 
- if(currently_inside_of === 'template' && data_.charAt(data_index_) === '$' && data_.charAt(data_index_ + 1) === '{') { 
+ if(
+  currently_inside_of === 'template' && 
+  data_.charAt(data_index_) === '$' && 
+  data_.charAt(data_index_ + 1) === '{'
+ ) { 
   currently_inside_of === 'literal'
   recursive_counter_literal = recursive_counter_literal + 1; 
   in_function_ === true ? in_function_build_string_ += data_.charAt(data_index_ + 1) : '';
@@ -92,25 +110,37 @@ function recurse(data_index_) {
   return recurse(data_index_);
  }
 
- if(currently_inside_of === 'literal' && data_.charAt(data_index_) === '}') {
+ if(
+  currently_inside_of === 'literal' && 
+  data_.charAt(data_index_) === '}'
+ ) {
   currently_inside_of = 'template'; 
   recursive_counter_literal = recursive_counter_literal - 1;
   data_index_ = data_index_ + 1;
   return recurse(data_index_);
  }
 
- if(currently_inside_of === 'literal' && data_.charAt(data_index_) === '`') { 
+ if(
+  currently_inside_of === 'literal' && 
+  data_.charAt(data_index_) === '`'
+ ) { 
   currently_inside_of = 'template'; 
   recursive_counter_template = recursive_counter_template + 1;
   data_index_ = data_index_ + 1;
   return recurse(data_index_);
  }
 
- if(currently_inside_of === 'template' && data_.charAt(data_index_) === '`') {
+ if(
+  currently_inside_of === 'template' && 
+  data_.charAt(data_index_) === '`'
+ ) {
   currently_inside_of = 'literal'; 
   recursive_counter_template = recursive_counter_template - 1;
   data_index_ = data_index_ + 1;
-  if(recursive_counter_template === 0 && recursive_counter_literal === 0) {
+  if(
+   recursive_counter_template === 0 && 
+   recursive_counter_literal === 0
+  ) {
    return {
     data_index: data_index_, 
     line_number: line_number_,
