@@ -171,6 +171,11 @@
  
  }
 
+ var a = /*
+ */
+'hello world'; 
+console.log(a);
+
  /*
   when in an html file, find script tag and run the script function
  */
@@ -260,6 +265,8 @@
   if(data.charAt(data_index) === '\n') { 
    line_number = line_number + 1;
   }
+
+  //could do an equals sign here, store the beginning name, async type then the next time im in one of the below data structures append this equals (last) to it... to avoid building the beginning in each data structure thing... 
 
   if(
    data.charAt(data_index) === '/' &&

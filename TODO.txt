@@ -17,7 +17,7 @@
    add inside functions as an array to the outermost function 
    add template literal functions if necessary underneath the set of conditions that are related to index in template_string -- dont need recursive_counter_literal === 0 on the end.. assumed zero
    figure out correct beginning and end of regular and arrow function 
-   is it jeff or justin. lol. yeah not sure about life right now. i will give my solute and continue to serve. if you give me yours then ill know.
+   store equals and name and whatever at the beginning of something... if async you know its a function etc... add all the oter data structures underneath
 
    1. template 
    2. regex 

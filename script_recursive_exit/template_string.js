@@ -16,7 +16,8 @@ var regex = require('./script_recursive_exit/regex');
 
 var data_ = '';
 var data_index_ = 0; 
-var in_function_ = false, in_function_build_string_ = '';
+var in_function_ = false
+var in_function_build_string_ = '';
 var line_number_ = 0;
 var recursive_counter_literal = 0;
 var recursive_counter_template = 0; 
