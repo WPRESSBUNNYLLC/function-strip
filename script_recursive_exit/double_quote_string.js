@@ -7,7 +7,8 @@ var update_function_and_update_data = require('../data');
 
 var data_ = '';
 var data_index_ = 0;
-var in_function_ = false, in_function_build_string_ = '';
+var in_function_ = false
+var in_function_build_string_ = '';
 var line_number_ = 0;
 var in_tag_ = false;
 var in_tag_string = '';

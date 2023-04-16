@@ -47,7 +47,7 @@
    * @param {function_types} the different functions to execute
    */
 
-   var LEX = [];
+   var LEX = {}; //name: type,  values: [] --line number, data_index and value -- something like that
    var bts = '';
    var tags = [];
    var temp_line_number = 0;

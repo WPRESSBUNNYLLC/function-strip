@@ -16,7 +16,8 @@
    just figure out the cases for tags 
    add inside functions as an array to the outermost function 
    add template literal functions if necessary underneath the set of conditions that are related to index in template_string -- dont need recursive_counter_literal === 0 on the end.. assumed zero
-   figure out correct beginning and end of regular and arrow function   
+   figure out correct beginning and end of regular and arrow function 
+   you know what j.b the musician. we gone get every fkin jawn data structure available in every fkin document type. period
 
 
    1. template 
