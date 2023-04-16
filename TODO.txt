@@ -17,7 +17,7 @@
    add inside functions as an array to the outermost function 
    add template literal functions if necessary underneath the set of conditions that are related to index in template_string -- dont need recursive_counter_literal === 0 on the end.. assumed zero
    figure out correct beginning and end of regular and arrow function 
-   is it jeff or justin
+   is it jeff or justin. lol
 
    1. template 
    2. regex 
