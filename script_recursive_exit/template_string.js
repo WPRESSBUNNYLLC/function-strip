@@ -5,8 +5,8 @@
  `, ${ handled with a recursive counter and single boolean value for what i am immediately inside of
 */
 
-console.log(`${`` + console.log('hello world') + ``}`);
-        //  a1b1a2a1                          a2a1b0a0  
+console.log(`${`${``}` + console.log('hello world') + ``}`);
+//       a1-b1-a2-b2-a3-a2-b1-a1                   a2-a1-b0-a0  
 
 
 var update_function_and_update_data = require('../data');
