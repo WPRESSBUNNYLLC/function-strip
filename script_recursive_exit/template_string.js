@@ -3,9 +3,11 @@
  determines the exit of a template string... gets very funky
  ",',//,/* <-- handled inside of template literal via outside functions 
  `, ${ handled with a recursive counter and single boolean value for what i am immediately inside of
+ wrong do again -- when ending on a template literal in a template literal... there might be some random stuff
 */
 
-console.log(`${console.log(`${console.log(`${console.log('hello world')}`)}`)}`)
+console.log(`${console.log(`${console.log('wow')}```````` `)}nhjhjjkj ``jkjk `` `` `` `);
+
 
 var update_function_and_update_data = require('../data');
 var double_quote_string = require('./script_recursive_exit/double_quote_string');
@@ -98,7 +100,7 @@ function recurse(data_index_) {
   return recurse(data_index_);
  }
 
- if(currently_inside_of === 'literal' && data_.charAt(data_index_) === '`') {
+ if(currently_inside_of === 'literal' && data_.charAt(data_index_) === '`') { 
   currently_inside_of = 'template'; 
   recursive_counter_template = recursive_counter_template + 1;
   data_index_ = data_index_ + 1;
@@ -112,6 +114,7 @@ function recurse(data_index_) {
   recursive_counter_template = recursive_counter_template - 1;
   data_index_ = data_index_ + 1;
   if(recursive_counter_template === 0 && recursive_counter_literal === 0) {
+   check_inaccurate_ending
    return {
     data_index: data_index_, 
     line_number: line_number_,
