@@ -4,7 +4,7 @@
    add other languages (below iterate_through_file_text) also add languages as a configuration property to skip over files
    make sure to use regular expressions instead of many !== in some files... many !== isnt accurate
    add an exported updated data for every new file to avoid passing
-   possibly use a library for checking syntax errors or some web browser, use the window function to get errors in the document and move next.. eslint or something
+   possibly use a library for checking syntax errors or some compiler and skip file if error
    make sure to add if a regular name in arrow function in case there are no parameters - const wow = jkj => { }
    add a start and stop index when pushing scripts if necessary
    for the lex, determine with an equals sign at the top making sure not in anything else... backtrack, get name and type... then continue... ... functions will be added in their own thing and additional parameters for strings and lex will be figured out.

@@ -15,7 +15,7 @@ var build_body_of_function = require('./regular_body');
   return_object.is_function = true;
   return_object.beginning_line_number = line_number;
 
-  var beginning_function_ = build_beginning_of_function(data_index);
+  var beginning_function_ = build_beginning_of_function(data_index); //this would go until an equals sign
 
   return_object.build_string = beginning_function_.build_string + "function";
   return_object.is_async = beginning_function_.is_async;

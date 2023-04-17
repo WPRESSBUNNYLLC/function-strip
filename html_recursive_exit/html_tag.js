@@ -20,10 +20,10 @@ var found_space_identify_name = false;
 var last_character = [];
 var script_name = '';
 var data_index_and_line_number_update = {};
-var valid_character = /^[a-zA-Z0-9]*$/; //valid character is anything but /, ' and " --- can prob get rid of this expression
+var valid_character = /a-zA-Z0-9/; //valid character is anything but /, ' and " --- can prob get rid of this expression
 var tag_string = '';
 
-function html_tag(data_index, line_number, start) { 
+function html_tag(data_index, line_number, start, first_character_of_script_name) { 
  data_ = update_function_and_update_data.data;
  data_index_ = data_index;
  line_number_ = line_number;
@@ -32,11 +32,7 @@ function html_tag(data_index, line_number, start) {
  script_name = '';
  data_index_and_line_number_update = {};
  tag_string = start;
- if(start.length === 3) { 
-  last_character.push(start.split('')[2]);
- } else { 
-  last_character.push(start.split('')[1]);
- }
+ last_character.push(first_character_of_script_name);
  return recurse(data_index_);
 }
 

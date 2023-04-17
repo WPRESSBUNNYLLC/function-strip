@@ -52,7 +52,7 @@
    var tags = [];
    var temp_line_number = 0;
    var data_index = 0;
-   var first_valid_character_html_tag = /^[a-zA-Z0-9]*$/;
+   var first_valid_character_html_tag = /a-zA-Z0-9/;
    var arrow_index_parameter_boundries = [];
    var data_index_and_line_number_update = {}; 
    var function_index = 1;
@@ -205,7 +205,7 @@
    temp_line_number = line_number;
    bts = '<' +  data.charAt(data_index + 1);
    data_index = data_index + 2;
-   data_index_and_line_number_update = html_tag(data_index, line_number, bts);
+   data_index_and_line_number_update = html_tag(data_index, line_number, bts, data.charAt(data_index + 1));
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    tags.push({
@@ -229,7 +229,7 @@
    temp_line_number = line_number;
    bts = '<' + data.charAt(data_index + 1) + data.charAt(data_index + 2);
    data_index = data_index + 3;
-   data_index_and_line_number_update = html_tag(data_index, line_number, bts);
+   data_index_and_line_number_update = html_tag(data_index, line_number, bts, data.charAt(data_index + 2));
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    tags.push({
@@ -297,8 +297,6 @@
    return iterate_through_file_text(data_index);
   }
 
-  var a = 3889 + 'awesome';
-
   if(data.charAt(data_index) === '/') {
    arrow_index_parameter_boundries.push({
     boundry_type: 'regular_expression', 
@@ -364,7 +362,7 @@
     temp_line_number = line_number;
     bts = '<' + data.charAt(data_index + 1) + data.charAt(data_index + 2);
     data_index = data_index + 3;
-    data_index_and_line_number_update = html_tag(data_index, line_number, bts);
+    data_index_and_line_number_update = html_tag(data_index, line_number, bts, data.charAt(data_index + 2));
     data_index = data_index_and_line_number_update.data_index;
     line_number = data_index_and_line_number_update.line_number;
     tags.push({
