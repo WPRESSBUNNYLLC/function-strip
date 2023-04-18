@@ -1,6 +1,7 @@
 
 /*
  determines when ending a single quote string
+ new RegExp(`["'\`].*(${_reImport}).*["'\`]`, "g");
 */
 
 var update_function_and_update_data = require('../data');
