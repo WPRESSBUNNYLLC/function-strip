@@ -23,6 +23,7 @@ var recursive_counter_literal = 0;
 var recursive_counter_template = 0; 
 var currently_inside_of = 'template';
 var data_index_and_line_number_update = {};
+var original_line_number = 0;
 
 function template_string(data_index, in_function, line_number) { 
  data_ = update_function_and_update_data.data;
@@ -30,6 +31,7 @@ function template_string(data_index, in_function, line_number) {
  in_function_ = in_function;
  in_function_build_string_ = '';
  line_number_ = line_number;
+ original_line_number = line_number;
  recursive_counter_template = 1;
  recursive_counter_literal = 0;
  currently_inside_of = 'template';
@@ -43,6 +45,7 @@ function recurse(data_index_) {
    data_index: data_index_, 
    line_number: line_number_,
    build_string: in_function_build_string_,
+   error: 'template string has not ended on line ' + original_line_number
   }
  }
 

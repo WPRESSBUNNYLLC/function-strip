@@ -25,7 +25,7 @@ var in_html = false; //used for the other types of functions
 
  function check_beginning_regular(data_index) { 
   if(
-   data.charAt(data_index-1) === '\n' || 
+   data.charAt(data_index-1) === '\n' ||  //any whatever character ) too
    data.charAt(data_index-1) === ' ' || 
    data.charAt(data_index-1) === ',' || 
    data.charAt(data_index-1) === ':' || 

@@ -9,6 +9,7 @@ var data_ = '';
 var data_index_ = 0;
 var in_function_ = false
 var in_function_build_string_ = '';
+var original_line_number = 0;
 var line_number_ = 0;
 var in_tag_ = false;
 var in_tag_string = '';
@@ -18,6 +19,7 @@ function double_quote_string(data_index, in_function, line_number, in_tag) {
  data_index_ = data_index;
  in_function_ = in_function;
  line_number_ = line_number;
+ original_line_number = line_number;
  in_function_build_string_ = '';
  in_tag_ = in_tag;
  in_tag_string = '';
@@ -31,7 +33,8 @@ function recurse(data_index_) {
    data_index: data_index_, 
    line_number: line_number_, 
    build_string: in_function_build_string_,
-   tag_string: in_tag_string
+   tag_string: in_tag_string, 
+   error: 'double quote string has not ended on line ' + original_line_number
   }
  }
 

@@ -47,7 +47,6 @@
    * @param {function_types} the different functions to execute
    */
 
-   var LEX = {}; //name: type,  values: [] --line number, data_index and value -- something like that
    var bts = '';
    var tags = [];
    var temp_line_number = 0;
@@ -248,7 +247,7 @@
  }
  
  /*
-  building the function outside of certain things like comments etc
+  building the function outside of certain things like comments etc...
  */
  
  function iterate_through_file_text(data_index) {
@@ -260,8 +259,6 @@
   if(data.charAt(data_index) === '\n') { 
    line_number = line_number + 1;
   }
-
-  //could add an equals sign here (add as last beginning anf for next data structure pre-append) 
 
   if(
    data.charAt(data_index) === '/' &&
