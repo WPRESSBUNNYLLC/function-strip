@@ -2,6 +2,8 @@
  
 var update_function_and_update_data = require('../../data');
 var data = '';
+var in_html = false;
+var in_template = false;
 
 function check_arrow(data_index) {
  data = update_function_and_update_data.data;

@@ -2,7 +2,6 @@
 /*
  determines when ending a multi line comment... 
 */
-// /\/\*[\s\S]*?\*\/|\/\/.*/gm;
 
 var update_function_and_update_data = require('../data');
 

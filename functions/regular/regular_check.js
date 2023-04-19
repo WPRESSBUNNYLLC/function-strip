@@ -2,6 +2,7 @@
 var update_function_and_update_data = require('../../data');
 var data = '';
 var in_html = false; //used for the other types of functions
+var in_template = false;
  
  function check_regular(data_index) {
   data = update_function_and_update_data.data;
@@ -25,7 +26,7 @@ var in_html = false; //used for the other types of functions
 
  function check_beginning_regular(data_index) { 
   if(
-   data.charAt(data_index-1) === '\n' ||  //any whatever character ) too
+   data.charAt(data_index-1) === '\n' ||  //any whatever character ) too ...will have to ask for a regrx matcher
    data.charAt(data_index-1) === ' ' || 
    data.charAt(data_index-1) === ',' || 
    data.charAt(data_index-1) === ':' || 
