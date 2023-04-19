@@ -1,4 +1,4 @@
-strips a variety of different functions from a set of files. Should capture entire function body, parameters, and name along with filepath and line number.
+strips a variety of different functions from a set of files. Should capture entire function body, parameters, and name along with the filepath and line number.
 
 https://stackoverflow.com/questions/42987651/regular-expression-to-match-all-javascript-functions
 
@@ -8,7 +8,7 @@ Also, the parameters of the function does not take these into consideration.
 
 Template literal functions are not noted.
 
-And many more errors when using a regular expression for this problem. The amunt of edge cases I think can not be solved with a regular expression and if tried, would lead to inaccurate results.
+And many more errors when using a regular expression for this problem. The amount of edge cases I think can not be solved with a regular expression and if tried, would lead to inaccurate results.
 
 Example of a function that would lead to inaccurate results.
 
