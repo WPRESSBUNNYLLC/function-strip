@@ -24,4 +24,9 @@ function recurse() {
 
 }
 
+//escapes on regular expression /
+//when in [], escapes on ] for counting... and not counting /
+var a = /[\removeMe]/]/
+var a = /\(regex\/ \/ []]]]][(/)\]] )/
+
 module.exports = regex;
