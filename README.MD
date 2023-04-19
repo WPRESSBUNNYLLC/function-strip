@@ -12,13 +12,15 @@ And many more errors when using a regular expression for this problem. The amunt
 
 Example of a function that would lead to inaccurate results.
 
-var a = function wow(1,2 // )) { \n
-2, 3) \n
-// } \n
-/\* } \n
-var a = 'sdsd }' \n
-var b = "ddsd }" \n
-var a = ` ${awesome + '}}}'}`; \n
-} \n
+```js
+var a = function wow(1,2 // )) {
+2, 3)
+// }
+/* } */
+var a = 'sdsd }'
+var b = "ddsd }"
+var a = ` ${awesome + '}}}'}`;
+}
+```
 
 The solution provided should match 100% of the time if no errors are found in the document.
