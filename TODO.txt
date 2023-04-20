@@ -10,7 +10,7 @@
    add inside functions as an array to the outermost function as a non returned recursive call
    correct beginning and end of regular and arrow function 
    before and after for error
-   replace all recursive functions with while loops .. 1 per
+   replace all recursive functions with while loops .. 1 per -- or not.. it depends on the times of the conditions.. returning on al of them to avoid running others.
 
    1. template 
    2. regex 

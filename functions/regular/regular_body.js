@@ -9,7 +9,7 @@ var regex = require('./script_recursive_exit/regex');
 var data_index_ = 0;
 var data_ = '';
 var line_number_ = 0;
-var in_parameter_set = false;
+var in_parameter_set = 'out';
 var parameter_string = '';
 var original_line_number = '';
 var in_function_build_string_ = ''; 
@@ -22,7 +22,7 @@ function build_body_of_function(data_index, line_number, i) {
  data_index_ = data_index;
  line_number_ = line_number;
  original_line_number = line_number;
- in_parameter_set = false; //false true false
+ in_parameter_set = 'out';
  parameter_string = '';
  in_function_build_string_ = '';
  is_invokable = i;
@@ -41,29 +41,15 @@ function recurse(data_index_) {
   }
  }
 
- if(beginning_bracket_count === ending_bracket_count) { 
-  if(is_invokable === true) {
-   check_invokable();
-  }
-  return {
-   data_index: data_index_, 
-   line_number: line_number_, 
-   build_string: in_function_build_string_,
-   parameters: parameter_string, 
-   error: 'function has not ended on line ' + original_line_number
-  }
- }
-
- if(in_function_ === true) { 
-  in_function_build_string_ += data_.charAt(data_index_); //two first characters will be pushed together... error to avoid with && character not this and this
- }
-
  if(data_.charAt(data_index_) === '\n') { 
   line_number_ = line_number_ + 1;
  }
 
- if(in_parameter_set === true) { 
-  parameter_string += data_.charAt(data_index_);
+ in_function_build_string_ += data_.charAt(data_index_); //two first characters will be pushed together... error to avoid with && character not this and this
+ 
+
+ if(in_parameter_set === 'in') { 
+  parameter_string += data_.charAt(data_index_); //two first characters will be pushed... just add and statements
  }
 
  if(data_.charAt(data_index_) === '"') {
@@ -96,15 +82,15 @@ function recurse(data_index_) {
   return recurse(data_index_);
  }
 
- if(in_parameter_set === false && data_.charAt(data_index_) === '(') { 
-  in_parameter_set = true;
+ if(in_parameter_set === 'out' && data_.charAt(data_index_) === '(') { 
+  in_parameter_set = 'in';
   parameter_string += data_.charAt(data_index_);
   data_index_ = data_index_ + 1; 
   return recurse(data_index_);
  }
 
- if(in_parameter_set === true && data_.charAt(data_index_) === ')') { 
-  in_parameter_set = false;
+ if(in_parameter_set === 'in' && data_.charAt(data_index_) === ')') { 
+  in_parameter_set = 'done';
   data_index_ = data_index_ + 1; 
   return recurse(data_index_);
  }
@@ -118,6 +104,17 @@ function recurse(data_index_) {
  if(data_.charAt(data_index_) === '}') { 
   ending_bracket_count += 1;
   data_index_ = data_index_ + 1; 
+  if(beginning_bracket_count === ending_bracket_count) { 
+   if(is_invokable === true) {
+    check_invokable(data_index_);
+   }
+   return {
+    data_index: data_index_, 
+    line_number: line_number_, 
+    build_string: in_function_build_string_,
+    parameters: parameter_string, 
+   }
+  }
   return recurse(data_index_);
  }
 
@@ -129,16 +126,14 @@ function recurse(data_index_) {
 function update() {  
   data_index_ = data_index_and_line_number_update.data_index_;
   line_number_ = data_index_and_line_number_update.line_number_;
-  if(in_function_ === true) { 
-    in_function_build_string_ += data_index_and_line_number_update.build_string; //two of the first characters will be pushed here
-  }
-  if(in_parameter_set === true) { 
+  in_function_build_string_ += data_index_and_line_number_update.build_string; //two of the first characters will be pushed here
+  if(in_parameter_set === 'in') { 
     parameter_string += data_index_and_line_number_update.build_string; //two of the first character will be pushed here
   }
 }
 
-function check_invokable() { 
-
+function check_invokable(data_index_) { 
+ //recurse for )(); or )
 }
 
 module.exports = build_body_of_function;
