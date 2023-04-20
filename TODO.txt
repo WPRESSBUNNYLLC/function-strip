@@ -14,13 +14,12 @@
    add a ignore comments in parameter string and function attribute
    look over check invokable again.. should be okay except 
    //  (function ow() { 
-   //  })(...) // not sure what would come before or after.... also for ending: increasing data_index and line_number until i find a character outside above... if opening is there and random character for ending, go back to the opening index... it might be the enclosing of the next function
+   //  })(...) // not sure what would come inside.... also for ending: increasing data_index and line_number until i find a character outside above... if opening is there and random character for ending, go back to the opening index... it might be the enclosing of the next function
+   replace all the data_index > data_length in files with throw new error...
 
-   1. template 
-   2. regex 
-   3. regular beginning
-   4. regular body
-   5. arrow beginning 
-   6. arrow body 
+    1. html tag
+    2. regex 
+    3. regular beginning
+    4. arrow beginning 
 
    done 

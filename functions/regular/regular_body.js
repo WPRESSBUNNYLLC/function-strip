@@ -37,7 +37,7 @@ function build_body_of_function(data_index, line_number, i) {
   found_opening_invokable: false, 
   found_closing_invokable: false
  }; 
-recurse(data_index_);
+ recurse(data_index_);
 }
 
 function recurse(data_index_) { 

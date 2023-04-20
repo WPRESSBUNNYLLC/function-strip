@@ -32,6 +32,11 @@ var build_body_of_function = require('./arrow_body');
   return_object.data_index = body_of_function.data_index;
   return_object.is_invoked = body_of_function.is_invoked;
 
+  if(return_object.is_enclosed === true && return_object.found_enclosing === false) { 
+    //enclosed function but no enclosing tag
+  }
+
+
   return return_object;
 
  }
