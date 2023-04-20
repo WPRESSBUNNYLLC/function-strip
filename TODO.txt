@@ -2,23 +2,15 @@
    https://blog.sessionstack.com/how-javascript-works-the-different-ways-of-declaring-a-function-5-best-practices-8a0324c06fe2
    make sure to recurse on if a function is invokable (); - do this at the end of each function... make sure the function can be invoked beforehand with a parameter
    add other languages (below iterate_through_file_text) also add languages as a configuration property to skip over files
-   make sure to use regular expressions instead of many !== in some files... many !== isnt accurate
-   add an exported updated data for every new file to avoid passing
+   make sure to use regular expressions instead of many !== in some files
    possibly use a library for checking syntax errors or some compiler and skip file if error
-   make sure to add if a regular name in arrow function in case there are no parameters - const wow = jkj => { }
-   add a start and stop index when pushing scripts if necessary
-   for the lex, determine with an equals sign at the top making sure not in anything else... backtrack, get name and type... then continue... ... functions will be added in their own thing and additional parameters for strings and lex will be figured out.
+   make sure to add if a regular name in arrow function in case there are no parameters - const wow = jkj => { } <-- condition to avoid counting brackets
    add additional checks for regular expressions on the reg call in index.js
-   make data accessible everywhere. update at the beginning of each script
-   just do html_tag again. recurse through the bad character set for red zone
-   for arrow function, before => check for characters and set a condition to avoid counting brackets if character (arrow_check and arrow_beginning)
-   check for / as the last character before the space in tags html_tag
    just figure out the cases for tags 
-   add inside functions as an array to the outermost function 
-   add template literal functions if necessary underneath the set of conditions that are related to index in template_string -- dont need recursive_counter_literal === 0 on the end.. assumed zero
-   figure out correct beginning and end of regular and arrow function 
-   store equals and name and whatever at the beginning of something... if async you know its a function etc... add all the oter data structures underneath
-   add everything else inside of template like in index.. will have to add all the other characters in index. =, character(will recurse and get name, then lookup, then ), number
+   add inside functions as an array to the outermost function as a non returned recursive call
+   correct beginning and end of regular and arrow function 
+   before and after for error
+   replace all recursive functions with while loops .. 1 per
 
    1. template 
    2. regex 
@@ -28,7 +20,3 @@
    6. arrow body 
 
    done 
-
-   backtracking
-   the only thing to check for is an equals sign in the backtracking set... when an equals sign is found, you know the function has a name and possibly a type. 
-   this should be able to determine when to end. ending is based on = ...no need to count parentheses. you can do this for every function

@@ -35,7 +35,8 @@ function check_ending_arrow(data_index) {
  if(
   data.charAt(data_index+2) === '\n' || 
   data.charAt(data_index+2) === ' ' || 
-  data.charAt(data_index+2) === '{'
+  data.charAt(data_index+2) === '{' || 
+  data.charAt(data_index+2) === '(' 
  ) { 
    return true
   } else { 

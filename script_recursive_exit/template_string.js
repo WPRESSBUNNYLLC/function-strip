@@ -86,7 +86,7 @@ function recurse(data_index_) {
 
  if(
   currently_inside_of === 'literal' && 
-  data_.charAt(data_index_) === '/*'
+  data_.charAt(data_index_) === '/*' //fix
  ) {
   data_index_and_line_number_update = multiline_comment(data_index_, in_function_, line_number_);
   update();
@@ -163,7 +163,7 @@ function update() {
   data_index_ = data_index_and_line_number_update.data_index_;
   line_number_ = data_index_and_line_number_update.line_number_;
   if(in_function_ === true) { 
-    in_function_build_string_ += data_index_and_line_number_update.build_string;
+    in_function_build_string_ += data_index_and_line_number_update.build_string; //duplicate character on top... make sure to fix this
   }
 }
 

@@ -1,61 +1,144 @@
-  /*
-   if in a function and a bracket..when in the above things, i avoid counting bad brackets --- maybe make all these bottom parts into their own seperate files... ..which would be backtracking beginning first then building the function secoond
-  */
- 
-   if(
-    data.charAt(data_index) === '{' && 
-    in_function === true
-   ) {
-    opening_bracket = opening_bracket + 1; 
-    has_bracket = true; //has bracket needs to be noted above too or not
-    build_string += data.charAt(data_index);
-    data_index = data_index + 1;
-    return iterate_through_file_text(data_index);
-   } 
-  
-   /*
-    if not in a comment or string, keeping count of ending bracket to know when to end the function
-   */
-   
-   if(
-    data.charAt(data_index) === '}' && 
-    in_function === true
-   ) {
-    closing_bracket = closing_bracket + 1;
-    build_string += data.charAt(data_index);
-    data_index = data_index + 1;
-    return iterate_through_file_text(data_index);
-   }
-  
-   /* 
-    end creating the function.. this condition should hit one time then going out of the function.
-   */
-  
-   if(
-    ((is_arrow === true && has_bracket === false && data.charAt(data_index) === '\n') || //is arrow and has bracket needs to be checked above
-    (opening_bracket === closing_bracket && opening_bracket > 0)) && 
-    in_function === true
-   ) { 
-    push_function();
-    function_index = function_index + 1;
-    build_string = '';
-    has_bracket = false;
-    in_function = false;
-    opening_bracket = 0; 
-    closing_bracket = 0;
-    data_index = data_index + 1;
-    return iterate_through_file_text(data_index);
-   }
-  
-   /* 
-    pushing every character when in the function... the build string is also in the other files copied over.... if not in the function, just moving next
-   */
-   
-   if(in_function === true) { 
-    build_string += data.charAt(data_index);
-    data_index = data_index + 1;
-    return iterate_through_file_text(data_index);
-   } else { 
-    data_index = data_index + 1;
-    return iterate_through_file_text(data_index);
-   }
+
+var update_function_and_update_data = require('../data');
+var double_quote_string = require('./script_recursive_exit/double_quote_string');
+var single_quote_string = require('./script_recursive_exit/single_quote_string');
+var multiline_comment = require('./script_recursive_exit/multiline_comment');
+var singleline_comment = require('./script_recursive_exit/singleline_comment');
+var regex = require('./script_recursive_exit/regex');
+
+var data_index_ = 0;
+var data_ = '';
+var line_number_ = 0;
+var in_parameter_set = false;
+var parameter_string = '';
+var original_line_number = '';
+var in_function_build_string_ = ''; 
+var beginning_bracket_count = 0;
+var ending_bracket_count = 0;
+var is_invokable = false; //comes from beginning
+
+function build_body_of_function(data_index, line_number, i) {
+ data_ = update_function_and_update_data.data;
+ data_index_ = data_index;
+ line_number_ = line_number;
+ original_line_number = line_number;
+ in_parameter_set = false; //false true false
+ parameter_string = '';
+ in_function_build_string_ = '';
+ is_invokable = i;
+ recurse(data_index_);
+}
+
+function recurse(data_index_) { 
+
+ if(data_index_ > data_.length) {
+  return {
+   data_index: data_index_, 
+   line_number: line_number_, 
+   build_string: in_function_build_string_,
+   parameters: parameter_string, 
+   error: 'function has not ended on line ' + original_line_number
+  }
+ }
+
+ if(beginning_bracket_count === ending_bracket_count) { 
+  if(is_invokable === true) {
+   check_invokable();
+  }
+  return {
+   data_index: data_index_, 
+   line_number: line_number_, 
+   build_string: in_function_build_string_,
+   parameters: parameter_string, 
+   error: 'function has not ended on line ' + original_line_number
+  }
+ }
+
+ if(in_function_ === true) { 
+  in_function_build_string_ += data_.charAt(data_index_); //two first characters will be pushed together... error to avoid with && character not this and this
+ }
+
+ if(data_.charAt(data_index_) === '\n') { 
+  line_number_ = line_number_ + 1;
+ }
+
+ if(in_parameter_set === true) { 
+  parameter_string += data_.charAt(data_index_);
+ }
+
+ if(data_.charAt(data_index_) === '"') {
+  data_index_and_line_number_update = double_quote_string(data_index_, true, line_number_, false);
+  update();
+  return recurse(data_index_);
+ }
+
+ if(data_.charAt(data_index_) === "'") {
+  data_index_and_line_number_update = single_quote_string(data_index_, true, line_number_, false);
+  update();
+  return recurse(data_index_);
+ }
+
+ if(data_.charAt(data_index_) === '//') {
+  data_index_and_line_number_update = singleline_comment(data_index_, true, line_number_);
+  update();
+  return recurse(data_index_);
+ }
+
+ if(data_.charAt(data_index_) === '/*') {
+  data_index_and_line_number_update = multiline_comment(data_index_, true, line_number_);
+  update();
+  return recurse(data_index_);
+ }
+
+ if(data_.charAt(data_index_) === '/') {
+  data_index_and_line_number_update = regex(data_index_, true, line_number_);
+  update();
+  return recurse(data_index_);
+ }
+
+ if(in_parameter_set === false && data_.charAt(data_index_) === '(') { 
+  in_parameter_set = true;
+  parameter_string += data_.charAt(data_index_);
+  data_index_ = data_index_ + 1; 
+  return recurse(data_index_);
+ }
+
+ if(in_parameter_set === true && data_.charAt(data_index_) === ')') { 
+  in_parameter_set = false;
+  data_index_ = data_index_ + 1; 
+  return recurse(data_index_);
+ }
+
+ if(data_.charAt(data_index_) === '{') { 
+  beginning_bracket_count += 1;
+  data_index_ = data_index_ + 1; 
+  return recurse(data_index_);
+ }
+
+ if(data_.charAt(data_index_) === '}') { 
+  ending_bracket_count += 1;
+  data_index_ = data_index_ + 1; 
+  return recurse(data_index_);
+ }
+
+ data_index_ = data_index_ + 1; 
+ return recurse(data_index_);
+
+}
+
+function update() {  
+  data_index_ = data_index_and_line_number_update.data_index_;
+  line_number_ = data_index_and_line_number_update.line_number_;
+  if(in_function_ === true) { 
+    in_function_build_string_ += data_index_and_line_number_update.build_string; //two of the first characters will be pushed here
+  }
+  if(in_parameter_set === true) { 
+    parameter_string += data_index_and_line_number_update.build_string; //two of the first character will be pushed here
+  }
+}
+
+function check_invokable() { 
+
+}
+
+module.exports = build_body_of_function;
