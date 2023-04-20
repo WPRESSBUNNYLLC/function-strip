@@ -12,7 +12,9 @@
    before and after for error
    replace all recursive functions with while loops .. 1 per with an if else if to make up for the single recursive statements
    add a ignore comments in parameter string and function attribute
-   look over check invokable again.. should be okay
+   look over check invokable again.. should be okay except 
+   //  (function ow() { 
+   //  })(...) // not sure what would come before or after.... also for ending: increasing data_index and line_number until i find a character outside above... if opening is there and random character for ending, go back to the opening index... it might be the enclosing of the next function
 
    1. template 
    2. regex 

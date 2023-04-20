@@ -143,8 +143,8 @@ function recurse(data_index_) {
     line_number: line_number_, 
     build_string: in_function_build_string_,
     parameters: parameter_string, 
-    is_invokable: invokable_return_object.found_opening_invokable && invokable_return_object.found_closing_invokable ? true : false, //for invokable
-    found_closing: invokable_return_object.found_enclosing //for error
+    is_invoked: invokable_return_object.found_opening_invokable && invokable_return_object.found_closing_invokable ? true : false,
+    found_closing: invokable_return_object.found_enclosing
    }
   }
   return recurse(data_index_);
@@ -180,7 +180,7 @@ function check_invokable(data_index_) {
   invokable_string === ''
  ) {
   invokable_string += ')';
-  in_function_build_string_ += ')';
+  in_function_build_string_ += data_.charAt(data_index_);  ;
   data_index_ = data_index_ + 1;
   invokable_return_object.found_enclosing = true;
   return check_invokable(data_index_);
@@ -208,21 +208,23 @@ function check_invokable(data_index_) {
  } 
 
  if(data_.charAt(data_index_) === '\n') { 
+  in_function_build_string_ += data_.charAt(data_index_);
   data_index_ = data_index_ + 1;
   line_number_ = line_number_ + 1;
   return check_invokable(data_index_);
  }
 
  if(data_.charAt(data_index_) === ' ') { 
+  in_function_build_string_ += data_.charAt(data_index_);
   data_index_ = data_index_ + 1;
   return check_invokable(data_index_);
  }
 
  if(invokable_return_object.found_opening_invokable === true){ 
-  data_index_ = remember_me; //increasing data_index and line_number until i find a character
+  data_index_ = remember_me;
  }
 
- return false;
+ return false
 
 }
 
