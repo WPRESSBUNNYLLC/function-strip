@@ -30,6 +30,7 @@ var build_body_of_function = require('./arrow_body');
   return_object.build_string += body_of_function.build_string;
   return_object.ending_line_number = body_of_function.ending_line_number;
   return_object.data_index = body_of_function.data_index;
+  return_object.is_invoked = body_of_function.is_invoked;
 
   return return_object;
 

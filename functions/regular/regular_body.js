@@ -16,7 +16,9 @@ var in_function_build_string_ = '';
 var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
 var data_index_and_line_number_update = {};
-var is_invokable = false; //comes from beginning
+var is_invokable = false; 
+var invokable_string = ''; //could do this a few ways
+var remember_this_index_which_may_not_be_the_invoked_function = 0;
 
 function build_body_of_function(data_index, line_number, i) {
  data_ = update_function_and_update_data.data;
@@ -27,6 +29,8 @@ function build_body_of_function(data_index, line_number, i) {
  parameter_string = '';
  in_function_build_string_ = '';
  is_invokable = i;
+ invokable_string = '';
+ remember_this_index_which_may_not_be_the_invoked_function = 0;
  recurse(data_index_);
 }
 
@@ -126,6 +130,7 @@ function recurse(data_index_) {
   data_index_ = data_index_ + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
    if(is_invokable === true) {
+    remember_this_index_which_may_not_be_the_invoked_function.push(data_index_);
     check_invokable(data_index_);
    }
    return {
@@ -153,8 +158,61 @@ function update() {
 }
 
 function check_invokable(data_index_) { 
- //recurse for )() or )
-}
 
+ if(data_index_ > data_.length) {
+  return {
+   data_index: data_index_, 
+   line_number: line_number_, 
+   build_string: in_function_build_string_,
+   parameters: parameter_string, 
+  }
+ }
+
+ if(
+  data_.charAt(data_index_) === ')' && 
+  invokable_string === ''
+ ) {
+  invokable_string += ')';
+  in_function_build_string_ += ')';
+  data_index_ = data_index_ + 1;
+  return check_invokable(data_index_);
+ } 
+
+ if(
+  data_.charAt(data_index_) === '(' && 
+  invokable_string === ')'
+ ) {
+  invokable_string += '(';
+  remember_this_index_which_may_not_be_the_invoked_function.push(data_index_);
+  data_index_ = data_index_ + 1;
+  return check_invokable(data_index_);
+ } 
+
+ if(
+  data_.charAt(data_index_) === ')' && 
+  invokable_string === ')('
+ ) {
+  in_function_build_string_ += '()';
+  data_index_ = data_index_ + 1;
+  return;
+ } 
+
+ if(data_.charAt(data_index_) === '\n') { 
+  remember_this_index_which_may_not_be_the_invoked_function.push(data_index_);
+  data_index_ = data_index_ + 1;
+  line_number_ = line_number_ + 1;
+  return check_invokable(data_index_);
+ }
+
+ if(data_.charAt(data_index_) === ' ') { 
+  remember_this_index_which_may_not_be_the_invoked_function.push(data_index_);
+  data_index_ = data_index_ + 1;
+  return check_invokable(data_index_);
+ }
+
+ data_index_ = remember_this_index_which_may_not_be_the_invoked_function[0];
+ return;
+
+}
 
 module.exports = build_body_of_function;

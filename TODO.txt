@@ -12,6 +12,7 @@
    before and after for error
    replace all recursive functions with while loops .. 1 per with an if else if to make up for the single recursive statements
    add a ignore comments in parameter string and function attribute
+   look over check invokable again.. should be okay
 
    1. template 
    2. regex 
