@@ -16,7 +16,7 @@ var in_function_build_string_ = '';
 var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
 var data_index_and_line_number_update = {};
-var is_invokable = false; //comes from beginning
+var is_invokable = false; 
 var invokable_return_object = {
   found_enclosing: false, 
   found_opening_invokable: false, 
@@ -167,12 +167,7 @@ function update() {
 function check_invokable(data_index_) { 
 
  if(data_index_ > data_.length) {
-  return {
-   data_index: data_index_, 
-   line_number: line_number_, 
-   build_string: in_function_build_string_,
-   parameters: parameter_string, 
-  }
+  return;
  }
 
  if(
@@ -204,7 +199,7 @@ function check_invokable(data_index_) {
   in_function_build_string_ += '()';
   data_index_ = data_index_ + 1;
   invokable_return_object.found_closing_invokable = true;
-  return true;
+  return;
  } 
 
  if(data_.charAt(data_index_) === '\n') { 
@@ -224,7 +219,7 @@ function check_invokable(data_index_) {
   data_index_ = remember_me;
  }
 
- return false
+ return;
 
 }
 
