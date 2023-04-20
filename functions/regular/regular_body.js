@@ -15,6 +15,7 @@ var original_line_number = '';
 var in_function_build_string_ = ''; 
 var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
+var data_index_and_line_number_update = {};
 var is_invokable = false; //comes from beginning
 
 function build_body_of_function(data_index, line_number, i) {
@@ -45,51 +46,70 @@ function recurse(data_index_) {
   line_number_ = line_number_ + 1;
  }
 
- in_function_build_string_ += data_.charAt(data_index_); //two first characters will be pushed together... error to avoid with && character not this and this
+ in_function_build_string_ += data_.charAt(data_index_); 
  
-
  if(in_parameter_set === 'in') { 
-  parameter_string += data_.charAt(data_index_); //two first characters will be pushed... just add and statements
+  parameter_string += data_.charAt(data_index_); 
  }
 
  if(data_.charAt(data_index_) === '"') {
+  data_index_ = data_index_ + 1;
   data_index_and_line_number_update = double_quote_string(data_index_, true, line_number_, false);
   update();
   return recurse(data_index_);
  }
 
  if(data_.charAt(data_index_) === "'") {
+  data_index_ = data_index_ + 1;
   data_index_and_line_number_update = single_quote_string(data_index_, true, line_number_, false);
   update();
   return recurse(data_index_);
  }
 
- if(data_.charAt(data_index_) === '//') {
+ if(
+  data_.charAt(data_index_) === '/' && 
+  data_.charAt(data_index_ + 1) === '/'
+ ) {
+  in_function_build_string_ += data_.charAt(data_index_ + 1);
+  data_index_ = data_index_ + 2;
   data_index_and_line_number_update = singleline_comment(data_index_, true, line_number_);
   update();
   return recurse(data_index_);
  }
 
- if(data_.charAt(data_index_) === '/*') {
+ if(
+  data_.charAt(data_index_) === '/' && 
+  data_.charAt(data_index_ + 1) === '/'
+ ) {
+  in_function_build_string_ += data_.charAt(data_index_ + 1);
+  data_index_ = data_index_ + 2;
   data_index_and_line_number_update = multiline_comment(data_index_, true, line_number_);
   update();
   return recurse(data_index_);
  }
 
- if(data_.charAt(data_index_) === '/') {
+ if(data_.charAt(data_index_) === '/') { 
+  in_function_build_string_ += data_.charAt(data_index_ + 1);
+  data_index_ = data_index_ + 2;
   data_index_and_line_number_update = regex(data_index_, true, line_number_);
   update();
   return recurse(data_index_);
  }
 
- if(in_parameter_set === 'out' && data_.charAt(data_index_) === '(') { 
+ if(
+  in_parameter_set === 'out' && 
+  data_.charAt(data_index_) === '('
+ ) { 
   in_parameter_set = 'in';
   parameter_string += data_.charAt(data_index_);
   data_index_ = data_index_ + 1; 
   return recurse(data_index_);
  }
 
- if(in_parameter_set === 'in' && data_.charAt(data_index_) === ')') { 
+ if(
+  in_parameter_set === 'in' && 
+  data_.charAt(data_index_) === ')'
+ ) { 
   in_parameter_set = 'done';
   data_index_ = data_index_ + 1; 
   return recurse(data_index_);
@@ -126,14 +146,15 @@ function recurse(data_index_) {
 function update() {  
   data_index_ = data_index_and_line_number_update.data_index_;
   line_number_ = data_index_and_line_number_update.line_number_;
-  in_function_build_string_ += data_index_and_line_number_update.build_string; //two of the first characters will be pushed here
+  in_function_build_string_ += data_index_and_line_number_update.build_string;
   if(in_parameter_set === 'in') { 
-    parameter_string += data_index_and_line_number_update.build_string; //two of the first character will be pushed here
+    parameter_string += data_index_and_line_number_update.build_string; 
   }
 }
 
 function check_invokable(data_index_) { 
- //recurse for )(); or )
+ //recurse for )() or )
 }
+
 
 module.exports = build_body_of_function;

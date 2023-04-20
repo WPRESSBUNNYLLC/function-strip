@@ -20,10 +20,11 @@ var build_body_of_function = require('./regular_body');
   return_object.build_string = beginning_function_.build_string + "function";
   return_object.is_async = beginning_function_.is_async;
   return_object.has_name = beginning_function_.has_name;
+  return_object.is_enclosed = beginning_function_.is_enclosed;
 
   data_index = data_index + 8; 
 
-  var body_of_function = build_body_of_function(data_index, line_number);
+  var body_of_function = build_body_of_function(data_index, line_number, return_object.is_enclosed);
 
   return_object.build_string += body_of_function.build_string;
   return_object.parameters = body_of_function.parameters;

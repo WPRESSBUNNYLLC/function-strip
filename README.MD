@@ -4,7 +4,7 @@ https://stackoverflow.com/questions/42987651/regular-expression-to-match-all-jav
 
 This solution is somewhat accurate except that it does not take ending brackets in single-line comments, multi-line comments, strings, regular expressions and template literals into consideration. If an ending bracket is found, the function ends when it should not.
 
-There are many edge cases in this problem I think can not be solved with a regular expression and if tried, would lead to many expressions and would be difficult to manage (drop offs, trimming, recursion etc).
+There are many edge cases in this problem I think can not be solved with a regular expression and if tried, would lead to many expressions and would be difficult to manage (drop offs, trimming, recursion/whileloops etc).
 
 Example of a function that would lead to inaccurate results.
 
