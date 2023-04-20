@@ -7,7 +7,7 @@
    make sure to add if a regular name in arrow function in case there are no parameters - const wow = jkj => { } <-- condition to avoid counting brackets
    add additional checks for regular expressions on the reg call in index.js
    just figure out the cases for tags 
-   add inside functions as an array to the outermost function using a non returned recursive call
+   add inside functions as an array to the outermost function using a non returned recursive call - if adding a few other data structures... can do the same thing and create an object or array pointer {a{b{c}}}
    correct beginning and end of regular and arrow function 
    before and after for error
    replace all recursive functions with while loops .. 1 per with an if else if to make up for the single recursive statements
