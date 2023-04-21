@@ -23,11 +23,10 @@ function singleline(data_index, in_function, line_number) {
 function recurse(data_index_) { 
 
  if(data_index_ > data_.length) {
-  return {
-   data_index: data_index_, 
-   line_number: line_number_,
-   build_string: in_function_build_string_,
-  }
+  throw new Error(
+   "Error: The single line comment in the document has not ended. End of file error \n" + 
+   "line number: " + original_line_number
+  )
  }
 
  if(in_function_ === true) { 

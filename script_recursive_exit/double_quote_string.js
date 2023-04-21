@@ -29,13 +29,10 @@ function double_quote_string(data_index, in_function, line_number, in_tag) {
 function recurse(data_index_) { 
 
  if(data_index_ > data_.length) {
-  return {
-   data_index: data_index_, 
-   line_number: line_number_, 
-   build_string: in_function_build_string_,
-   tag_string: in_tag_string, 
-   error: 'double quote string has not ended on line ' + original_line_number
-  }
+  throw new Error(
+   "Error: The double quote string in the document has not ended. End of file error \n" + 
+   "line number: " + original_line_number
+  )
  }
 
  if(data_.charAt(data_index_) === '\n') { 

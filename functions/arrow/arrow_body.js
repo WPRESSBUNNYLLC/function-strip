@@ -43,13 +43,10 @@ function build_body_of_function(data_index, line_number, i) {
 function recurse(data_index_) { 
 
  if(data_index_ > data_.length) {
-  return {
-   data_index: data_index_, 
-   line_number: line_number_, 
-   build_string: in_function_build_string_,
-   parameters: parameter_string, 
-   error: 'function has not ended on line ' + original_line_number
-  }
+  throw new Error(
+   "Error: The function in the document has not ended. End of file error \n" + 
+   "line number: " + original_line_number
+  )
  }
 
  if(data_.charAt(data_index_) === '\n') { 
@@ -143,7 +140,8 @@ function recurse(data_index_) {
     line_number: line_number_, 
     build_string: in_function_build_string_,
     parameters: parameter_string, 
-    is_invoked: invokable_return_object.found_opening_invokable && invokable_return_object.found_closing_invokable ? true : false,
+    is_invoked: invokable_return_object.found_opening_invokable && 
+    invokable_return_object.found_closing_invokable ? true : false,
     found_closing: invokable_return_object.found_enclosing
    }
   }
@@ -186,8 +184,8 @@ function check_invokable(data_index_) {
   invokable_string === ')'
  ) {
   invokable_string += '(';
-  data_index_ = data_index_ + 1;
   remember_me = data_index_;
+  data_index_ = data_index_ + 1;
   invokable_return_object.found_opening_invokable = true;
   return check_invokable(data_index_);
  } 
@@ -215,7 +213,7 @@ function check_invokable(data_index_) {
   return check_invokable(data_index_);
  }
 
- if(invokable_return_object.found_opening_invokable === true){ 
+ if(invokable_return_object.found_opening_invokable === true) { 
   data_index_ = remember_me;
  }
 
