@@ -1,4 +1,8 @@
 
+/*
+ initiates the process of building the function
+*/
+
 var check_if_function = require('./regular_check');
 var build_beginning_of_function = require('./regular_beginning');
 var build_body_of_function = require('./regular_body');

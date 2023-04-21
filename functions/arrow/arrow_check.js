@@ -1,5 +1,8 @@
-  
- 
+
+/*
+ checks if a function
+*/
+
 var update_function_and_update_data = require('../../data');
 var data = '';
 var in_html = false;

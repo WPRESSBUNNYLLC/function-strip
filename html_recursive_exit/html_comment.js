@@ -22,8 +22,7 @@ function recurse(data_index_) {
 
  if(data_index_ > data_.length) { 
   throw new Error(
-   "Error: The html comment in the document has not ended. End of file error \n" + 
-   "line number: " + original_line_number
+   "html comment End of file"
   )
  }
 

@@ -24,8 +24,7 @@ function recurse(data_index_) {
 
  if(data_index_ > data_.length) {
   throw new Error(
-   "Error: The single line comment in the document has not ended. End of file error \n" + 
-   "line number: " + original_line_number
+   "single line comment End of file"
   )
  }
 

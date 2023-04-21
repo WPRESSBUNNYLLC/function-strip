@@ -1,4 +1,8 @@
 
+/*
+ builds the function body
+*/
+
 var update_function_and_update_data = require('../data');
 var double_quote_string = require('./script_recursive_exit/double_quote_string');
 var single_quote_string = require('./script_recursive_exit/single_quote_string');

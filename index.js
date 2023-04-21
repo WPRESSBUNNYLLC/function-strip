@@ -153,7 +153,6 @@
       data_length = data.length;
       fp = filepath;
       line_number = 0;
-
       try {
        if(file_type === 'html') { 
         run_from_html(data_index);
@@ -163,7 +162,6 @@
       } catch(err) { 
        console.log(err.message + '\n' + 'filepath: ' + filepath); 
       }
-
      }
  
     }
