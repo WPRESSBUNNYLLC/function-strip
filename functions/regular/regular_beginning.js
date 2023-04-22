@@ -1,11 +1,4 @@
 
-/*
- * @param {bt_regular_parameter_string} using this to backtrack and build the beginning of the build string. "var wow = async function" then pushing the character sets
- * @param {bt_index} the back tracking of an index
- * @param {found_equals} found equals sign so we know when to end... (name and type check)
- * @param {found_async} found async before i found equals if there is an equals. 
- * @param {found_name} found equals now i can get the name and type if there is a type.. there has to be a name though if equals is found
-*/
 
 var data = '';
 var bt_index = 0;
@@ -14,10 +7,6 @@ var found_equals = false;
 var found_async = false;
 var found_name = false;
 var bt_index_drop_off_alphabet = /^[a-zA-Z0-9_$]*$/; //just copy async one without the whatever.
-
-/*
- initiate the beginning of the regular function... 
-*/
 
 function initiate_regular(d, data_index) { 
 

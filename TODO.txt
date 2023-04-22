@@ -3,7 +3,7 @@
    make sure to recurse on if a function is invokable (); - do this at the end of each function... make sure the function can be invoked beforehand with a parameter
    add other languages (below iterate_through_file_text) also add languages as a configuration property to skip over files
    make sure to use regular expressions instead of many !== in some files
-   possibly use a library for checking syntax errors or some compiler and skip file if error
+   possibly use a library for checking syntax errors or some compiler and skip file if error. jshint
    make sure to add if a regular name in arrow function in case there are no parameters - const wow = jkj => { } <-- condition to avoid counting brackets
    add additional checks for regular expressions on the reg call in index.js
    just figure out the cases for tags 

@@ -16,7 +16,7 @@ var line_number_ = 0;
 var in_parameter_set = 'out';
 var parameter_string = '';
 var original_line_number = '';
-var in_function_build_string_ = ''; 
+var in_function_build_string_ = '';
 var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
 var data_index_and_line_number_update = {};
@@ -36,6 +36,7 @@ function build_body_of_function(data_index, line_number, i) {
  parameter_string = '';
  in_function_build_string_ = '';
  is_invokable = i;
+ function_tree[function_index] = 
  invokable_return_object = {
   found_enclosing: false, 
   found_opening_invokable: false, 

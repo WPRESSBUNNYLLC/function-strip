@@ -23,7 +23,7 @@ var build_body_of_function = require('./regular_body');
 
   return_object.build_string = beginning_function_.build_string + "function";
   return_object.is_async = beginning_function_.is_async;
-  return_object.has_name = beginning_function_.has_name;
+  return_object.has_name = beginning_function_.has_name; //push both names
   return_object.is_enclosed = beginning_function_.is_enclosed;
 
   data_index = data_index + 8; 
