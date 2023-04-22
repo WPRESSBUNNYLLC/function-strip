@@ -36,7 +36,6 @@ function build_body_of_function(data_index, line_number, i) {
  parameter_string = '';
  in_function_build_string_ = '';
  is_invokable = i;
- function_tree[function_index] = 
  invokable_return_object = {
   found_enclosing: false, 
   found_opening_invokable: false, 
