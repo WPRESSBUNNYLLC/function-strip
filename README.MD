@@ -1,4 +1,4 @@
-strips a variety of different functions from a set of files. Should capture entire function body, parameters, and name along with the filepath and line number.
+strips a variety of different functions from a set of files. Should capture entire function body, parameters, and name along with the filepath and beginning/ending line number.
 
 https://stackoverflow.com/questions/42987651/regular-expression-to-match-all-javascript-functions
 
@@ -18,4 +18,4 @@ var a = ` ${awesome + '}}}'}`;
 }
 ```
 
-The solution provided should capture the true function 100% of the time if there are no errors in the document
+The solution provided should capture the true function 100% of the time if there are no errors in the document.

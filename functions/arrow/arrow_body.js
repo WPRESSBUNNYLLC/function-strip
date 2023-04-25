@@ -1,6 +1,6 @@
 
 /*
- builds the function body
+ builds the function body -- needs to take (body) and new line into consideration
 */
 
 var update_function_and_update_data = require('../data');
@@ -8,11 +8,14 @@ var double_quote_string = require('./script_recursive_exit/double_quote_string')
 var single_quote_string = require('./script_recursive_exit/single_quote_string');
 var multiline_comment = require('./script_recursive_exit/multiline_comment');
 var singleline_comment = require('./script_recursive_exit/singleline_comment');
+var template_string = require('./script_recursive_exit/template_string');
 var regex = require('./script_recursive_exit/regex');
 
 var data_index_ = 0;
 var data_ = '';
 var line_number_ = 0;
+var capture_name = 'on';
+var function_name = '';
 var in_parameter_set = 'out';
 var parameter_string = '';
 var original_line_number = '';
@@ -32,6 +35,8 @@ function build_body_of_function(data_index, line_number, i) {
  data_index_ = data_index;
  line_number_ = line_number;
  original_line_number = line_number;
+ capture_name = 'on';
+ function_name = '';
  in_parameter_set = 'out';
  parameter_string = '';
  in_function_build_string_ = '';
@@ -63,6 +68,15 @@ function recurse(data_index_) {
   parameter_string += data_.charAt(data_index_); 
  }
 
+ if(
+  capture_name === 'on' && 
+  data_.charAt(data_index_) !== ' ' && 
+  data_.charAt(data_index_) !== '\n' && 
+  data_.charAt(data_index_) !== '('
+ ) { 
+  function_name += data_.charAt(data_index_);
+ }
+
  if(data_.charAt(data_index_) === '"') {
   data_index_ = data_index_ + 1;
   data_index_and_line_number_update = double_quote_string(data_index_, true, line_number_, false);
@@ -73,6 +87,13 @@ function recurse(data_index_) {
  if(data_.charAt(data_index_) === "'") {
   data_index_ = data_index_ + 1;
   data_index_and_line_number_update = single_quote_string(data_index_, true, line_number_, false);
+  update();
+  return recurse(data_index_);
+ }
+
+ if(data_.charAt(data_index_) === '`') { 
+  data_index_ = data_index_ + 1;
+  data_index_and_line_number_update = template_string(data_index_, true, line_number_);
   update();
   return recurse(data_index_);
  }
@@ -112,6 +133,7 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '('
  ) { 
   in_parameter_set = 'in';
+  capture_name = 'off';
   parameter_string += data_.charAt(data_index_);
   data_index_ = data_index_ + 1; 
   return recurse(data_index_);

@@ -40,8 +40,8 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '*' &&
   data_.charAt(data_index_ + 1) === '/'
  ) { 
-  data_index_ = data_index_ + 2; 
   in_function_ === true ? in_function_build_string_ += data_.charAt(data_index_ + 1) : '';
+  data_index_ = data_index_ + 2; 
   return {
    data_index: data_index_, 
    line_number: line_number_,
