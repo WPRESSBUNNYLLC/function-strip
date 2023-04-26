@@ -68,15 +68,6 @@ function recurse(data_index_) {
   parameter_string += data_.charAt(data_index_); 
  }
 
- if(
-  capture_name === 'on' && 
-  data_.charAt(data_index_) !== ' ' && 
-  data_.charAt(data_index_) !== '\n' && 
-  data_.charAt(data_index_) !== '('
- ) { 
-  function_name += data_.charAt(data_index_);
- }
-
  if(data_.charAt(data_index_) === '"') {
   data_index_ = data_index_ + 1;
   data_index_and_line_number_update = double_quote_string(data_index_, true, line_number_, false);
@@ -129,6 +120,15 @@ function recurse(data_index_) {
  }
 
  if(
+  capture_name === 'on' && 
+  data_.charAt(data_index_) !== ' ' && 
+  data_.charAt(data_index_) !== '\n' && 
+  data_.charAt(data_index_) !== '('
+ ) { 
+  function_name += data_.charAt(data_index_);
+ }
+
+ if(
   in_parameter_set === 'out' && 
   data_.charAt(data_index_) === '('
  ) { 
@@ -166,8 +166,8 @@ function recurse(data_index_) {
     line_number: line_number_, 
     build_string: in_function_build_string_,
     parameters: parameter_string, 
-    is_invoked: invokable_return_object.found_opening_invokable && 
-    invokable_return_object.found_closing_invokable ? true : false,
+    name: function_name,
+    is_invoked: invokable_return_object.found_opening_invokable && invokable_return_object.found_closing_invokable ? true : false,
     found_closing: invokable_return_object.found_enclosing
    }
   }

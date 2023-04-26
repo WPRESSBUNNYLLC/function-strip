@@ -14,12 +14,12 @@ var regex = require('./script_recursive_exit/regex');
 var data_index_ = 0;
 var data_ = '';
 var line_number_ = 0;
-var capture_name = 'on';
-var function_name = '';
-var in_parameter_set = 'out';
-var parameter_string = '';
 var original_line_number = '';
 var in_function_build_string_ = ''; 
+var bracket_type = 'none';
+var opening_bracket = '';
+var closing_bracket = '';
+var found_opening_bracket = false;
 var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
 var data_index_and_line_number_update = {};
@@ -35,11 +35,11 @@ function build_body_of_function(data_index, line_number, i) {
  data_index_ = data_index;
  line_number_ = line_number;
  original_line_number = line_number;
- capture_name = 'on';
- function_name = '';
- in_parameter_set = 'out';
- parameter_string = '';
  in_function_build_string_ = '';
+ bracket_type = 'none'; 
+ opening_bracket = '';
+ closing_bracket = '';
+ found_opening_bracket = false;
  is_invokable = i;
  invokable_return_object = {
   found_enclosing: false, 
@@ -63,19 +63,6 @@ function recurse(data_index_) {
  }
 
  in_function_build_string_ += data_.charAt(data_index_); 
- 
- if(in_parameter_set === 'in') { 
-  parameter_string += data_.charAt(data_index_); 
- }
-
- if(
-  capture_name === 'on' && 
-  data_.charAt(data_index_) !== ' ' && 
-  data_.charAt(data_index_) !== '\n' && 
-  data_.charAt(data_index_) !== '('
- ) { 
-  function_name += data_.charAt(data_index_);
- }
 
  if(data_.charAt(data_index_) === '"') {
   data_index_ = data_index_ + 1;
@@ -129,32 +116,29 @@ function recurse(data_index_) {
  }
 
  if(
-  in_parameter_set === 'out' && 
-  data_.charAt(data_index_) === '('
+  data_.charAt(data_index_) === '{' && 
+  bracket_type === 'none'
  ) { 
-  in_parameter_set = 'in';
-  capture_name = 'off';
-  parameter_string += data_.charAt(data_index_);
-  data_index_ = data_index_ + 1; 
-  return recurse(data_index_);
+  bracket_type = 'reg';
+  opening_bracket = '{';
+  closing_bracket = '}';
+ } else if(
+  data_.charAt(data_index_) === '(' && 
+  bracket_type === 'none'
+ ) { 
+  bracket_type = 'paren';
+  opening_bracket = '('; //have to figure out new line / console.log( --- prob have to pass a param upstairs, and pass back if a new line character found... 
+  opening_bracket = ')';
  }
 
- if(
-  in_parameter_set === 'in' && 
-  data_.charAt(data_index_) === ')'
- ) { 
-  in_parameter_set = 'done';
-  data_index_ = data_index_ + 1; 
-  return recurse(data_index_);
- }
-
- if(data_.charAt(data_index_) === '{') { 
+ if(data_.charAt(data_index_) === opening_bracket) { 
+  found_opening_bracket = true;
   beginning_bracket_count += 1;
   data_index_ = data_index_ + 1; 
   return recurse(data_index_);
  }
 
- if(data_.charAt(data_index_) === '}') { 
+ if(data_.charAt(data_index_) === closing_bracket) { 
   ending_bracket_count += 1;
   data_index_ = data_index_ + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
@@ -165,9 +149,7 @@ function recurse(data_index_) {
     data_index: data_index_, 
     line_number: line_number_, 
     build_string: in_function_build_string_,
-    parameters: parameter_string, 
-    is_invoked: invokable_return_object.found_opening_invokable && 
-    invokable_return_object.found_closing_invokable ? true : false,
+    is_invoked: invokable_return_object.found_opening_invokable && invokable_return_object.found_closing_invokable ? true : false,
     found_closing: invokable_return_object.found_enclosing
    }
   }
@@ -183,9 +165,6 @@ function update() {
   data_index_ = data_index_and_line_number_update.data_index_;
   line_number_ = data_index_and_line_number_update.line_number_;
   in_function_build_string_ += data_index_and_line_number_update.build_string;
-  if(in_parameter_set === 'in') { 
-    parameter_string += data_index_and_line_number_update.build_string; 
-  }
 }
 
 function check_invokable(data_index_) { 
