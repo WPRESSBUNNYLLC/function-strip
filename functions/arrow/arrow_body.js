@@ -1,6 +1,25 @@
 
 /*
  builds the function body -- needs to take (body) and new line into consideration
+
+let a = 1; 
+let b = 2; 
+let c = 3;
+let d = 0;
+
+var cc = () =>
+
+d = a  
+ + b + 
+c;
+
+console.log(d);
+cc();
+console.log(d);
+
+using finish_first_statement as something completely seperate...
+
+ 
 */
 
 var update_function_and_update_data = require('../data');
@@ -20,6 +39,7 @@ var bracket_type = 'none';
 var opening_bracket = '';
 var closing_bracket = '';
 var found_opening_bracket = false;
+var found_new_line = false;
 var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
 var data_index_and_line_number_update = {};
@@ -40,6 +60,7 @@ function build_body_of_function(data_index, line_number, i) {
  opening_bracket = '';
  closing_bracket = '';
  found_opening_bracket = false;
+ found_new_line = false;
  is_invokable = i;
  invokable_return_object = {
   found_enclosing: false, 
@@ -58,11 +79,16 @@ function recurse(data_index_) {
   )
  }
 
+ in_function_build_string_ += data_.charAt(data_index_); 
+
  if(data_.charAt(data_index_) === '\n') { 
   line_number_ = line_number_ + 1;
+  found_new_line = true;
+  if(found_opening_bracket === false) { 
+    finish_first_statement(); //when finishing the first statement, look at the previous build string, and check if a statement was already made... if so, get the fuck out. if no statement or in the middle of one, finish it and get the fuck out. just figure it out.
+    return end();
+  }
  }
-
- in_function_build_string_ += data_.charAt(data_index_); 
 
  if(data_.charAt(data_index_) === '"') {
   data_index_ = data_index_ + 1;
@@ -119,6 +145,7 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '{' && 
   bracket_type === 'none'
  ) { 
+  found_opening_bracket = true;
   bracket_type = 'reg';
   opening_bracket = '{';
   closing_bracket = '}';
@@ -126,13 +153,13 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '(' && 
   bracket_type === 'none'
  ) { 
+  found_opening_bracket = true;
   bracket_type = 'paren';
-  opening_bracket = '('; //have to figure out new line / console.log( --- prob have to pass a param upstairs, and pass back if a new line character found... 
-  opening_bracket = ')';
+  opening_bracket = '(';  
+  closing_bracket = ')';
  }
 
  if(data_.charAt(data_index_) === opening_bracket) { 
-  found_opening_bracket = true;
   beginning_bracket_count += 1;
   data_index_ = data_index_ + 1; 
   return recurse(data_index_);
@@ -145,13 +172,7 @@ function recurse(data_index_) {
    if(is_invokable === true) {
     check_invokable(data_index_);
    }
-   return {
-    data_index: data_index_, 
-    line_number: line_number_, 
-    build_string: in_function_build_string_,
-    is_invoked: invokable_return_object.found_opening_invokable && invokable_return_object.found_closing_invokable ? true : false,
-    found_closing: invokable_return_object.found_enclosing
-   }
+   return end();
   }
   return recurse(data_index_);
  }
@@ -165,6 +186,14 @@ function update() {
   data_index_ = data_index_and_line_number_update.data_index_;
   line_number_ = data_index_and_line_number_update.line_number_;
   in_function_build_string_ += data_index_and_line_number_update.build_string;
+  found_new_line = data_index_and_line_number_update.found_new_line;
+  if(
+   found_new_line === true && 
+   found_opening_bracket === false
+  ) { 
+   finish_first_statement(); 
+   return end();
+  }
 }
 
 function check_invokable(data_index_) { 
@@ -224,6 +253,24 @@ function check_invokable(data_index_) {
 
  return;
 
+}
+
+function finish_first_statement() { 
+  //look at the build string and compartmentalize it into sections of strings, left hand assignments and operations and then keywords and all that
+  //split it on spaces
+  //check if in the middle of it
+  //if in the middle of it finish it
+  //when done, end it
+}
+
+function end() { 
+  return {
+    data_index: data_index_, 
+    line_number: line_number_, 
+    build_string: in_function_build_string_,
+    is_invoked: invokable_return_object.found_opening_invokable && invokable_return_object.found_closing_invokable ? true : false,
+    found_closing: invokable_return_object.found_enclosing
+  } 
 }
 
 module.exports = build_body_of_function;
