@@ -28,7 +28,7 @@
  bb();
  console.log(d);
 
- kind of weird
+ kind of weird - if finding anything before the first opening bracket, then finding a bracket, it means that we are in a single statement function... and we need to build until the end of only one statement. ...i think there is one exception to this.. just look at single statements 
 
 */
 
@@ -50,8 +50,10 @@ var bracket_type = 'none';
 var opening_bracket = '';
 var closing_bracket = '';
 var found_opening_bracket = false;
+var single_statement_function = false;
 var found_new_line = false;
 var beginning_bracket_count = 0;
+var in_single_statement_detector = '';
 var ending_bracket_count = 0;
 var data_index_and_line_number_update = {};
 var finish_first_statement_line_number_data_index_and_build_string_update = {};
@@ -72,6 +74,8 @@ function build_body_of_function(data_index, line_number, i) {
  opening_bracket = '';
  closing_bracket = '';
  found_opening_bracket = false;
+ single_statement_function = false;
+ in_single_statement_detector = ''; 
  found_new_line = false;
  first_statement_descriptor = [];
  is_invokable = i;
@@ -93,6 +97,10 @@ function recurse(data_index_) {
  }
 
  in_function_build_string_ += data_.charAt(data_index_); 
+
+ if(data_.charAt(data_index_) !== ' ' && data_.charAt(data_index_) !== '\n') { 
+  in_single_statement_detector += data_.charAt(data_index_); 
+ }
 
  if(data_.charAt(data_index_) === '\n') { 
   line_number_ = line_number_ + 1;
@@ -158,7 +166,9 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '{' && 
   bracket_type === 'none'
  ) { 
-  //do something here
+  if(in_single_statement_detector.length > 0) { 
+   single_statement_function = true;
+  }
   found_opening_bracket = true;
   bracket_type = 'reg';
   opening_bracket = '{';
@@ -167,7 +177,13 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '(' && //look at this again... might see (a) + (b) 
   bracket_type === 'none'
  ) { 
-  //do something here -- this might end  being me counting statements
+  if(in_single_statement_detector.length > 0) { 
+   single_statement_function = true;
+   //do something
+  } else if(recurse_next_opening()) { //if next opening is  (( not a single if () 
+   single_statement_function = true;
+   //do something
+  }
   found_opening_bracket = true;
   bracket_type = 'paren';
   opening_bracket = '(';  
@@ -198,17 +214,17 @@ function recurse(data_index_) {
 }
 
 function update() {  
-  data_index_ = data_index_and_line_number_update.data_index_;
-  line_number_ = data_index_and_line_number_update.line_number_;
-  in_function_build_string_ += data_index_and_line_number_update.build_string;
-  found_new_line = data_index_and_line_number_update.found_new_line;
-  if(
-   found_new_line === true && 
-   found_opening_bracket === false
-  ) { 
-   finish_first_then_end();
-   return end();
-  }
+ data_index_ = data_index_and_line_number_update.data_index_;
+ line_number_ = data_index_and_line_number_update.line_number_;
+ in_function_build_string_ += data_index_and_line_number_update.build_string;
+ found_new_line = data_index_and_line_number_update.found_new_line;
+ if(
+  found_new_line === true && 
+  found_opening_bracket === false
+ ) { 
+  finish_first_then_end();
+  return end();
+ }
 }
 
 function check_invokable(data_index_) { 
