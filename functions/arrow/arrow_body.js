@@ -22,7 +22,11 @@
  also have to take this into consideration if opening is ( 
  var c = () => (a) + (b);
 
- var bb = () => d = (a) + (b) - (c);
+ var bb = () => d = 
+ 
+ (a) + (b)
+ 
+ - (c);
 
  console.log(d);
  bb();
@@ -51,6 +55,7 @@ var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
 var data_index_and_line_number_update = {};
 var finish_first_statement_line_number_data_index_and_build_string_update = {};
+var check_if_first_statement_line_number_data_index_and_build_string_update = {};
 var invokable_return_object = {
   found_enclosing: false, 
   found_opening_invokable: false, 
@@ -96,6 +101,7 @@ function check_if_single_statement_or_enclosed_function(data_index_) {
   data_.charAt(data_index_) !== '{' && 
   data_.charAt(data_index_) !== '('
  ) { 
+  data_index_ += 1;
   finish_first_then_end();
   return end();
  }
@@ -103,14 +109,19 @@ function check_if_single_statement_or_enclosed_function(data_index_) {
  if(data_.charAt(data_index_) === '{') { 
   opening_bracket = '{';
   closing_bracket = '}';
+  beginning_bracket_count += 1;
+  data_index_ += 1;
   return recurse(data_index_);
  } 
  
  if(data_.charAt(data_index_) === '(') { 
-  opening_bracket = '(';  
-  closing_bracket = ')';
-  if(check_if_a_single_statement(data_index_, line_number_, in_function_build_string_) === false) { //make this a variable
-   return recurse();
+  data_index_ += 1;
+  check_if_single();
+  if(is_single === false) {
+   opening_bracket = '(';  
+   closing_bracket = ')';
+   beginning_bracket_count += 1;
+   return recurse(); 
   } else { 
    finish_first_then_end();
    return end();
@@ -196,7 +207,7 @@ function recurse(data_index_) {
 
  if(data_.charAt(data_index_) === closing_bracket) { 
   ending_bracket_count += 1;
-  data_index_ = data_index_ + 1; 
+  data_index_ = data_index_  + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
    return end();
   }
@@ -212,6 +223,16 @@ function update() {
  data_index_ = data_index_and_line_number_update.data_index_;
  line_number_ = data_index_and_line_number_update.line_number_;
  in_function_build_string_ += data_index_and_line_number_update.build_string;
+}
+
+function check_if_single() {
+ check_if_first_statement_line_number_data_index_and_build_string_update = check_if_a_single_statement(data_index_, line_number_, in_function_build_string_);
+ data_index_ = check_if_first_statement_line_number_data_index_and_build_string_update.data_index_;
+ line_number_ = check_if_first_statement_line_number_data_index_and_build_string_update.line_number_;
+ beginning_bracket_count = check_if_first_statement_line_number_data_index_and_build_string_update.beginning_bracket_count;
+ ending_bracket_count = check_if_first_statement_line_number_data_index_and_build_string_update.ending_bracket_count;
+ in_function_build_string_ += check_if_first_statement_line_number_data_index_and_build_string_update.build_string;
+ is_single = check_if_first_statement_line_number_data_index_and_build_string_update.is_single;
 }
 
 function finish_first_then_end() { 

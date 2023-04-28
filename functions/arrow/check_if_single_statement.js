@@ -7,6 +7,7 @@ function check_if_a_single_statement(data_index, line_number, build_string) {
  build_string = build_string;
  line_number = line_number;
  data_index = data_index;
+ first_statement_descriptor.push('(');
  recurse(data_index_);
 }
 
