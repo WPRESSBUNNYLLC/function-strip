@@ -28,8 +28,6 @@
  bb();
  console.log(d);
 
- kind of weird - if finding anything before the first opening bracket, then finding a bracket, it means that we are in a single statement function... and we need to build until the end of only one statement. ...i think there is one exception to this.. just look at single statements 
-
 */
 
 var update_function_and_update_data = require('../data');
@@ -39,7 +37,8 @@ var multiline_comment = require('./script_recursive_exit/multiline_comment');
 var singleline_comment = require('./script_recursive_exit/singleline_comment');
 var template_string = require('./script_recursive_exit/template_string');
 var regex = require('./script_recursive_exit/regex');
-var finish_first_statement = require('./first_statement_descriptor');
+var finish_first_statement = require('generate/functions/arrow/return_first_statement');
+var check_if_a_single_statement = require('generate/functions/arrow/check_if_single_statement');
 
 var data_index_ = 0;
 var data_ = '';
@@ -52,7 +51,6 @@ var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
 var data_index_and_line_number_update = {};
 var finish_first_statement_line_number_data_index_and_build_string_update = {};
-var is_invokable = false; 
 var invokable_return_object = {
   found_enclosing: false, 
   found_opening_invokable: false, 
@@ -75,10 +73,8 @@ function build_body_of_function(data_index, line_number, i) {
   found_closing_invokable: false
  }; 
  check_if_single_statement_or_enclosed_function(data_index_);
- recurse(data_index_);
 }
 
-//either runs the single statement function or the bracket counting function - single statement in other file
 function check_if_single_statement_or_enclosed_function(data_index_) { 
 
  if(data_index_ > data_.length) {
@@ -113,7 +109,7 @@ function check_if_single_statement_or_enclosed_function(data_index_) {
  if(data_.charAt(data_index_) === '(') { 
   opening_bracket = '(';  
   closing_bracket = ')';
-  if(check_if_a_single_statement()) {
+  if(check_if_a_single_statement(data_index_, line_number_, in_function_build_string_) === false) { //make this a variable
    return recurse();
   } else { 
    finish_first_then_end();
@@ -202,9 +198,6 @@ function recurse(data_index_) {
   ending_bracket_count += 1;
   data_index_ = data_index_ + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
-   if(is_invokable === true) {
-    check_invokable(data_index_);
-   }
    return end();
   }
   return recurse(data_index_);
@@ -221,74 +214,11 @@ function update() {
  in_function_build_string_ += data_index_and_line_number_update.build_string;
 }
 
-function check_invokable(data_index_) { 
-
- if(data_index_ > data_.length) {
-  return;
- }
-
- if(
-  data_.charAt(data_index_) === ')' && 
-  invokable_string === ''
- ) {
-  invokable_string += ')';
-  in_function_build_string_ += data_.charAt(data_index_);  ;
-  data_index_ = data_index_ + 1;
-  invokable_return_object.found_enclosing = true;
-  return check_invokable(data_index_);
- } 
-
- if(
-  data_.charAt(data_index_) === '(' && 
-  invokable_string === ')'
- ) {
-  invokable_string += '(';
-  remember_me = data_index_;
-  data_index_ = data_index_ + 1;
-  invokable_return_object.found_opening_invokable = true;
-  return check_invokable(data_index_);
- } 
-
- if(
-  data_.charAt(data_index_) === ')' && 
-  invokable_string === ')('
- ) {
-  in_function_build_string_ += '()';
-  data_index_ = data_index_ + 1;
-  invokable_return_object.found_closing_invokable = true;
-  return;
- } 
-
- if(data_.charAt(data_index_) === '\n') { 
-  in_function_build_string_ += data_.charAt(data_index_);
-  data_index_ = data_index_ + 1;
-  line_number_ = line_number_ + 1;
-  return check_invokable(data_index_);
- }
-
- if(data_.charAt(data_index_) === ' ') { 
-  in_function_build_string_ += data_.charAt(data_index_);
-  data_index_ = data_index_ + 1;
-  return check_invokable(data_index_);
- }
-
- if(invokable_return_object.found_opening_invokable === true) { 
-  data_index_ = remember_me;
- }
-
- return;
-
-}
-
 function finish_first_then_end() { 
  finish_first_statement_line_number_data_index_and_build_string_update = finish_first_statement(data_index_, line_number_, in_function_build_string_); 
  data_index_ = finish_first_statement_line_number_data_index_and_build_string_update.data_index_;
  line_number_ = finish_first_statement_line_number_data_index_and_build_string_update.line_number_;
- in_function_build_string_ = finish_first_statement_line_number_data_index_and_build_string_update.build_string;
-}
-
-function check_if_a_single_statement() { 
- //going to have to check if in a single statement... not sure but
+ in_function_build_string_ += finish_first_statement_line_number_data_index_and_build_string_update.build_string;
 }
 
 function end() { 
