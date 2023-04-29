@@ -1,3 +1,37 @@
+/*
+
+ let a = 1; 
+ let b = 2; 
+ let c = 3;
+ let d = 0;
+
+ var cc = () =>
+
+ d = a  
+  + b + 
+ c;
+
+ console.log(d);
+ cc();
+ console.log(d);
+
+ using finish_first_statement as something completely seperate...
+
+ also have to take this into consideration if opening is ( 
+ var c = () => (a) + (b);
+
+ var bb = () => d = 
+
+ (a) + (b)
+ 
+ - (c);
+
+ console.log(d);
+ bb();
+ console.log(d);
+ 
+*/
+
 var first_statement_descriptor = [];
 var build_string_ = '';
 var line_number_ = 0;

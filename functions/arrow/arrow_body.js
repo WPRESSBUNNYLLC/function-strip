@@ -1,37 +1,6 @@
 
 /*
- builds the function body -- needs to take (body) and new line into consideration
-
- let a = 1; 
- let b = 2; 
- let c = 3;
- let d = 0;
-
- var cc = () =>
-
- d = a  
-  + b + 
- c;
-
- console.log(d);
- cc();
- console.log(d);
-
- using finish_first_statement as something completely seperate...
-
- also have to take this into consideration if opening is ( 
- var c = () => (a) + (b);
-
- var bb = () => d = 
-
- (a) + (b)
- 
- - (c);
-
- console.log(d);
- bb();
- console.log(d);
-
+ builds the function body
 */
 
 var update_function_and_update_data = require('../data');
@@ -104,7 +73,7 @@ function check_if_single_statement_or_bracket_function(data_index_) {
  } 
 
  data_index_ += 1; 
- return check_if_single_statement_or_enclosed_function(data_index_);
+ return check_if_single_statement_or_bracket_function(data_index_);
 
 }
 
