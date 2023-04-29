@@ -70,10 +70,10 @@ function build_body_of_function(data_index, line_number, i) {
   found_opening_invokable: false, 
   found_closing_invokable: false
  }; 
- check_if_single_statement_or_enclosed_function(data_index_);
+ check_if_single_statement_or_bracket_function(data_index_);
 }
 
-function check_if_single_statement_or_enclosed_function(data_index_) { 
+function check_if_single_statement_or_bracket_function(data_index_) { 
 
  if(data_index_ > data_.length) {
   throw new Error(
@@ -91,12 +91,10 @@ function check_if_single_statement_or_enclosed_function(data_index_) {
  if(
   data_.charAt(data_index_) !== '\n' && 
   data_.charAt(data_index_) !== ' ' && 
-  data_.charAt(data_index_) !== '{' && 
-  data_.charAt(data_index_) !== '('
+  data_.charAt(data_index_) !== '{'
  ) { 
   data_index_ += 1;
-  finish_first_then_end();
-  return end();
+  return finish_first_then_end();
  }
 
  if(data_.charAt(data_index_) === '{') { 
@@ -104,12 +102,6 @@ function check_if_single_statement_or_enclosed_function(data_index_) {
   data_index_ += 1;
   return recurse(data_index_);
  } 
- 
- if(data_.charAt(data_index_) === '(') { 
-  data_index_ += 1;
-  finish_first_then_end();
-  return end();
- }
 
  data_index_ += 1; 
  return check_if_single_statement_or_enclosed_function(data_index_);
@@ -213,6 +205,7 @@ function finish_first_then_end() {
  data_index_ = finish_first_statement_line_number_data_index_and_build_string_update.data_index_;
  line_number_ = finish_first_statement_line_number_data_index_and_build_string_update.line_number_;
  in_function_build_string_ += finish_first_statement_line_number_data_index_and_build_string_update.build_string;
+ return end();
 }
 
 function end() { 
