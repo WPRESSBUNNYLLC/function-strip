@@ -120,7 +120,7 @@ function recurse(data_index_) {
  }
 
  if(
-  capture_name === 'on' && //make this nicer - razzaaaaaaaaa clean
+  capture_name === 'on' &&
   data_.charAt(data_index_) !== ' ' && 
   data_.charAt(data_index_) !== '\n' && 
   data_.charAt(data_index_) !== '('
