@@ -19,3 +19,13 @@ var a = ` ${awesome + '}}}'}`;
 ```
 
 The solution provided should capture the true function 100% of the time if there are no errors in the document.
+
+# javascript
+
+# regular functions
+
+gets name, body parameters and beginning and ending line number of regular function. Uses bracket counting to note when the function ends.
+
+# arrow functions
+
+gets name, body parameters and beginning and ending line number of arrow function. Uses bracket counting to note when the function ends if first character is a bracket. If first is not a bracket, builds a single statement to return as the body of the function.
