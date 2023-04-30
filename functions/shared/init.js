@@ -11,7 +11,7 @@ function init(p) {
   case 'async':
   return async();
   case 'name_and_type':
-  return initiate_enclosed_and_invoked();
+  return name_and_type();
   default: throw new error('invalid paramater');
  }
 }

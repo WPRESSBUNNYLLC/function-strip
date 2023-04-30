@@ -16,8 +16,10 @@ var data_ = '';
 var line_number_ = 0;
 var capture_name = 'on';
 var function_name = '';
-var in_parameter_set = 'out'; //i have to count this shit too
+var in_parameter_set = 'out';
 var parameter_string = '';
+var opening_parameter_count = 0; 
+var closing_parameter_count = 0;
 var original_line_number = '';
 var in_function_build_string_ = '';
 var beginning_bracket_count = 0;
@@ -37,6 +39,8 @@ function build_body_of_function(data_index, line_number, closed, deep_enclosed) 
  function_name = '';
  in_parameter_set = 'out';
  parameter_string = '';
+ opening_parameter_count = 0; 
+ closing_parameter_count = 0;
  in_function_build_string_ = '';
  is_enclosed = closed;
  levels_deep_enclosed - deep_enclosed;
@@ -125,12 +129,16 @@ function recurse(data_index_) {
  }
 
  if(
-  in_parameter_set === 'out' && 
-  data_.charAt(data_index_) === '('
+  data_.charAt(data_index_) === '(' && 
+  in_parameter_set === 'out' || 
+  in_parameter_set === 'in'
  ) { 
-  in_parameter_set = 'in';
-  capture_name = 'off';
-  parameter_string += data_.charAt(data_index_);
+  if(in_parameter_set === 'out') { 
+   in_parameter_set = 'in';
+   capture_name = 'off';
+   parameter_string += data_.charAt(data_index_);
+  }
+  opening_parameter_count += 1;
   data_index_ = data_index_ + 1; 
   return recurse(data_index_);
  }
@@ -139,7 +147,10 @@ function recurse(data_index_) {
   in_parameter_set === 'in' && 
   data_.charAt(data_index_) === ')'
  ) { 
-  in_parameter_set = 'done';
+  closing_parameter_count += 1; 
+  if(opening_parameter_count === closing_parameter_count) {
+   in_parameter_set = 'done';
+  }
   data_index_ = data_index_ + 1; 
   return recurse(data_index_);
  }
