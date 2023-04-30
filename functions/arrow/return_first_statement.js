@@ -30,6 +30,11 @@
  bb();
  console.log(d);
 
+ single statements vs block statements. 
+ if first statement is not a block statement, dont recurse 
+ if first statement is a block statement recurse the blocks inside and for each block, build a single statement
+
+
 */
 
 var first_statement_descriptor = [];

@@ -1,5 +1,3 @@
-
-
 var data = '';
 var bt_index = 0;
 var bt_regular_parameter_string = [];

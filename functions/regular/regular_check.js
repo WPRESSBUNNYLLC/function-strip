@@ -37,7 +37,7 @@ var in_template = false;
    data.charAt(data_index-1) === '}' || 
    data.charAt(data_index-1) === '=' || 
    data.charAt(data_index-1) === '(' || 
-   data.charAt(data_index-1) === ';'
+   data.charAt(data_index-1) === ';' //and abunch of other characters
   ) {
    return true
   } else { 

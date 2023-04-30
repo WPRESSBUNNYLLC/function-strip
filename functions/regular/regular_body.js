@@ -23,14 +23,13 @@ var in_function_build_string_ = '';
 var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
 var data_index_and_line_number_update = {};
-var is_invokable = false;
-var invokable_return_object = {
-  found_enclosing: false, 
-  found_opening_invokable: false, 
-  found_closing_invokable: false
-};
+var is_enclosed = false;
+var levels_deep_enclosed = 0;
+var found_enclosing = false; 
+var found_opening_and_closing_invokable = false;
 
-function build_body_of_function(data_index, line_number, i) {
+
+function build_body_of_function(data_index, line_number, closed, deep_enclosed) {
  data_ = update_function_and_update_data.data;
  data_index_ = data_index;
  line_number_ = line_number;
@@ -40,13 +39,11 @@ function build_body_of_function(data_index, line_number, i) {
  in_parameter_set = 'out';
  parameter_string = '';
  in_function_build_string_ = '';
- is_invokable = i;
- invokable_return_object = {
-  found_enclosing: false, 
-  found_opening_invokable: false, 
-  found_closing_invokable: false
- }; 
- recurse(data_index_);
+ is_enclosed = closed;
+ levels_deep_enclosed - deep_enclosed;
+ found_enclosing = false; 
+ found_opening_and_closing_invokable = false;
+ return recurse(data_index_);
 }
 
 function recurse(data_index_) { 
@@ -158,8 +155,8 @@ function recurse(data_index_) {
   ending_bracket_count += 1;
   data_index_ = data_index_ + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
-   if(is_invokable === true) {
-    check_invokable(data_index_);
+   if(is_enclosed === true) {
+    initiate_enclosed_and_invoked();
    }
    return end();
   }
@@ -180,63 +177,9 @@ function update() {
   }
 }
 
-function check_invokable(data_index_) { 
-
- if(data_index_ > data_.length) {
-  return
- }
-
- if(
-  data_.charAt(data_index_) === ')' && 
-  invokable_string === ''
- ) {
-  invokable_string += ')';
-  in_function_build_string_ += data_.charAt(data_index_);  ;
-  data_index_ = data_index_ + 1;
-  invokable_return_object.found_enclosing = true;
-  return check_invokable(data_index_);
- } 
-
- if(
-  data_.charAt(data_index_) === '(' && 
-  invokable_string === ')'
- ) {
-  invokable_string += '(';
-  remember_me = data_index_;
-  data_index_ = data_index_ + 1;
-  invokable_return_object.found_opening_invokable = true;
-  return check_invokable(data_index_);
- } 
-
- if(
-  data_.charAt(data_index_) === ')' && 
-  invokable_string === ')('
- ) {
-  in_function_build_string_ += '()';
-  data_index_ = data_index_ + 1;
-  invokable_return_object.found_closing_invokable = true;
-  return;
- } 
-
- if(data_.charAt(data_index_) === '\n') { 
-  in_function_build_string_ += data_.charAt(data_index_);
-  data_index_ = data_index_ + 1;
-  line_number_ = line_number_ + 1;
-  return check_invokable(data_index_);
- }
-
- if(data_.charAt(data_index_) === ' ') { 
-  in_function_build_string_ += data_.charAt(data_index_);
-  data_index_ = data_index_ + 1;
-  return check_invokable(data_index_);
- }
-
- if(invokable_return_object.found_opening_invokable === true) { 
-  data_index_ = remember_me;
- }
-
- return;
-
+function initiate_enclosed_and_invoked() { 
+ found_enclosing = get_enclosed(data_index_);
+ found_opening_and_closing_invokable = check_invokable(data_index_);    
 }
 
 function end() { 
@@ -246,8 +189,8 @@ function end() {
   build_string: in_function_build_string_,
   parameters: parameter_string, 
   name: function_name,
-  is_invoked: invokable_return_object.found_opening_invokable && invokable_return_object.found_closing_invokable ? true : false,
-  found_closing: invokable_return_object.found_enclosing
+  found_opening_and_closing_invokable: found_opening_and_closing_invokable,
+  found_closing: found_enclosing
  }
 }
 
