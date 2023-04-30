@@ -155,7 +155,7 @@ function recurse(data_index_) {
   data_index_ = data_index_  + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
    if(is_enclosed === true) {
-    initiate_enclosed_and_invoked(); //init with a switch
+    init('initiate_enclosed_and_invoked');
    }
    return end();
   }

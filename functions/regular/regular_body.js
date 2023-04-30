@@ -16,7 +16,7 @@ var data_ = '';
 var line_number_ = 0;
 var capture_name = 'on';
 var function_name = '';
-var in_parameter_set = 'out';
+var in_parameter_set = 'out'; //i have to count this shit too
 var parameter_string = '';
 var original_line_number = '';
 var in_function_build_string_ = '';
@@ -27,7 +27,6 @@ var is_enclosed = false;
 var levels_deep_enclosed = 0;
 var found_enclosing = false; 
 var found_opening_and_closing_invokable = false;
-
 
 function build_body_of_function(data_index, line_number, closed, deep_enclosed) {
  data_ = update_function_and_update_data.data;
@@ -145,18 +144,24 @@ function recurse(data_index_) {
   return recurse(data_index_);
  }
 
- if(data_.charAt(data_index_) === '{') { 
+ if(
+  data_.charAt(data_index_) === '{' && 
+  in_parameter_set === 'done'
+ ) { 
   beginning_bracket_count += 1;
   data_index_ = data_index_ + 1; 
   return recurse(data_index_);
  }
 
- if(data_.charAt(data_index_) === '}') { 
+ if(
+  data_.charAt(data_index_) === '}' && 
+  in_parameter_set === 'done' 
+ ) { 
   ending_bracket_count += 1;
   data_index_ = data_index_ + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
    if(is_enclosed === true) {
-    initiate_enclosed_and_invoked();
+    init('initiate_enclosed_and_invoked');
    }
    return end();
   }
