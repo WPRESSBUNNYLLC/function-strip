@@ -169,17 +169,12 @@ function recurse(data_index_) {
 }
 
 function update() {  
-  data_index_ = data_index_and_line_number_update.data_index_;
-  line_number_ = data_index_and_line_number_update.line_number_;
-  in_function_build_string_ += data_index_and_line_number_update.build_string;
-  if(in_parameter_set === 'in') { 
-    parameter_string += data_index_and_line_number_update.build_string; 
-  }
-}
-
-function initiate_enclosed_and_invoked() { 
- found_enclosing = get_enclosed(data_index_);
- found_opening_and_closing_invokable = check_invokable(data_index_);    
+ data_index_ = data_index_and_line_number_update.data_index_;
+ line_number_ = data_index_and_line_number_update.line_number_;
+ in_function_build_string_ += data_index_and_line_number_update.build_string;
+ if(in_parameter_set === 'in') { 
+  parameter_string += data_index_and_line_number_update.build_string; 
+ }
 }
 
 function end() { 

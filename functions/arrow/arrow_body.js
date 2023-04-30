@@ -20,11 +20,11 @@ var in_function_build_string_ = '';
 var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
 var data_index_and_line_number_update = {};
-var finish_first_statement_line_number_data_index_and_build_string_update = {};
+var finish_first_ldb = {};
 var is_enclosed = false;
 var levels_deep_enclosed = 0;
-var found_enclosing_line_number_data_index_and_build_string_update = {};
-var found_opening_and_closing_invokable_line_number_data_index_and_build_string_update = {};
+var found_enclosing_ldb = {};
+var found_opening_and_closing_invokable_ldb = {};
 var found_enclosing = false; 
 var found_opening_and_closing_invokable = false;
 
@@ -38,8 +38,8 @@ function build_body_of_function(data_index, line_number, closed, deep_enclosed) 
  levels_deep_enclosed = deep_enclosed;
  found_enclosing = false; 
  found_opening_and_closing_invokable = false;
- found_enclosing_line_number_data_index_and_build_string_update = {};
- found_opening_and_closing_invokable_line_number_data_index_and_build_string_update = {};
+ found_enclosing_ldb = {};
+ found_opening_and_closing_invokable_ldb = {};
  return check_if_single_statement_or_bracket_function(data_index_);
 }
 
@@ -155,7 +155,7 @@ function recurse(data_index_) {
   data_index_ = data_index_  + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
    if(is_enclosed === true) {
-    initiate_enclosed_and_invoked();
+    initiate_enclosed_and_invoked(); //init with a switch
    }
    return end();
   }
@@ -174,24 +174,11 @@ function update() {
 }
 
 function finish_first_then_end() { 
- finish_first_statement_line_number_data_index_and_build_string_update = finish_first_statement(data_index_, line_number_, in_function_build_string_); 
- data_index_ = finish_first_statement_line_number_data_index_and_build_string_update.data_index_;
- line_number_ = finish_first_statement_line_number_data_index_and_build_string_update.line_number_;
- in_function_build_string_ += finish_first_statement_line_number_data_index_and_build_string_update.build_string;
+ finish_first_ldb = finish_first_statement(data_index_, line_number_, in_function_build_string_); 
+ data_index_ = finish_first_ldb.data_index_;
+ line_number_ = finish_first_ldb.line_number_;
+ in_function_build_string_ += finish_first_ldb.build_string;
  return end();
-}
-
-function initiate_enclosed_and_invoked() { 
- found_enclosing_line_number_data_index_and_build_string_update = get_enclosed(data_index_, line_number_);
- data_index_ = found_enclosing_line_number_data_index_and_build_string_update.data_index_; 
- line_number_ = found_enclosing_line_number_data_index_and_build_string_update.line_number_;
- in_function_build_string_ += found_enclosing_line_number_data_index_and_build_string_update.build_string;
- found_enclosing = found_enclosing_line_number_data_index_and_build_string_update.found_closing;
- found_opening_and_closing_invokable_line_number_data_index_and_build_string_update = check_invokable(data_index_, line_number_);
- data_index_ = found_opening_and_closing_invokable_line_number_data_index_and_build_string_update.data_index_; 
- line_number_ = found_opening_and_closing_invokable_line_number_data_index_and_build_string_update.line_number_;
- in_function_build_string_ += found_opening_and_closing_invokable_line_number_data_index_and_build_string_update.build_string;
- found_opening_and_closing_invokable = found_opening_and_closing_invokable_line_number_data_index_and_build_string_update.found_opening_and_closing_invokable;
 }
 
 function end() { 
