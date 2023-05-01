@@ -11,6 +11,7 @@ var singleline_comment = require('./script_recursive_exit/singleline_comment');
 var template_string = require('./script_recursive_exit/template_string');
 var regex = require('./script_recursive_exit/regex');
 var finish_first_statement = require('generate/functions/arrow/return_first_statement');
+var shared = require('../shared/init');
 
 var data_index_ = 0;
 var data_ = '';
@@ -118,7 +119,7 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '/' && 
   data_.charAt(data_index_ + 1) === '/'
  ) {
-  in_function_build_string_ += data_.charAt(data_index_ + 1);
+  in_function_build_string_ += '/';
   data_index_ = data_index_ + 2;
   data_index_and_line_number_update = singleline_comment(data_index_, true, line_number_);
   update();
@@ -129,7 +130,7 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '/' && 
   data_.charAt(data_index_ + 1) === '*'
  ) {
-  in_function_build_string_ += data_.charAt(data_index_ + 1);
+  in_function_build_string_ += '*';
   data_index_ = data_index_ + 2;
   data_index_and_line_number_update = multiline_comment(data_index_, true, line_number_);
   update();
@@ -155,7 +156,8 @@ function recurse(data_index_) {
   data_index_ = data_index_  + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
    if(is_enclosed === true) {
-    init('initiate_enclosed_and_invoked');
+    data_index_and_line_number_update = shared('initiate_enclosed_and_invoked');
+    update();
    }
    return end();
   }

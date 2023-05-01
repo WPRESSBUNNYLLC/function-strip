@@ -10,6 +10,7 @@ var multiline_comment = require('./script_recursive_exit/multiline_comment');
 var singleline_comment = require('./script_recursive_exit/singleline_comment');
 var template_string = require('./script_recursive_exit/template_string');
 var regex = require('./script_recursive_exit/regex');
+var shared = require('../shared/init');
 
 var data_index_ = 0;
 var data_ = '';
@@ -43,7 +44,7 @@ function build_body_of_function(data_index, line_number, closed, deep_enclosed) 
  closing_parameter_count = 0;
  in_function_build_string_ = '';
  is_enclosed = closed;
- levels_deep_enclosed - deep_enclosed;
+ levels_deep_enclosed = deep_enclosed;
  found_enclosing = false; 
  found_opening_and_closing_invokable = false;
  return recurse(data_index_);
@@ -93,7 +94,7 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '/' && 
   data_.charAt(data_index_ + 1) === '/'
  ) {
-  in_function_build_string_ += data_.charAt(data_index_ + 1);
+  in_function_build_string_ += '/';
   parameter_string += in_parameter_set === 'in' ? '/' : ''
   data_index_ = data_index_ + 2;
   data_index_and_line_number_update = singleline_comment(data_index_, true, line_number_);
@@ -105,7 +106,7 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '/' && 
   data_.charAt(data_index_ + 1) === '*'
  ) {
-  in_function_build_string_ += data_.charAt(data_index_ + 1);
+  in_function_build_string_ += '*';
   parameter_string += in_parameter_set === 'in' ? '/' : ''
   data_index_ = data_index_ + 2;
   data_index_and_line_number_update = multiline_comment(data_index_, true, line_number_);
@@ -183,7 +184,8 @@ function recurse(data_index_) {
   data_index_ = data_index_ + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
    if(is_enclosed === true) {
-    init('initiate_enclosed_and_invoked');
+    data_index_and_line_number_update = shared('initiate_enclosed_and_invoked');
+    update();
    }
    return end();
   }

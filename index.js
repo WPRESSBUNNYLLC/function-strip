@@ -9,7 +9,7 @@
    Includes the line number, filepath and function name for each function.
    Includes a list of function types to strip. All configurable.
 
-   Author: Alexander f ff fff ffff fffff ffffff fffffff ffffffff ff ff ff ff ff ff ff ff ff ff
+   Author: AleJandro
    License: MIT
    
   */

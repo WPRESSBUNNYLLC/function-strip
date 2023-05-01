@@ -1,8 +1,15 @@
 
-var return_object = {};
+/*
+ builds the string of a few shared functions returned to function body or beginning
+*/
 
-function init(p) { 
- return_object = {};
+var build_string; 
+var line_number; 
+var data_index;
+
+function init(p, line_number_, data_index_) { 
+ line_number = line_number_; 
+ data_index = data_index_
  switch(p) {
   case 'initiate_enclosed_and_invoked':
   return initiate_enclosed_and_invoked();
@@ -17,17 +24,7 @@ function init(p) {
 }
 
 function initiate_enclosed_and_invoked() { 
- found_enclosing_ldb = get_enclosed(data_index_, line_number_);
- data_index_ = found_enclosing_ldb.data_index_; 
- line_number_ = found_enclosing_ldb.line_number_;
- in_function_build_string_ += found_enclosing_ldb.build_string;
- found_enclosing = found_enclosing_ldb.found_closing;
- if(found_enclosing === false) return;
- found_opening_and_closing_invokable_ldb = check_invokable(data_index_, line_number_);
- data_index_ = found_opening_and_closing_invokable_ldb.data_index_; 
- line_number_ = found_opening_and_closing_invokable_ldb.line_number_;
- in_function_build_string_ += found_opening_and_closing_invokable_ldb.build_string;
- found_opening_and_closing_invokable = found_opening_and_closing_invokable_ldb.found_opening_and_closing_invokable;
+
 }
 
 function equals() { 
@@ -41,3 +38,5 @@ function async() {
 function name_and_type() { 
 
 }
+
+module.exports = init;

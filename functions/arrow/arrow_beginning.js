@@ -15,11 +15,10 @@ var in_string_in_parameter_set = false;
 var in_string_in_parameter_set_ = [];
 var opening_parameter_count = 0; 
 var closing_parameter_count = 0;
-var bt_index_drop_off_alphabet = /a-zA-Z0-9_$/;
 var paren_boundries = [];
 
-function initiate_arrow(d, data_index, b) {
- paren_boundries = b;
+function initiate_arrow(data_index, boundries) {
+ paren_boundries = boundries;
  data = d;
  bt_arrow_parameter_string = [];
  bt_index = data_index - 1;
@@ -65,6 +64,40 @@ function append_name(bt_index) {
 
 function append_parameter_set(bt_index) { 
 
+ beginning_string.unshift(data.charAt(bt_index));
+
+ if(data.charAt(bt_index) === ')') { 
+  if(check_boundries(bt_index) === false) {
+    closing_parameter_count += 1;
+   }
+ }
+
+ if(data.charAt(bt_index) === '(') { 
+  if(check_boundries(bt_index) === false) {
+   opening_parameter_count += 1;
+   if(opening_parameter_count === closing_parameter_count) { 
+    return true
+   }
+  }
+ }
+
+ bt_index -= 1; 
+ return append_parameter_set(bt_index);
+
+}
+
+function check_boundries(bt_index) { 
+ for(let i = paren_boundries.length - 1; i > -1; i--) { 
+  if(
+   bt_index <= paren_boundries[i].last_index && 
+   bt_index >= paren_boundries[i].first_index
+  ) { 
+   return true;
+  } else {
+   paren_boundries.pop(); //wrong.. just figure it out
+  }
+ }
+ return false;
 }
 
 function append_possible_async(bt_index) { 
