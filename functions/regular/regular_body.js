@@ -94,6 +94,7 @@ function recurse(data_index_) {
   data_.charAt(data_index_ + 1) === '/'
  ) {
   in_function_build_string_ += data_.charAt(data_index_ + 1);
+  parameter_string += in_parameter_set === 'in' ? '/' : ''
   data_index_ = data_index_ + 2;
   data_index_and_line_number_update = singleline_comment(data_index_, true, line_number_);
   update();
@@ -105,6 +106,7 @@ function recurse(data_index_) {
   data_.charAt(data_index_ + 1) === '*'
  ) {
   in_function_build_string_ += data_.charAt(data_index_ + 1);
+  parameter_string += in_parameter_set === 'in' ? '/' : ''
   data_index_ = data_index_ + 2;
   data_index_and_line_number_update = multiline_comment(data_index_, true, line_number_);
   update();
@@ -113,6 +115,7 @@ function recurse(data_index_) {
 
  if(data_.charAt(data_index_) === '/') { 
   in_function_build_string_ += data_.charAt(data_index_ + 1);
+  parameter_string += in_parameter_set === 'in' ? '/' : ''
   data_index_ = data_index_ + 2;
   data_index_and_line_number_update = regex(data_index_, true, line_number_);
   update();
@@ -131,19 +134,25 @@ function recurse(data_index_) {
  }
 
  if(
-  data_.charAt(data_index_) === '(' && 
-  in_parameter_set === 'out' || 
-  in_parameter_set === 'in'
- ) { 
-  if(in_parameter_set === 'out') { 
-   in_parameter_set = 'in';
-   capture_name = 'off';
-   parameter_string += data_.charAt(data_index_);
-  }
+  in_parameter_set === 'out' &&
+  data_.charAt(data_index_) === '(' 
+ ) {  
+  in_parameter_set = 'in';
+  capture_name = 'off';
+  parameter_string += data_.charAt(data_index_);
   opening_parameter_count += 1;
   data_index_ = data_index_ + 1; 
   return recurse(data_index_);
- }
+ } 
+
+ if(
+  in_parameter_set === 'in' &&
+  data_.charAt(data_index_) === '(' 
+ ) { 
+  opening_parameter_count += 1;
+  data_index_ = data_index_ + 1; 
+  return recurse(data_index_);
+ } 
 
  if(
   in_parameter_set === 'in' && 
@@ -158,8 +167,8 @@ function recurse(data_index_) {
  }
 
  if(
-  data_.charAt(data_index_) === '{' && 
-  in_parameter_set === 'done'
+  in_parameter_set === 'done' &&
+  data_.charAt(data_index_) === '{' 
  ) { 
   beginning_bracket_count += 1;
   data_index_ = data_index_ + 1; 
@@ -167,8 +176,8 @@ function recurse(data_index_) {
  }
 
  if(
-  data_.charAt(data_index_) === '}' && 
-  in_parameter_set === 'done' 
+  in_parameter_set === 'done' &&
+  data_.charAt(data_index_) === '}' 
  ) { 
   ending_bracket_count += 1;
   data_index_ = data_index_ + 1; 
