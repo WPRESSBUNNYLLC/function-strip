@@ -15,13 +15,12 @@ var shared = require('../shared/init');
 var data_index_ = 0;
 var data_ = '';
 var line_number_ = 0;
-var capture_name = 'on';
 var function_name = '';
 var in_parameter_set = 'out';
 var parameter_string = '';
 var opening_parameter_count = 0; 
 var closing_parameter_count = 0;
-var original_line_number = '';
+var original_line_number = 0;
 var in_function_build_string_ = '';
 var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
@@ -36,7 +35,6 @@ function build_body_of_function(data_index, line_number, closed, deep_enclosed) 
  data_index_ = data_index;
  line_number_ = line_number;
  original_line_number = line_number;
- capture_name = 'on';
  function_name = '';
  in_parameter_set = 'out';
  parameter_string = '';
@@ -124,7 +122,7 @@ function recurse(data_index_) {
  }
 
  if(
-  capture_name === 'on' &&
+  in_parameter_set === 'out' &&
   data_.charAt(data_index_) !== ' ' && 
   data_.charAt(data_index_) !== '\n' && 
   data_.charAt(data_index_) !== '('
@@ -139,7 +137,6 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '(' 
  ) {  
   in_parameter_set = 'in';
-  capture_name = 'off';
   parameter_string += data_.charAt(data_index_);
   opening_parameter_count += 1;
   data_index_ = data_index_ + 1; 

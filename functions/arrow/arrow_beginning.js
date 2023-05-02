@@ -76,7 +76,7 @@ function append_parameter_set(bt_index) {
   if(check_boundries(bt_index) === false) {
    opening_parameter_count += 1;
    if(opening_parameter_count === closing_parameter_count) { 
-    return true
+    return;
    }
   }
  }
@@ -88,13 +88,15 @@ function append_parameter_set(bt_index) {
 
 function check_boundries(bt_index) { 
  for(let i = paren_boundries.length - 1; i > -1; i--) { 
+  if(bt_index < paren_boundries[i].first_index) { 
+   paren_boundries.pop();
+   continue;
+  }
   if(
    bt_index <= paren_boundries[i].last_index && 
    bt_index >= paren_boundries[i].first_index
   ) { 
    return true;
-  } else {
-   paren_boundries.pop(); //wrong.. just figure it out
   }
  }
  return false;
