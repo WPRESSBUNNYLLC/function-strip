@@ -42,7 +42,7 @@
    * @param {folders} folders of all the files to test
    * @param {file_type} whether a .html, .js or .ts file. Used for determining certain types of functions and when to check for functions. example <script
    * @param {function_types} types of functions being stripped
-   * @param {arrow_index_parameter_boundries} track the opening and closing indexes for counting the correct amount of '(' in arrow function parameter set... reset when entering arrow function... will be called someting more general if another type of function needs to be backtracked for parameters... not sure what else i can use this for counting
+   * @param {valid_parens} valid parens for backtracking beginning of regular
    * @param {data_index_and_line_number_update} used to copy index and line number back over from other file to main
    * @param {function_types} the different functions to execute
    */
@@ -52,7 +52,6 @@
    var temp_line_number = 0;
    var data_index = 0;
    var first_valid_character_html_tag = /a-zA-Z0-9/;
-   var arrow_index_parameter_boundries = [];
    var data_index_and_line_number_update = {}; 
    var function_index = 1;
    var possibly_push_arrow = {};
@@ -60,6 +59,7 @@
    var data = '';
    var data_length = 0;
    var exported_functions = [];
+   var valid_parens = {};
    var fp = '';
    var line_number = 0;
    var folders = [];
@@ -153,6 +153,7 @@
       data_length = data.length;
       fp = filepath;
       line_number = 0;
+      valid_parens = {};
       try {
        if(file_type === 'html') { 
         run_from_html(data_index);
@@ -264,20 +265,20 @@
    line_number = line_number + 1;
   }
 
+  if(data.charAt(data_index) === '(') { 
+   valid_parens[`${data_index}-opening`];
+  } else if(data.charAt(data_index) === ')') { 
+   valid_parens[`${data_index}-closing`];
+  }
+
   if(
    data.charAt(data_index) === '/' &&
    data.charAt(data_index + 1) === '*'
   ) { 
-   arrow_index_parameter_boundries.push({
-    boundry_type: 'multiline_comment', 
-    first_index: data_index, 
-    last_index: 'to be determined'
-   });
    data_index = data_index + 2; 
    data_index_and_line_number_update = multiline_comment(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
 
@@ -285,72 +286,42 @@
    data.charAt(data_index) === '/' &&
    data.charAt(data_index + 1) === '/'
   ) { 
-   arrow_index_parameter_boundries.push({
-    boundry_type: 'singleline_comment', 
-    first_index: data_index, 
-    last_index: 'to be determined'
-   });
    data_index = data_index + 2; 
    data_index_and_line_number_update = singleline_comment(data_index, false, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
 
   if(data.charAt(data_index) === '/') {
-   arrow_index_parameter_boundries.push({
-    boundry_type: 'regular_expression', 
-    first_index: data_index, 
-    last_index: 'to be determined'
-   });
    data_index = data_index + 1; 
    data_index_and_line_number_update = regex(data_index, false, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
 
   if(data.charAt(data_index) === '"') { 
-   arrow_index_parameter_boundries.push({
-    boundry_type: 'double_quote', 
-    first_index: data_index, 
-    last_index: 'to be determined'
-   });
    data_index = data_index + 1; 
    data_index_and_line_number_update = double_quote_string(data_index, false, line_number, false);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
 
   if(data.charAt(data_index) === "'") { 
-   arrow_index_parameter_boundries.push({
-    boundry_type: 'single_quote', 
-    first_index: data_index, 
-    last_index: 'to be determined'
-   });
    data_index = data_index + 1; 
    data_index_and_line_number_update = single_quote_string(data_index, false, line_number, false);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
 
   if(data.charAt(data_index) === '`') { 
-   arrow_index_parameter_boundries.push({
-    boundry_type: 'template_quote', 
-    first_index: data_index, 
-    last_index: 'to be determined'
-   });
    data_index = data_index + 1; 
    data_index_and_line_number_update = template_string(data_index, false, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
-   arrow_index_parameter_boundries[arrow_index_parameter_boundries.length - 1].last_index = data_index - 1;
    return iterate_through_file_text(data_index);
   }
 
@@ -402,7 +373,7 @@
   }
 
   if(function_types.arrow === true) {
-   possibly_push_arrow = initiate_arrow(data_index, line_number, arrow_index_parameter_boundries);
+   possibly_push_arrow = initiate_arrow(data_index, line_number, valid_parens);
    if(possibly_push_arrow.is_function === true) { 
     exported_functions.push({ 
      index: function_index, 
@@ -417,7 +388,6 @@
     line_number = possibly_push_arrow.ending_line_number;
     data_index = possibly_push_arrow.data_index;
     function_index = function_index + 1;
-    arrow_index_parameter_boundries = [];
     return iterate_through_file_text(data_index);
    }
   }
