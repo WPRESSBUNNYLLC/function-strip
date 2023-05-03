@@ -8,10 +8,9 @@ var update_function_and_update_data = require('../data');
 var data = '';
 var beginning_string = [];
 var bt_index = 0;
-var found_equals = false;
 var found_async = false;
 var found_name = false;
-var end_name = false
+var found_type = false;
 var opening_parameter_count = 0; 
 var closing_parameter_count = 0;
 var space_found = false;
@@ -24,12 +23,13 @@ function initiate_arrow(data_index, boundries) {
  bt_index = data_index - 1;
  found_equals = false;
  found_name = false;
- end_name = false;
  found_async = false;
+ found_type = false;
  space_found = false;
  opening_parameter_count = 0;
  closing_parameter_count = 0;
  is_parameter_set_or_is_name(bt_index);
+ return beginning_string.join(); //return name, parameters as a seperate string, type and whether async as an object.. and the beginning for building
 }
 
 function is_parameter_set_or_is_name(bt_index) { 
@@ -120,7 +120,6 @@ function finish_parameter_set(bt_index) {
    data.charAt(bt_index) !== '\n' && 
    data.charAt(bt_index) !== 'c' 
   ) { 
-   end = true; 
    break;
   } 
 
@@ -158,6 +157,7 @@ function append_async(bt_index) {
   beginning_string.unshift(data.charAt(bt_index - 3));
   beginning_string.unshift(data.charAt(bt_index - 4));
   bt_index -= 5;
+  found_async = true;
   finish_async(bt_index);
  }
 
@@ -172,7 +172,6 @@ function finish_async() {
    data.charAt(bt_index) !== '\n' && 
    data.charAt(bt_index) !== '=' 
   ) { 
-   end = true; 
    break;
   }
 
@@ -207,6 +206,7 @@ function append_name_and_possible_type(bt_index) {
   data.charAt(bt_index) === ' ' || 
   data.charAt(bt_index) === '\n'
  ) { 
+  found_name = true;
   bt_index -= 1; 
   get_type(bt_index)
   return;
@@ -254,6 +254,7 @@ function append_type(bt_index) {
   beginning_string.unshift(data.charAt(bt_index));
   beginning_string.unshift(data.charAt(bt_index - 1));
   beginning_string.unshift(data.charAt(bt_index - 2));
+  found_type = true;
  }
 
  if(  
@@ -265,6 +266,7 @@ function append_type(bt_index) {
   beginning_string.unshift(data.charAt(bt_index));
   beginning_string.unshift(data.charAt(bt_index - 1));
   beginning_string.unshift(data.charAt(bt_index - 2));
+  found_type = true;
  }
 
  if(  
@@ -280,6 +282,7 @@ function append_type(bt_index) {
   beginning_string.unshift(data.charAt(bt_index - 2));
   beginning_string.unshift(data.charAt(bt_index - 3));
   beginning_string.unshift(data.charAt(bt_index - 4));
+  found_type = true;
  }
 
  return;
