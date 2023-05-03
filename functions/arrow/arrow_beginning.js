@@ -214,7 +214,7 @@ function append_name_and_possible_type(bt_index) {
   data.charAt(bt_index) !== ' ' || 
   data.charAt(bt_index) !== '\n'
  ) { 
-  found_name === true
+  found_name = true
   name.unshift(data.charAt(bt_index))
   bt_index -= 1; 
   return append_name_and_possible_type(bt_index);
@@ -230,8 +230,10 @@ function append_name_and_possible_type(bt_index) {
   return;
  }
 
- name.unshift(data.charAt(bt_index));
- 
+ if(found_name === true) {
+  name.unshift(data.charAt(bt_index));
+ }
+
  bt_index -= 1; 
  return append_name_and_possible_type(bt_index);
 
