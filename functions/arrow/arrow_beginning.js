@@ -12,7 +12,6 @@ var found_async = false;
 var found_name = false;
 var name = [];
 var found_type = false;
-var found_enclosed = false;
 var type = '';
 var parameters = [];
 var opening_parameter_count = 0; 
@@ -30,7 +29,6 @@ function initiate_arrow(data_index, boundries) {
  name = [];
  found_async = false;
  found_type = false;
- found_enclosed = true;
  type = '';
  parameters = [];
  opening_parameter_count = 0;
@@ -45,6 +43,8 @@ function initiate_arrow(data_index, boundries) {
   type: type, 
   parameters: parameters.join(), 
   beginning_string: beginning_string.join(), 
+  is_enclosed: enclosed_counter > 0 ? true : false, 
+  enclosed_count: enclosed_counter
  }
 }
 
@@ -92,7 +92,6 @@ function append_parameter_name(bt_index) {
   data.charAt(bt_index) === '('
  ) { 
   if(data.charAt(bt_index) === '(') {
-   found_enclosed = true; 
    enclosed_counter += 1;
   }
   bt_index -= 1;
@@ -151,13 +150,12 @@ function finish_parameter_set(bt_index) {
   } 
 
   if(data.charAt(bt_index) === '(') { 
-   found_enclosed = true;
    enclosed_counter += 1;
   } 
 
   if(
    data.charAt(bt_index) === 'c' && //(( async (params){}))()
-   found_enclosed === false
+   enclosed_counter === 0
   ) { 
    append_async();
    break;
@@ -165,7 +163,7 @@ function finish_parameter_set(bt_index) {
 
   if(
    data.charAt(bt_index) === 'c' && //async (( (params){}))()
-   found_enclosed === true
+   enclosed_counter > 0
   ) { 
    break;
   } 
@@ -220,7 +218,6 @@ function finish_async() {
   }
 
   if(data.charAt(bt_index) === '(') { //(( async (params){}))()
-   found_enclosed = true; 
    enclosed_counter += 1;
   }
 
