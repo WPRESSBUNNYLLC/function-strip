@@ -10,4 +10,5 @@ gets assignment name, assignment type, body, parameters, beginning / ending line
 
 # additional
 
-also can be configured to transform functions like in bebel going from arrow to regular etc
+also can be configured to transform functions like in babel going from arrow to regular etc.
+create function lines

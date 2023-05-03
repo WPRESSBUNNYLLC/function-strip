@@ -16,6 +16,7 @@ var type = '';
 var parameters = [];
 var opening_parameter_count = 0; 
 var closing_parameter_count = 0;
+var enclosed_counter = 0;
 var valid_parens = {};
 
 function initiate_arrow(data_index, boundries) {
@@ -32,6 +33,7 @@ function initiate_arrow(data_index, boundries) {
  parameters = [];
  opening_parameter_count = 0;
  closing_parameter_count = 0;
+ enclosed_counter = 0;
  is_parameter_set_or_is_name(bt_index);
  return { 
   found_async: found_async, 
@@ -61,9 +63,9 @@ function is_parameter_set_or_is_name(bt_index) {
   data.charAt(bt_index) !== ' ' && 
   data.charAt(bt_index) !== '\n'
   ) { 
-  name.unshift(data.charAt(bt_index));
+  parameters.unshift(data.charAt(bt_index));
   bt_index -= 1;
-  append_name(bt_index); 
+  append_parameter_name(bt_index); 
   return;
  }
 
@@ -72,7 +74,7 @@ function is_parameter_set_or_is_name(bt_index) {
 
 } 
 
-function append_name(bt_index) { 
+function append_parameter_name(bt_index) { //append enclosing if enclosing exists
 
  beginning_string.unshift(data.charAt(bt_index));
 
@@ -87,18 +89,18 @@ function append_name(bt_index) {
   data.charAt(bt_index) === '\n'
  ) { 
   bt_index -= 1;
-  append_possible_async(bt_index);
+  append_async(bt_index);
   return;
  }
 
- parameters.unshift( data.charAt(bt_index));
+ parameters.unshift(data.charAt(bt_index));
 
  bt_index -= 1; 
- return append_name(bt_index);
+ return append_parameter_name(bt_index);
 
 }
 
-function append_parameter_set(bt_index) { 
+function append_parameter_set(bt_index) { //append enclosing if enclosing exists
 
  beginning_string.unshift(data.charAt(bt_index));
  parameters.unshift(data.charAt(bt_index));
@@ -161,6 +163,7 @@ function finish_parameter_set(bt_index) {
 function append_async(bt_index) { 
 
  if(
+  data.charAt(bt_index - 5) === ' ' || data.charAt(bt_index - 5) === '\n' || data.charAt(bt_index - 5) === '=' &&
   data.charAt(bt_index - 4) === 'a' &&
   data.charAt(bt_index - 3) === 's' && 
   data.charAt(bt_index - 2) === 'y' &&
