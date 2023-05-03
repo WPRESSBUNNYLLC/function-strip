@@ -44,7 +44,8 @@ function initiate_arrow(data_index, boundries) {
   parameters: parameters.join(), 
   beginning_string: beginning_string.join(), 
   is_enclosed: enclosed_counter > 0 ? true : false, 
-  enclosed_count: enclosed_counter
+  enclosed_count: enclosed_counter, 
+  beginning_index: bt_index
  }
 }
 
@@ -64,7 +65,7 @@ function is_parameter_set_or_is_name(bt_index) {
   data.charAt(bt_index) !== ')' && 
   data.charAt(bt_index) !== ' ' && 
   data.charAt(bt_index) !== '\n'
-  ) { 
+ ) { 
   parameters.unshift(data.charAt(bt_index));
   bt_index -= 1;
   append_parameter_name(bt_index); 
@@ -308,6 +309,7 @@ function append_type(bt_index) {
   beginning_string.unshift(data.charAt(bt_index - 2));
   found_type = true;
   type = 'let';
+  bt_index -= 2;
  }
 
  if(  
@@ -321,6 +323,7 @@ function append_type(bt_index) {
   beginning_string.unshift(data.charAt(bt_index - 2));
   found_type = true;
   type = 'var';
+  bt_index -= 2;
  }
 
  if(  
@@ -338,6 +341,7 @@ function append_type(bt_index) {
   beginning_string.unshift(data.charAt(bt_index - 4));
   found_type = true;
   type = 'const';
+  bt_index -= 4;
  }
 
  return;
