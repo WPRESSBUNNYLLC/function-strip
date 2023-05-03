@@ -35,18 +35,7 @@ function initiate_arrow(data_index, boundries) {
  closing_parameter_count = 0;
  enclosed_counter = 0;
  is_parameter_set_or_is_name(bt_index);
- return { 
-  found_async: found_async, 
-  found_name: found_name, 
-  name: name.join(), 
-  found_type: found_type, 
-  type: type, 
-  parameters: parameters.join(), 
-  beginning_string: beginning_string.join(), 
-  is_enclosed: enclosed_counter > 0 ? true : false, 
-  enclosed_count: enclosed_counter, 
-  beginning_index: bt_index
- }
+ return end();
 }
 
 function is_parameter_set_or_is_name(bt_index) { 
@@ -346,6 +335,21 @@ function append_type(bt_index) {
 
  return;
 
+}
+
+function end() { 
+ return { 
+  found_async: found_async, 
+  found_name: found_name, 
+  name: name.join(), 
+  found_type: found_type, 
+  type: type, 
+  parameters: parameters.join(), 
+  build_string: beginning_string.join(), 
+  is_enclosed: enclosed_counter > 0 ? true : false, 
+  enclosed_count: enclosed_counter, 
+  beginning_index: bt_index
+ }
 }
 
 module.exports = initiate_arrow; 

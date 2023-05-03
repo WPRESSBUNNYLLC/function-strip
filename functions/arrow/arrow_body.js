@@ -22,25 +22,19 @@ var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
 var data_index_and_line_number_update = {};
 var finish_first_ldb = {};
-var is_enclosed = false;
-var levels_deep_enclosed = 0;
-var found_enclosing_ldb = {};
-var found_opening_and_closing_invokable_ldb = {};
-var found_enclosing = false; 
-var found_opening_and_closing_invokable = false;
+var enclosed_invoked = {};
+var enclosed_count = 0;
+var is_invoked = false;
 
-function build_body_of_function(data_index, line_number, closed, deep_enclosed) {
+function build_body_of_function(data_index, line_number, enclosed_count_) {
  data_ = update_function_and_update_data.data;
  data_index_ = data_index;
  line_number_ = line_number;
  original_line_number = line_number;
  in_function_build_string_ = '';
- is_enclosed = closed;
- levels_deep_enclosed = deep_enclosed;
- found_enclosing = false; 
- found_opening_and_closing_invokable = false;
- found_enclosing_ldb = {};
- found_opening_and_closing_invokable_ldb = {};
+ enclosed_count = enclosed_count_;
+ is_invoked = false; 
+ enclosed_invoked = {};
  return check_if_single_statement_or_bracket_function(data_index_);
 }
 
@@ -155,9 +149,9 @@ function recurse(data_index_) {
   ending_bracket_count += 1;
   data_index_ = data_index_  + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
-   if(is_enclosed === true) {
-    data_index_and_line_number_update = shared('initiate_enclosed_and_invoked');
-    update();
+   if(enclosed_count > 0) {
+    enclosed_invoked = shared('initiate_enclosed_and_invoked', enclosed_count);
+    update_enclosed_invoked();
    }
    return end();
   }
@@ -175,6 +169,10 @@ function update() {
  in_function_build_string_ += data_index_and_line_number_update.build_string;
 }
 
+function update_enclosed_invoked() { 
+ //enclosed_invoked - update data index, line_number , note if invoked and ignore if found enclosed.. just append what you need too... if count is wrong or whatever... modify it to the count of the original
+}
+
 function finish_first_then_end() { 
  finish_first_ldb = finish_first_statement(data_index_, line_number_, in_function_build_string_); 
  data_index_ = finish_first_ldb.data_index_;
@@ -185,11 +183,10 @@ function finish_first_then_end() {
 
 function end() { 
  return {
-  data_index: data_index_, 
-  line_number: line_number_, 
+  ending_data_index: data_index_, 
+  ending_line_number: line_number_, 
   build_string: in_function_build_string_,
-  found_opening_and_closing_invokable: found_opening_and_closing_invokable,
-  found_closing: found_enclosing
+  is_invoked: is_invoked,
  } 
 }
 
