@@ -12,6 +12,7 @@ var found_async = false;
 var found_name = false;
 var name = [];
 var found_type = false;
+var found_enclosed = false;
 var type = '';
 var parameters = [];
 var opening_parameter_count = 0; 
@@ -29,6 +30,7 @@ function initiate_arrow(data_index, boundries) {
  name = [];
  found_async = false;
  found_type = false;
+ found_enclosed = true;
  type = '';
  parameters = [];
  opening_parameter_count = 0;
@@ -86,10 +88,15 @@ function append_parameter_name(bt_index) { //append enclosing if enclosing exist
 
  if(
   data.charAt(bt_index) === ' ' || 
-  data.charAt(bt_index) === '\n'
+  data.charAt(bt_index) === '\n' || 
+  data.charAt(bt_index) === '('
  ) { 
+  if(data.charAt(bt_index) === '(') {
+   found_enclosed = true; 
+   enclosed_counter += 1;
+  }
   bt_index -= 1;
-  append_async(bt_index);
+  finish_parameter_set(bt_index);
   return;
  }
 
@@ -100,7 +107,7 @@ function append_parameter_name(bt_index) { //append enclosing if enclosing exist
 
 }
 
-function append_parameter_set(bt_index) { //append enclosing if enclosing exists
+function append_parameter_set(bt_index) {
 
  beginning_string.unshift(data.charAt(bt_index));
  parameters.unshift(data.charAt(bt_index));
@@ -136,13 +143,30 @@ function finish_parameter_set(bt_index) {
   if(
    data.charAt(bt_index) !== ' ' && 
    data.charAt(bt_index) !== '\n' && 
-   data.charAt(bt_index) !== 'c' 
+   data.charAt(bt_index) !== 'c' && 
+   data.charAt(bt_index) !== '(' && 
+   data.charAt(bt_index) !== '='
   ) { 
    break;
   } 
 
-  if(data.charAt(bt_index) === 'c') { 
+  if(data.charAt(bt_index) === '(') { 
+   found_enclosed = true;
+   enclosed_counter += 1;
+  } 
+
+  if(
+   data.charAt(bt_index) === 'c' && //(( async (params){}))()
+   found_enclosed === false
+  ) { 
    append_async();
+   break;
+  } 
+
+  if(
+   data.charAt(bt_index) === 'c' && //async (( (params){}))()
+   found_enclosed === true
+  ) { 
    break;
   } 
 
