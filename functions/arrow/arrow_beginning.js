@@ -76,7 +76,7 @@ function is_parameter_set_or_is_name(bt_index) {
 
 } 
 
-function append_parameter_name(bt_index) { //append enclosing if enclosing exists
+function append_parameter_name(bt_index) {
 
  beginning_string.unshift(data.charAt(bt_index));
 
@@ -187,7 +187,7 @@ function finish_parameter_set(bt_index) {
 function append_async(bt_index) { 
 
  if(
-  data.charAt(bt_index - 5) === ' ' || data.charAt(bt_index - 5) === '\n' || data.charAt(bt_index - 5) === '=' &&
+  data.charAt(bt_index - 5) === ' ' || data.charAt(bt_index - 5) === '\n' || data.charAt(bt_index - 5) === '=' || data.charAt(bt_index - 5) === '(' &&
   data.charAt(bt_index - 4) === 'a' &&
   data.charAt(bt_index - 3) === 's' && 
   data.charAt(bt_index - 2) === 'y' &&
@@ -213,9 +213,15 @@ function finish_async() {
   if(
    data.charAt(bt_index) !== ' ' && 
    data.charAt(bt_index) !== '\n' && 
-   data.charAt(bt_index) !== '=' 
+   data.charAt(bt_index) !== '=' && 
+   data.charAt(bt_index) !== '('
   ) { 
    break;
+  }
+
+  if(data.charAt(bt_index) === '(') { //(( async (params){}))()
+   found_enclosed = true; 
+   enclosed_counter += 1;
   }
 
   if(data.charAt(bt_index) === '=') { 
