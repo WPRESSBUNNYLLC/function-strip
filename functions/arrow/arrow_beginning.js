@@ -1,6 +1,6 @@
 
 /*
- recurses backwards the parameters of the arrow function and additional things
+ recurses backwards the parameters of the arrow function and additional things...
 */
 
 var update_function_and_update_data = require('../data');
@@ -10,10 +10,12 @@ var beginning_string = [];
 var bt_index = 0;
 var found_async = false;
 var found_name = false;
+var name = [];
 var found_type = false;
+var type = '';
+var parameters = [];
 var opening_parameter_count = 0; 
 var closing_parameter_count = 0;
-var space_found = false;
 var valid_parens = {};
 
 function initiate_arrow(data_index, boundries) {
@@ -23,13 +25,23 @@ function initiate_arrow(data_index, boundries) {
  bt_index = data_index - 1;
  found_equals = false;
  found_name = false;
+ name = [];
  found_async = false;
  found_type = false;
- space_found = false;
+ type = '';
+ parameters = [];
  opening_parameter_count = 0;
  closing_parameter_count = 0;
  is_parameter_set_or_is_name(bt_index);
- return beginning_string.join(); //return name, parameters as a seperate string, type and whether async as an object.. and the beginning for building
+ return { 
+  found_async: found_async, 
+  found_name: found_name, 
+  name: name.join(), 
+  found_type: found_type, 
+  type: type, 
+  parameters: parameters.join(), 
+  beginning_string: beginning_string.join(), 
+ }
 }
 
 function is_parameter_set_or_is_name(bt_index) { 
@@ -38,6 +50,7 @@ function is_parameter_set_or_is_name(bt_index) {
 
  if(data.charAt(bt_index) === ')') { 
   closing_parameter_count += 1; 
+  parameters.unshift(')');
   bt_index -= 1;
   append_parameter_set(bt_index); 
   return;
@@ -48,6 +61,7 @@ function is_parameter_set_or_is_name(bt_index) {
   data.charAt(bt_index) !== ' ' && 
   data.charAt(bt_index) !== '\n'
   ) { 
+  name.unshift(data.charAt(bt_index));
   bt_index -= 1;
   append_name(bt_index); 
   return;
@@ -77,6 +91,7 @@ function append_name(bt_index) {
   return;
  }
 
+ parameters.unshift( data.charAt(bt_index));
 
  bt_index -= 1; 
  return append_name(bt_index);
@@ -86,6 +101,7 @@ function append_name(bt_index) {
 function append_parameter_set(bt_index) { 
 
  beginning_string.unshift(data.charAt(bt_index));
+ parameters.unshift(data.charAt(bt_index));
 
  if(
   data.charAt(bt_index) === ')' && 
@@ -149,7 +165,7 @@ function append_async(bt_index) {
   data.charAt(bt_index - 3) === 's' && 
   data.charAt(bt_index - 2) === 'y' &&
   data.charAt(bt_index - 1) === 'n' &&
-  data.charAt(bt_index) === 'c'
+  data.charAt(bt_index) ===     'c'
  ) { 
   beginning_string.unshift(data.charAt(bt_index));
   beginning_string.unshift(data.charAt(bt_index - 1));
@@ -194,24 +210,28 @@ function append_name_and_possible_type(bt_index) {
  beginning_string.unshift(data.charAt(bt_index));
 
  if(
-  space_found === false && 
-  data.charAt(bt_index) === ' ' || 
-  data.charAt(bt_index) === '\n'
+  found_name === false && 
+  data.charAt(bt_index) !== ' ' || 
+  data.charAt(bt_index) !== '\n'
  ) { 
-  space_found === true
+  found_name === true
+  name.unshift(data.charAt(bt_index))
+  bt_index -= 1; 
+  return append_name_and_possible_type(bt_index);
  }
 
  if(
-  space_found === true && 
+  found_name === true && 
   data.charAt(bt_index) === ' ' || 
   data.charAt(bt_index) === '\n'
  ) { 
-  found_name = true;
   bt_index -= 1; 
   get_type(bt_index)
   return;
  }
 
+ name.unshift(data.charAt(bt_index));
+ 
  bt_index -= 1; 
  return append_name_and_possible_type(bt_index);
 
@@ -255,6 +275,7 @@ function append_type(bt_index) {
   beginning_string.unshift(data.charAt(bt_index - 1));
   beginning_string.unshift(data.charAt(bt_index - 2));
   found_type = true;
+  type = 'let';
  }
 
  if(  
@@ -267,6 +288,7 @@ function append_type(bt_index) {
   beginning_string.unshift(data.charAt(bt_index - 1));
   beginning_string.unshift(data.charAt(bt_index - 2));
   found_type = true;
+  type = 'var';
  }
 
  if(  
@@ -283,6 +305,7 @@ function append_type(bt_index) {
   beginning_string.unshift(data.charAt(bt_index - 3));
   beginning_string.unshift(data.charAt(bt_index - 4));
   found_type = true;
+  type = 'const';
  }
 
  return;
