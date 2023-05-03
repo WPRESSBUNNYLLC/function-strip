@@ -267,8 +267,14 @@
 
   if(data.charAt(data_index) === '(') { 
    valid_parens[`${data_index}-opening`];
-  } else if(data.charAt(data_index) === ')') { 
+   data_index += 1;
+   return iterate_through_file_text(data_index);
+  } 
+  
+  if(data.charAt(data_index) === ')') { 
    valid_parens[`${data_index}-closing`];
+   data_index += 1;
+   return iterate_through_file_text(data_index);
   }
 
   if(

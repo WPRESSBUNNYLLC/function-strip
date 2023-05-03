@@ -246,10 +246,10 @@ function get_type(bt_index) {
 function append_type(bt_index) { 
 
  if(  
-  (data.charAt(bt_index - 3) === ' ' || data.charAt(bt_index - 3) === '\n') &&
+  (data.charAt(bt_index - 3) === ' ' || data.charAt(bt_index - 3) === '\n') && //and more
   data.charAt(bt_index - 2) === 'l' && 
   data.charAt(bt_index - 1) === 'e' &&
-  data.charAt(bt_index) === 't'
+  data.charAt(bt_index) ===     't'
  ) { 
   beginning_string.unshift(data.charAt(bt_index));
   beginning_string.unshift(data.charAt(bt_index - 1));
@@ -261,7 +261,7 @@ function append_type(bt_index) {
   (data.charAt(bt_index - 3) === ' ' || data.charAt(bt_index - 3) === '\n') &&
   data.charAt(bt_index - 2) === 'v' && 
   data.charAt(bt_index - 1) === 'a' &&
-  data.charAt(bt_index) === 'r'
+  data.charAt(bt_index) ===     'r'
  ) { 
   beginning_string.unshift(data.charAt(bt_index));
   beginning_string.unshift(data.charAt(bt_index - 1));
@@ -271,11 +271,11 @@ function append_type(bt_index) {
 
  if(  
   (data.charAt(bt_index - 5) === ' ' || data.charAt(bt_index - 5) === '\n') &&
-  data.charAt(bt_index - 4) === 'c' && 
+  data.charAt(bt_index - 4) ===  'c' && 
   data.charAt(bt_index -  3) === 'o' &&
-  data.charAt(bt_index - 2) === 'n' &&
-  data.charAt(bt_index - 1) === 's' &&
-  data.charAt(bt_index) === 't'
+  data.charAt(bt_index - 2) ===  'n' &&
+  data.charAt(bt_index - 1) ===  's' &&
+  data.charAt(bt_index) ===      't'
  ) { 
   beginning_string.unshift(data.charAt(bt_index));
   beginning_string.unshift(data.charAt(bt_index - 1));
