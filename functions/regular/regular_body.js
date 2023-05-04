@@ -180,10 +180,10 @@ function recurse(data_index_) {
   ending_bracket_count += 1;
   data_index_ = data_index_ + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
-   if(is_enclosed === true) {
-    data_index_and_line_number_update = shared('initiate_enclosed_and_invoked');
-    update();
-   }
+//    if(is_enclosed === true) {
+//     data_index_and_line_number_update = shared('initiate_enclosed_and_invoked');
+//     update();
+//    }
    return end();
   }
   return recurse(data_index_);

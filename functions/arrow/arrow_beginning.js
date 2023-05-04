@@ -1,6 +1,7 @@
 
+
 /*
- recurses backwards the parameters of the arrow function and additional things...
+ recurses backwards the parameters of the arrow function and additional things... enclosed counter on this is wrong... backtrack this differently fo other things that might show up after an equals sign... possibly start building from the front.. make a last equals sign and build a string until you see the keyword function or async.. then connect them from each side
 */
 
 var update_function_and_update_data = require('../data');
@@ -19,7 +20,7 @@ var closing_parameter_count = 0;
 var enclosed_counter = 0;
 var valid_parens = {};
 
-function initiate_arrow(data_index, boundries) {
+function initiate_arrow(data_index, boundries) { //some things in here that are wrong.. enclosed counter needs to change.. migt have to start building from the opposite side
  valid_parens = boundries;
  data = update_function_and_update_data.data;
  beginning_string = [];
@@ -352,4 +353,4 @@ function end() {
  }
 }
 
-module.exports = initiate_arrow; 
+module.exports = initiate_arrow;

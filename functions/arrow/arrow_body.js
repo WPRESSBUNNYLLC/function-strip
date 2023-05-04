@@ -149,10 +149,10 @@ function recurse(data_index_) {
   ending_bracket_count += 1;
   data_index_ = data_index_  + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
-   if(enclosed_count > 0) {
-    enclosed_invoked = shared('initiate_enclosed_and_invoked', enclosed_count);
-    update_enclosed_invoked();
-   }
+  //  if(enclosed_count > 0) {
+  //   enclosed_invoked = shared('initiate_enclosed_and_invoked', enclosed_count);
+  //   update_enclosed_invoked();
+  //  }
    return end();
   }
   return recurse(data_index_);
