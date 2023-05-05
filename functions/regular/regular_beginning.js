@@ -4,7 +4,6 @@ var bt_regular_parameter_string = [];
 var found_equals = false;
 var found_async = false;
 var found_name = false;
-var bt_index_drop_off_alphabet = /a-zA-Z0-9_$/;
 
 function initiate_regular(d, data_index) { 
  data = d;
@@ -30,19 +29,7 @@ function initiate_regular(d, data_index) {
  }
 }
 
-function append_first_one_or_two_characters(bt_index) { 
-
-}
-
 function append_possible_async(bt_index) { 
-
-}
-
-function append_equals(bt_index) { 
-
-}
-
-function append_name_and_possibly_type(bt_index) { 
 
 }
 

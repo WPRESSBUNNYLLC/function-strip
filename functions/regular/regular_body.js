@@ -10,7 +10,6 @@ var multiline_comment = require('./script_recursive_exit/multiline_comment');
 var singleline_comment = require('./script_recursive_exit/singleline_comment');
 var template_string = require('./script_recursive_exit/template_string');
 var regex = require('./script_recursive_exit/regex');
-var shared = require('../shared/init');
 
 var data_index_ = 0;
 var data_ = '';
@@ -25,12 +24,8 @@ var in_function_build_string_ = '';
 var beginning_bracket_count = 0;
 var ending_bracket_count = 0;
 var data_index_and_line_number_update = {};
-var is_enclosed = false;
-var levels_deep_enclosed = 0;
-var found_enclosing = false; 
-var found_opening_and_closing_invokable = false;
 
-function build_body_of_function(data_index, line_number, closed, deep_enclosed) {
+function build_body_of_function(data_index, line_number) {
  data_ = update_function_and_update_data.data;
  data_index_ = data_index;
  line_number_ = line_number;
@@ -41,10 +36,6 @@ function build_body_of_function(data_index, line_number, closed, deep_enclosed) 
  opening_parameter_count = 0; 
  closing_parameter_count = 0;
  in_function_build_string_ = '';
- is_enclosed = closed;
- levels_deep_enclosed = deep_enclosed;
- found_enclosing = false; 
- found_opening_and_closing_invokable = false;
  return recurse(data_index_);
 }
 
@@ -180,10 +171,6 @@ function recurse(data_index_) {
   ending_bracket_count += 1;
   data_index_ = data_index_ + 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
-//    if(is_enclosed === true) {
-//     data_index_and_line_number_update = shared('initiate_enclosed_and_invoked');
-//     update();
-//    }
    return end();
   }
   return recurse(data_index_);
@@ -210,8 +197,6 @@ function end() {
   build_string: in_function_build_string_,
   parameters: parameter_string, 
   name: function_name,
-  found_opening_and_closing_invokable: found_opening_and_closing_invokable,
-  found_closing: found_enclosing
  }
 }
 
