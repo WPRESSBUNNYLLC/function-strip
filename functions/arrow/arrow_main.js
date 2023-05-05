@@ -21,7 +21,7 @@ var build_body_of_function = require('./arrow_body');
 
   var beginning_function_ = build_beginning_of_function(data_index, boundry_parameters_for_backtracking_paren);
 
-  return_object.build_string = beginning_function_.build_string + "=>"; //doing this wrong.. need to look at the beginning on the other side or just back track differently. would only woro for async
+  return_object.build_string = beginning_function_.build_string + "=>"; //doing this wrong.. need to look at the beginning on the other side or just back track differently. would only work for async
   return_object.found_async = beginning_function_.found_async;
   return_object.found_name = beginning_function_.found_name; 
   return_object.name = beginning_function_.name; 

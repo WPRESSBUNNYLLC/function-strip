@@ -265,6 +265,8 @@
    line_number = line_number + 1;
   }
 
+  //might need to do some stuff here qith an equals sign to get the correct beginning of the function -- 
+
   if(data.charAt(data_index) === '(') { 
    valid_parens[`${data_index}-opening`] = true;
    data_index += 1;

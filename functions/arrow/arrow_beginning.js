@@ -1,7 +1,8 @@
 
 
 /*
- recurses backwards the parameters of the arrow function and additional things... enclosed counter on this is wrong... backtrack this differently fo other things that might show up after an equals sign... possibly start building from the front.. make a last equals sign and build a string until you see the keyword function or async.. then connect them from each side.. get =, build name and type on left side.. and continue right side until asyn or function key word. save the beginning index of the key word and match it on this side (coming from left) when backtracking. if match.. take that last equals sign string and append it to the begnning of the function.
+ recurses backwards the parameters of the arrow function and additional things...
+ //this is wrong for the most part... only thing that can be gotten is parameters and if async... everything else is going to have to be a seperate problem
 */
 
 var update_function_and_update_data = require('../data');
@@ -20,7 +21,7 @@ var closing_parameter_count = 0;
 var enclosed_counter = 0;
 var valid_parens = {};
 
-function initiate_arrow(data_index, boundries) { //some things in here that are wrong.. enclosed counter needs to change.. migt have to start building from the opposite side
+function initiate_arrow(data_index, boundries) { 
  valid_parens = boundries;
  data = update_function_and_update_data.data;
  beginning_string = [];
