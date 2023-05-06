@@ -265,7 +265,7 @@
    line_number = line_number + 1;
   }
 
-  //might need to do some stuff here qith an equals sign to get the correct beginning of the function -- 
+  //might need to do some stuff here qith an equals sign to get the correct beginning of the function -- might need to build some things here, recurse and find out if the function is a an enclosed declaration of another function
 
   if(data.charAt(data_index) === '(') { 
    valid_parens[`${data_index}-opening`] = true;
@@ -278,6 +278,18 @@
    data_index += 1;
    return iterate_through_file_text(data_index);
   }
+
+  // if( //
+  //  data.charAt(data_index) === '=' && 
+  //  data.charAt(data_index + 1) !== '=' && 
+  //  data.charAt(data_index - 1) === '='
+  // ) { 
+  //  data_index = data_index + 2; 
+  //  data_index_and_line_number_update = multiline_comment(data_index, false, line_number, '');
+  //  data_index = data_index_and_line_number_update.data_index;
+  //  line_number = data_index_and_line_number_update.line_number;
+  //  return iterate_through_file_text(data_index);  
+  // }
 
   if(
    data.charAt(data_index) === '/' &&

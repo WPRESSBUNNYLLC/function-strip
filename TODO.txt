@@ -1,26 +1,6 @@
-   TODO:
-   https://blog.sessionstack.com/how-javascript-works-the-different-ways-of-declaring-a-function-5-best-practices-8a0324c06fe2
-   make sure to recurse on if a function is invokable (); - do this at the end of each function... make sure the function can be invoked beforehand with a parameter
-   add other languages (below iterate_through_file_text) also add languages as a configuration property to skip over files
-   make sure to use regular expressions instead of many !== in some files
-   possibly use a library for checking syntax errors or some compiler and skip file if error. jshint
-   make sure to add if a regular name in arrow function in case there are no parameters - const wow = jkj => { } <-- condition to avoid counting brackets
-   add additional checks for regular expressions on the reg call in index.js
-   just figure out the cases for tags 
-   add inside functions as an array to the outermost function using a non returned recursive call - if adding a few other data structures... can do the same thing and create an object or array pointer {a{b{c}}}
-   correct beginning and end of regular and arrow function 
-   before and after for error
-   replace all recursive functions with while loops .. 1 per with an if else if to make up for the single recursive statements
-   add a ignore comments in parameter string and function attribute
-   look over check invokable again.. should be okay except 
-   //  (function ow() { 
-   //  })(...) // not sure what would come inside.... also for ending: increasing data_index and line_number until i find a character outside above... if opening is there and random character for ending, go back to the opening index... it might be the enclosing of the next function
-   replace all the data_index > data_length in files with throw new error...
-   cretae your own charat if charat creates an array before pointing...data.split would be the charat array named myCharAt.. replace data.js with mycharAt.js
-
-    1. html tag
-    2. regex 
-    3. regular beginning
-    4. arrow beginning 
-
-   done 
+take equals into consideration
+possibly get rid of charAt and split across
+find a compiler that reutrns errors to skip over bad files 
+get enclosed and invoked in a different way... just count the wrappint parens from the equals sign...
+add class functions
+add the other function types in javascript 
