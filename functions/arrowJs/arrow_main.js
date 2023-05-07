@@ -3,9 +3,9 @@
  initiates the process of building the function
 */
 
-var check_if_function = require('./arrow_check');
-var build_beginning_of_function = require('./arrow_beginning');
-var build_body_of_function = require('./arrow_body');
+var check_if_function = require('generate/functions/arrowJs/arrow_check');
+var build_beginning_of_function = require('generate/functions/arrowJs/arrow_beginning');
+var build_body_of_function = require('generate/functions/arrowJs/arrow_body');
 
  function initiate_arrow(data_index, line_number, boundry_parameters_for_backtracking_paren) { 
 

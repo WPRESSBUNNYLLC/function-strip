@@ -3,9 +3,9 @@
  initiates the process of building the function
 */
 
-var check_if_function = require('./regular_check');
-var build_beginning_of_function = require('./regular_beginning');
-var build_body_of_function = require('./regular_body');
+var check_if_function = require('generate/functions/regularJs/regular_check');
+var build_beginning_of_function = require('generate/functions/regularJs/regular_beginning');
+var build_body_of_function = require('generate/functions/regularJs/regular_body');
 
  function initiate_regular(data_index, line_number) { 
 

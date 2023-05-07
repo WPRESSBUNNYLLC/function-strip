@@ -1,7 +1,7 @@
 
 
 /*
- recurses backwards the parameters of the arrow function and additional things... will have to build the beginning of this from the other side doing some stuff. this just gets async
+ recurses backwards the parameters of the arrow function and additional things... will have to build the beginning of this from the other side doing some stuff. this just gets async.. maybe dont get async here and just work it out some other way.. 
 */
 
 var update_function_and_update_data = require('../data');
@@ -24,7 +24,6 @@ function initiate_arrow(data_index, boundries) {
  parameters = [];
  opening_parameter_count = 0;
  closing_parameter_count = 0;
- enclosed_counter = 0;
  is_parameter_set_or_is_name(bt_index);
  return end();
 }
@@ -116,8 +115,8 @@ function finish_parameter_set(bt_index) {
 
   if(
    data.charAt(bt_index) !== 'c' && 
-   data.charAt(bt_index) === ' ' && 
-   data.charAt(bt_index) === '\n'
+   data.charAt(bt_index) !== ' ' && 
+   data.charAt(bt_index) !== '\n'
   ) { 
    break;
   }
@@ -158,7 +157,6 @@ function append_async(bt_index) {
 function end() { 
  return { 
   found_async: found_async, 
-  found_name: found_name, 
   parameters: parameters.join(), 
   build_string: beginning_string.join(), 
   beginning_index: bt_index

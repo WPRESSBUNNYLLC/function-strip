@@ -3,7 +3,8 @@
  determines the exit of a template string... gets very funky
  ",',//,/* <-- handled inside of template literal via outside functions 
  `, ${ handled with a recursive counter and single boolean value for what i am immediately inside of
- console.log(`${`${`//`}` + console.log('hello '+ 'world') + ``}`); 
+ console.log(`${`${`//
+ `}` + console.log('hello '+ 'world') + ``}`); 
  a1-b1-a2-b2-a3-a2-b1-a1                            a2-a1-b0-a0
 */
 
@@ -80,7 +81,7 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '/' && 
   data_.charAt(data_index_ + 1) === '/'
  ) {
-  in_function_ === true ? in_function_build_string_ += data_.charAt(data_index_ + 1) : '';
+  in_function_ === true ? in_function_build_string_ += '/' : '';
   data_index_ = data_index_ + 2;
   data_index_and_line_number_update = singleline_comment(data_index_, in_function_, line_number_);
   update();
@@ -92,7 +93,7 @@ function recurse(data_index_) {
   data_.charAt(data_index_) === '/' && 
   data_.charAt(data_index_ + 1) === '*'
  ) {
-  in_function_ === true ? in_function_build_string_ += data_.charAt(data_index_ + 1) : '';
+  in_function_ === true ? in_function_build_string_ += '*' : '';
   data_index_ = data_index_ + 2;
   data_index_and_line_number_update = multiline_comment(data_index_, in_function_, line_number_);
   update();
@@ -110,6 +111,8 @@ function recurse(data_index_) {
   return recurse(data_index_);
  }
 
+ //possibly regular and arrow funcitons here.
+
  if(
   currently_inside_of === 'template' && 
   data_.charAt(data_index_) === '$' && 
@@ -117,7 +120,7 @@ function recurse(data_index_) {
  ) { 
   currently_inside_of === 'literal'
   recursive_counter_literal = recursive_counter_literal + 1; 
-  in_function_ === true ? in_function_build_string_ += data_.charAt(data_index_ + 1) : '';
+  in_function_ === true ? in_function_build_string_ += '{' : '';
   data_index_ = data_index_ + 2; 
   return recurse(data_index_);
  }

@@ -1,6 +1,6 @@
 take equals into consideration
 possibly get rid of charAt and split across
 find a compiler that reutrns errors to skip over bad files 
-get enclosed and invoked in a different way... just count the wrappint parens from the equals sign...
+get enclosed and invoked in a different way
 add class functions
 add the other function types in javascript 

@@ -17,8 +17,8 @@
    var fs = require('file-system');
    var update_function_and_update_data = require('./data');
 
-   var initiate_arrow = require('./functions/arrow/arrow_main');
-   var initiate_regular = require('./functions/regular/regular_main');
+   var initiate_arrow = require('generate/functions/arrowJs/arrow_main');
+   var initiate_regular = require('generate/functions/regularJs/regular_main');
 
    var html_tag = require('generate/html_recursive_exit/html_tag');
    var html_comment = require('./html_recursive_exit/html_comment');
@@ -129,13 +129,13 @@
     throw new Error(errors);
    }
  
-   fs.recurseSync(folders[i].folder, folders[i].files == 'all' ? null : folders[i].files, (filepath, relative, filename) => {
- 
+   fs.recurseSync(
+    folders[i].folder, 
+    folders[i].files == 'all' ? null : folders[i].files, 
+    (filepath, relative, filename) => {
     if(filename) { 
- 
      file_type = filename.split('.');
      file_type = file_type[file_type.length - 1].toLowerCase(); 
- 
      if(file_type === 'ts') { 
       file_type = 'typescript';
      } else if(file_type === 'js') { 
@@ -145,7 +145,6 @@
      } else { 
       file_type = '';
      }
- 
      if(file_type !== '') {
       data_index = 0;
       update_function_and_update_data.update_data(fs.readFileSync(filepath, 'utf8'));
@@ -164,11 +163,9 @@
        console.log(err.message + '\n' + 'filepath: ' + filepath); 
       }
      }
- 
     }
- 
    })
- 
+   
   }
 
   return exported_functions;
@@ -264,8 +261,6 @@
   if(data.charAt(data_index) === '\n') { 
    line_number = line_number + 1;
   }
-
-  //might need to do some stuff here qith an equals sign to get the correct beginning of the function -- might need to build some things here, recurse and find out if the function is a an enclosed declaration of another function
 
   if(data.charAt(data_index) === '(') { 
    valid_parens[`${data_index}-opening`] = true;
