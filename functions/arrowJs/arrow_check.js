@@ -3,8 +3,8 @@
  checks if a function
 */
 
-var update_function_and_update_data = require('generate/data');
-var data = '';
+let update_function_and_update_data = require('generate/data');
+let data = '';
 
 function check_arrow(data_index) {
  data = update_function_and_update_data.data;

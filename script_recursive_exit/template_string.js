@@ -8,23 +8,23 @@
  a1-b1-a2-b2-a3-a2-b1-a1                            a2-a1-b0-a0
 */
 
-var update_function_and_update_data = require('../data');
-var double_quote_string = require('./script_recursive_exit/double_quote_string');
-var single_quote_string = require('./script_recursive_exit/single_quote_string');
-var multiline_comment = require('./script_recursive_exit/multiline_comment');
-var singleline_comment = require('./script_recursive_exit/singleline_comment');
-var regex = require('./script_recursive_exit/regex');
+let update_function_and_update_data = require('../data');
+let double_quote_string = require('./script_recursive_exit/double_quote_string');
+let single_quote_string = require('./script_recursive_exit/single_quote_string');
+let multiline_comment = require('./script_recursive_exit/multiline_comment');
+let singleline_comment = require('./script_recursive_exit/singleline_comment');
+let regex = require('./script_recursive_exit/regex');
 
-var data_ = '';
-var data_index_ = 0; 
-var in_function_ = false
-var in_function_build_string_ = '';
-var line_number_ = 0;
-var recursive_counter_literal = 0;
-var recursive_counter_template = 0; 
-var currently_inside_of = 'template';
-var data_index_and_line_number_update = {};
-var original_line_number = 0;
+let data_ = '';
+let data_index_ = 0; 
+let in_function_ = false
+let in_function_build_string_ = '';
+let line_number_ = 0;
+let recursive_counter_literal = 0;
+let recursive_counter_template = 0; 
+let currently_inside_of = 'template';
+let data_index_and_line_number_update = {};
+let original_line_number = 0;
 
 function template_string(data_index, in_function, line_number) { 
  data_ = update_function_and_update_data.data;

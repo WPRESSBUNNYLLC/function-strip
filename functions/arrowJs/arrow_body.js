@@ -3,24 +3,24 @@
  builds the function body
 */
 
-var update_function_and_update_data = require('../data');
-var double_quote_string = require('generate/functions/arrowJs/script_recursive_exit/double_quote_string');
-var single_quote_string = require('generate/functions/arrowJs/script_recursive_exit/single_quote_string');
-var multiline_comment = require('generate/functions/arrowJs/script_recursive_exit/multiline_comment');
-var singleline_comment = require('generate/functions/arrowJs/script_recursive_exit/singleline_comment');
-var template_string = require('generate/functions/arrowJs/script_recursive_exit/template_string');
-var regex = require('generate/functions/arrowJs/script_recursive_exit/regex');
+let update_function_and_update_data = require('../data');
+let double_quote_string = require('generate/functions/arrowJs/script_recursive_exit/double_quote_string');
+let single_quote_string = require('generate/functions/arrowJs/script_recursive_exit/single_quote_string');
+let multiline_comment = require('generate/functions/arrowJs/script_recursive_exit/multiline_comment');
+let singleline_comment = require('generate/functions/arrowJs/script_recursive_exit/singleline_comment');
+let template_string = require('generate/functions/arrowJs/script_recursive_exit/template_string');
+let regex = require('generate/functions/arrowJs/script_recursive_exit/regex');
 
-var data_index_ = 0;
-var data_ = '';
-var line_number_ = 0;
-var original_line_number = '';
-var in_function_build_string_ = ''; 
-var beginning_bracket_count = 0;
-var ending_bracket_count = 0;
-var data_index_and_line_number_update = {};
-var single_statement_ = [];
-var single_statement_index = 0;
+let data_index_ = 0;
+let data_ = '';
+let line_number_ = 0;
+let original_line_number = '';
+let in_function_build_string_ = ''; 
+let beginning_bracket_count = 0;
+let ending_bracket_count = 0;
+let data_index_and_line_number_update = {};
+let single_statement_ = [];
+let single_statement_index = 0;
 
 function build_body_of_function(data_index, line_number) {
  data_ = update_function_and_update_data.data;

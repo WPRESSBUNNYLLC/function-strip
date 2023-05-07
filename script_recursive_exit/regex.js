@@ -3,13 +3,13 @@
  determines when to end a regular expression... gets funky
 */
 
-var update_function_and_update_data = require('../data');
+let update_function_and_update_data = require('../data');
 
-var data_ = '';
-var data_index_ = 0;
-var in_function_ = false
-var in_function_build_string_ = '';
-var line_number_ = 0;
+let data_ = '';
+let data_index_ = 0;
+let in_function_ = false
+let in_function_build_string_ = '';
+let line_number_ = 0;
 
 function regex(data_index, in_function, line_number, build_string) { 
  data_ = update_function_and_update_data.data;
@@ -26,7 +26,7 @@ function recurse() {
 
 //escapes on regular expression /
 //when in [], escapes on ] for counting... and not counting /
-var a = /[\removeMe]/]/
-var a = /\(regex\/ \/ []]]]][(/)\]] )/
+let a = /[\removeMe]/]/
+let a = /\(regex\/ \/ []]]]][(/)\]] )/
 
 module.exports = regex;

@@ -3,10 +3,10 @@
  checks if a function
 */
 
-var update_function_and_update_data = require('generate/data');
-var data = '';
-var in_html = false;
-var in_template = false;
+let update_function_and_update_data = require('generate/data');
+let data = '';
+let in_html = false;
+let in_template = false;
  
  function check_regular(data_index) {
   data = update_function_and_update_data.data;

@@ -4,16 +4,16 @@
  recurses backwards the parameters of the arrow function and additional things... will have to build the beginning of this from the other side doing some stuff. this just gets async.. maybe dont get async here and just work it out some other way.. 
 */
 
-var update_function_and_update_data = require('../data');
+let update_function_and_update_data = require('../data');
 
-var data = '';
-var beginning_string = [];
-var bt_index = 0;
-var found_async = false;
-var parameters = [];
-var opening_parameter_count = 0; 
-var closing_parameter_count = 0;
-var valid_parens = {};
+let data = '';
+let beginning_string = [];
+let bt_index = 0;
+let found_async = false;
+let parameters = [];
+let opening_parameter_count = 0; 
+let closing_parameter_count = 0;
+let valid_parens = {};
 
 function initiate_arrow(data_index, boundries) { 
  valid_parens = boundries;

@@ -4,31 +4,31 @@
    Title: generate
 
    Description: 
-   strips a varierty of functions in .html, .js, .ts files using character sets, backtracking arrays and the addition of a build string (no ast). entering into a function when not in a template literal, single quote, double quote, multiline comment, single line comment, regular expression. counting brackets within each function file using the same script recursive exit.
+   strips a letierty of functions in .html, .js, .ts files using character sets, backtracking arrays and the addition of a build string (no ast). entering into a function when not in a template literal, single quote, double quote, multiline comment, single line comment, regular expression. counting brackets within each function file using the same script recursive exit.
    does not strip functions that are found inside strings("'`), single line comments and multline comments and outside of script tags in html documents. 
    Includes the line number, filepath and function name for each function.
    Includes a list of function types to strip. All configurable.
 
-   Author: AleJandro
+   Author: AleJandro - handro
    License: MIT
    
   */
 
-   var fs = require('file-system');
-   var update_function_and_update_data = require('./data');
+   let fs = require('file-system');
+   let update_function_and_update_data = require('./data');
 
-   var initiate_arrow = require('generate/functions/arrowJs/arrow_main');
-   var initiate_regular = require('generate/functions/regularJs/regular_main');
+   let initiate_arrow = require('generate/functions/arrowJs/arrow_main');
+   let initiate_regular = require('generate/functions/regularJs/regular_main');
 
-   var html_tag = require('generate/html_recursive_exit/html_tag');
-   var html_comment = require('./html_recursive_exit/html_comment');
+   let html_tag = require('generate/html_recursive_exit/html_tag');
+   let html_comment = require('./html_recursive_exit/html_comment');
 
-   var double_quote_string = require('./script_recursive_exit/double_quote_string');
-   var multiline_comment = require('./script_recursive_exit/multiline_comment');
-   var regex = require('./script_recursive_exit/regex');
-   var single_quote_string = require('./script_recursive_exit/single_quote_string');
-   var singleline_comment = require('./script_recursive_exit/singleline_comment');
-   var template_string = require('./script_recursive_exit/template_string');
+   let double_quote_string = require('./script_recursive_exit/double_quote_string');
+   let multiline_comment = require('./script_recursive_exit/multiline_comment');
+   let regex = require('./script_recursive_exit/regex');
+   let single_quote_string = require('./script_recursive_exit/single_quote_string');
+   let singleline_comment = require('./script_recursive_exit/singleline_comment');
+   let template_string = require('./script_recursive_exit/template_string');
 
    /* 
    * data about the file. line_number and fp used in the build string description
@@ -47,24 +47,24 @@
    * @param {function_types} the different functions to execute
    */
 
-   var bts = '';
-   var tags = [];
-   var temp_line_number = 0;
-   var data_index = 0;
-   var first_valid_character_html_tag = /a-zA-Z0-9/;
-   var data_index_and_line_number_update = {}; 
-   var function_index = 1;
-   var possibly_push_arrow = {};
-   var possibly_push_regular = {};
-   var data = '';
-   var data_length = 0;
-   var exported_functions = [];
-   var valid_parens = {};
-   var fp = '';
-   var line_number = 0;
-   var folders = [];
-   var file_type = '';
-   var function_types = {
+   let bts = '';
+   let tags = [];
+   let temp_line_number = 0;
+   let data_index = 0;
+   let first_valid_character_html_tag = /a-zA-Z0-9/;
+   let data_index_and_line_number_update = {}; 
+   let function_index = 1;
+   let possibly_push_arrow = {};
+   let possibly_push_regular = {};
+   let data = '';
+   let data_length = 0;
+   let exported_functions = [];
+   let valid_parens = {};
+   let fp = '';
+   let line_number = 0;
+   let folders = [];
+   let file_type = '';
+   let function_types = {
      regular: true,
      arrow: true, 
    }
@@ -78,7 +78,7 @@
  
  function generate(fldrs, f_t_g, f_t) {
  
-  var error_initial = '';
+  let error_initial = '';
  
   if(
    typeof(f_t) !== 'object' ||
@@ -106,7 +106,7 @@
  
   for(let i = 0; i < folders.length; i++) {
  
-   var errors = '';
+   let errors = '';
  
    if(typeof(folders[i].folder) !== 'string') { 
     errors += 'folder: folder must be a string \n';

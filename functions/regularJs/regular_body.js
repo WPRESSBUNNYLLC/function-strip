@@ -3,27 +3,27 @@
  builds the function body
 */
 
-var update_function_and_update_data = require('../data');
-var double_quote_string = require('generate/functions/regularJs/script_recursive_exit/double_quote_string');
-var single_quote_string = require('generate/functions/regularJs/script_recursive_exit/single_quote_string');
-var multiline_comment = require('generate/functions/regularJs/script_recursive_exit/multiline_comment');
-var singleline_comment = require('generate/functions/regularJs/script_recursive_exit/singleline_comment');
-var template_string = require('generate/functions/regularJs/script_recursive_exit/template_string');
-var regex = require('generate/functions/regularJs/script_recursive_exit/regex');
+let update_function_and_update_data = require('../data');
+let double_quote_string = require('generate/functions/regularJs/script_recursive_exit/double_quote_string');
+let single_quote_string = require('generate/functions/regularJs/script_recursive_exit/single_quote_string');
+let multiline_comment = require('generate/functions/regularJs/script_recursive_exit/multiline_comment');
+let singleline_comment = require('generate/functions/regularJs/script_recursive_exit/singleline_comment');
+let template_string = require('generate/functions/regularJs/script_recursive_exit/template_string');
+let regex = require('generate/functions/regularJs/script_recursive_exit/regex');
 
-var data_index_ = 0;
-var data_ = '';
-var line_number_ = 0;
-var function_name = '';
-var in_parameter_set = 'out';
-var parameter_string = '';
-var opening_parameter_count = 0; 
-var closing_parameter_count = 0;
-var original_line_number = 0;
-var in_function_build_string_ = '';
-var beginning_bracket_count = 0;
-var ending_bracket_count = 0;
-var data_index_and_line_number_update = {};
+let data_index_ = 0;
+let data_ = '';
+let line_number_ = 0;
+let function_name = '';
+let in_parameter_set = 'out';
+let parameter_string = '';
+let opening_parameter_count = 0; 
+let closing_parameter_count = 0;
+let original_line_number = 0;
+let in_function_build_string_ = '';
+let beginning_bracket_count = 0;
+let ending_bracket_count = 0;
+let data_index_and_line_number_update = {};
 
 function build_body_of_function(data_index, line_number) {
  data_ = update_function_and_update_data.data;
@@ -201,33 +201,3 @@ function end() {
 }
 
 module.exports = build_body_of_function;
-
-var a = { 
-  value: 12,
-  left: {
-    value: 10, 
-    left: {
-      value: 8, 
-      right: null, 
-      left: null
-    }, 
-    right: {
-      value: 11,
-      right: null, 
-      left: null
-    }
-  }, 
-  right: {
-    value: 18, 
-    left: {
-     value: 14, 
-     left: null, 
-     right: 16
-    }, 
-    right: {
-      value: 20, 
-      left: null, 
-      right: null
-    }
-  },
-}
