@@ -26,14 +26,14 @@ function recurse(data_index_) {
   )
  }
 
- if(data_.charAt(data_index_) === '\n') { 
+ if(update_function_and_update_data.data.charAt(data_index_) === '\n') { 
   line_number_ = line_number_ + 1;
  }
 
  if(
-  data_.charAt(data_index_) === '-' && 
-  data_.charAt(data_index_ + 1) === '-' && 
-  data_.charAt(data_index_ + 2) === '>'
+  update_function_and_update_data.data.charAt(data_index_) === '-' && 
+  update_function_and_update_data.data.charAt(data_index_ + 1) === '-' && 
+  update_function_and_update_data.data.charAt(data_index_ + 2) === '>'
  ) { 
   data_index_ = data_index_ + 3; 
   return {

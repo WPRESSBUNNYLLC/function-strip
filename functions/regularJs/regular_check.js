@@ -12,14 +12,14 @@ let in_template = false;
   data = update_function_and_update_data.data;
   if(
    check_beginning_regular(data_index) && 
-   data.charAt(data_index) ===   'f' && 
-   data.charAt(data_index+1) === 'u' &&  
-   data.charAt(data_index+2) === 'n' && 
-   data.charAt(data_index+3) === 'c' && 
-   data.charAt(data_index+4) === 't' && 
-   data.charAt(data_index+5) === 'i' && 
-   data.charAt(data_index+6) === 'o' && 
-   data.charAt(data_index+7) === 'n' && 
+   update_function_and_update_data.data.charAt(data_index) ===   'f' && 
+   update_function_and_update_data.data.charAt(data_index+1) === 'u' &&  
+   update_function_and_update_data.data.charAt(data_index+2) === 'n' && 
+   update_function_and_update_data.data.charAt(data_index+3) === 'c' && 
+   update_function_and_update_data.data.charAt(data_index+4) === 't' && 
+   update_function_and_update_data.data.charAt(data_index+5) === 'i' && 
+   update_function_and_update_data.data.charAt(data_index+6) === 'o' && 
+   update_function_and_update_data.data.charAt(data_index+7) === 'n' && 
    check_ending_regular(data_index)
   ) {
    return true;
@@ -30,14 +30,14 @@ let in_template = false;
 
  function check_beginning_regular(data_index) { 
   if(
-   data.charAt(data_index-1) === '\n' ||
-   data.charAt(data_index-1) === ' ' || 
-   data.charAt(data_index-1) === ',' || 
-   data.charAt(data_index-1) === ':' || 
-   data.charAt(data_index-1) === '}' || 
-   data.charAt(data_index-1) === '=' || 
-   data.charAt(data_index-1) === '(' || 
-   data.charAt(data_index-1) === ';' //and abunch of other characters
+   update_function_and_update_data.data.charAt(data_index-1) === '\n' ||
+   update_function_and_update_data.data.charAt(data_index-1) === ' ' || 
+   update_function_and_update_data.data.charAt(data_index-1) === ',' || 
+   update_function_and_update_data.data.charAt(data_index-1) === ':' || 
+   update_function_and_update_data.data.charAt(data_index-1) === '}' || 
+   update_function_and_update_data.data.charAt(data_index-1) === '=' || 
+   update_function_and_update_data.data.charAt(data_index-1) === '(' || 
+   update_function_and_update_data.data.charAt(data_index-1) === ';' //and abunch of other characters maybe just use regular expression and special character set
   ) {
    return true
   } else { 
@@ -47,9 +47,9 @@ let in_template = false;
 
  function check_ending_regular(data_index) { 
   if(
-   data.charAt(data_index+8) === '\n' || 
-   data.charAt(data_index+8) === ' ' || 
-   data.charAt(data_index+8) === '('
+   update_function_and_update_data.data.charAt(data_index+8) === '\n' || 
+   update_function_and_update_data.data.charAt(data_index+8) === ' ' || 
+   update_function_and_update_data.data.charAt(data_index+8) === '('
   ) { 
    return true
   } else { 

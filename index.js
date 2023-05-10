@@ -1,16 +1,10 @@
   
   /* 
 
-   Title: generate
+   Title: function parser
+   description: strips functions from files
 
-   Description: 
-   strips a letierty of functions in .html, .js, .ts files using character sets, backtracking arrays and the addition of a build string (no ast). entering into a function when not in a template literal, single quote, double quote, multiline comment, single line comment, regular expression. counting brackets within each function file using the same script recursive exit.
-   does not strip functions that are found inside strings("'`), single line comments and multline comments and outside of script tags in html documents. 
-   Includes the line number, filepath and function name for each function.
-   Includes a list of function types to strip. All configurable.
-
-   Author: AleJandro - handro
-   License: MIT
+   Author: Alex
    
   */
 
@@ -403,6 +397,7 @@
     line_number = possibly_push_arrow.ending_line_number;
     data_index = possibly_push_arrow.data_index;
     function_index = function_index + 1;
+    valid_parens = {};
     return iterate_through_file_text(data_index);
    }
   }

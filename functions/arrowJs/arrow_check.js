@@ -9,8 +9,8 @@ let data = '';
 function check_arrow(data_index) {
  data = update_function_and_update_data.data;
  if(
-  data.charAt(data_index) === '=' && 
-  data.charAt(data_index+1) ===  '>' 
+  update_function_and_update_data.data.charAt(data_index) === '=' && 
+  update_function_and_update_data.data.charAt(data_index+1) ===  '>' 
  ) {
    return true;
   } else { 

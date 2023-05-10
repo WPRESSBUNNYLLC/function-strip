@@ -15,7 +15,6 @@ let multiline_comment = require('./script_recursive_exit/multiline_comment');
 let singleline_comment = require('./script_recursive_exit/singleline_comment');
 let regex = require('./script_recursive_exit/regex');
 
-let data_ = '';
 let data_index_ = 0; 
 let in_function_ = false
 let in_function_build_string_ = '';
@@ -27,7 +26,6 @@ let data_index_and_line_number_update = {};
 let original_line_number = 0;
 
 function template_string(data_index, in_function, line_number) { 
- data_ = update_function_and_update_data.data;
  data_index_ = data_index;
  in_function_ = in_function;
  in_function_build_string_ = '';
@@ -49,16 +47,16 @@ function recurse(data_index_) {
  }
 
  if(in_function_ === true) { 
-  in_function_build_string_ += data_.charAt(data_index_);
+  in_function_build_string_ += update_function_and_update_data.data.charAt(data_index_);
  }
 
- if(data_.charAt(data_index_) === '\n') { 
+ if(update_function_and_update_data.data.charAt(data_index_) === '\n') { 
   line_number_ = line_number_ + 1;
  }
 
  if(
   currently_inside_of === 'literal' && 
-  data_.charAt(data_index_) === '"'
+  update_function_and_update_data.data.charAt(data_index_) === '"'
  ) {
   data_index_ = data_index_ + 1;
   data_index_and_line_number_update = double_quote_string(data_index_, in_function_, line_number_, false);
@@ -68,7 +66,7 @@ function recurse(data_index_) {
 
  if(
   currently_inside_of === 'literal' && 
-  data_.charAt(data_index_) === "'"
+  update_function_and_update_data.data.charAt(data_index_) === "'"
  ) {
   data_index_ = data_index_ + 1;
   data_index_and_line_number_update = single_quote_string(data_index_, in_function_, line_number_, false);
@@ -78,8 +76,8 @@ function recurse(data_index_) {
 
  if(
   currently_inside_of === 'literal' && 
-  data_.charAt(data_index_) === '/' && 
-  data_.charAt(data_index_ + 1) === '/'
+  update_function_and_update_data.data.charAt(data_index_) === '/' && 
+  update_function_and_update_data.data.charAt(data_index_ + 1) === '/'
  ) {
   in_function_ === true ? in_function_build_string_ += '/' : '';
   data_index_ = data_index_ + 2;
@@ -90,8 +88,8 @@ function recurse(data_index_) {
 
  if(
   currently_inside_of === 'literal' && 
-  data_.charAt(data_index_) === '/' && 
-  data_.charAt(data_index_ + 1) === '*'
+  update_function_and_update_data.data.charAt(data_index_) === '/' && 
+  update_function_and_update_data.data.charAt(data_index_ + 1) === '*'
  ) {
   in_function_ === true ? in_function_build_string_ += '*' : '';
   data_index_ = data_index_ + 2;
@@ -102,21 +100,19 @@ function recurse(data_index_) {
 
  if(
   currently_inside_of === 'literal' && 
-  data_.charAt(data_index_) === '/'
+  update_function_and_update_data.data.charAt(data_index_) === '/'
  ) {
-  in_function_ === true ? in_function_build_string_ += data_.charAt(data_index_ + 1) : '';
+  in_function_ === true ? in_function_build_string_ += update_function_and_update_data.data.charAt(data_index_ + 1) : '';
   data_index_ = data_index_ + 2;
   data_index_and_line_number_update = regex(data_index_, in_function_, line_number_);
   update();
   return recurse(data_index_);
  }
 
- //possibly regular and arrow funcitons here.
-
  if(
   currently_inside_of === 'template' && 
-  data_.charAt(data_index_) === '$' && 
-  data_.charAt(data_index_ + 1) === '{'
+  update_function_and_update_data.data.charAt(data_index_) === '$' && 
+  update_function_and_update_data.data.charAt(data_index_ + 1) === '{'
  ) { 
   currently_inside_of === 'literal'
   recursive_counter_literal = recursive_counter_literal + 1; 
@@ -127,7 +123,7 @@ function recurse(data_index_) {
 
  if(
   currently_inside_of === 'literal' && 
-  data_.charAt(data_index_) === '}'
+  update_function_and_update_data.data.charAt(data_index_) === '}'
  ) {
   currently_inside_of = 'template'; 
   recursive_counter_literal = recursive_counter_literal - 1;
@@ -137,7 +133,7 @@ function recurse(data_index_) {
 
  if(
   currently_inside_of === 'literal' && 
-  data_.charAt(data_index_) === '`'
+  update_function_and_update_data.data.charAt(data_index_) === '`'
  ) { 
   currently_inside_of = 'template'; 
   recursive_counter_template = recursive_counter_template + 1;
@@ -147,7 +143,7 @@ function recurse(data_index_) {
 
  if(
   currently_inside_of === 'template' && 
-  data_.charAt(data_index_) === '`'
+  update_function_and_update_data.data.charAt(data_index_) === '`'
  ) {
   currently_inside_of = 'literal'; 
   recursive_counter_template = recursive_counter_template - 1;

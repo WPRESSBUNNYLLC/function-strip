@@ -5,8 +5,7 @@ let found_equals = false;
 let found_async = false;
 let found_name = false;
 
-function initiate_regular(d, data_index) { 
- data = d;
+function initiate_regular(data_index) { 
  bt_index = data_index - 1;
  bt_regular_parameter_string = [];
  found_equals = false;

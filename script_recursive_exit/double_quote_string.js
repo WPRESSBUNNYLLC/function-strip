@@ -5,7 +5,6 @@
 
 let update_function_and_update_data = require('../data');
 
-let data_ = '';
 let data_index_ = 0;
 let in_function_ = false
 let in_function_build_string_ = '';
@@ -15,7 +14,6 @@ let in_tag_ = false;
 let in_tag_string = '';
 
 function double_quote_string(data_index, in_function, line_number, in_tag) { 
- data_ = update_function_and_update_data.data;
  data_index_ = data_index;
  in_function_ = in_function;
  line_number_ = line_number;
@@ -35,21 +33,21 @@ function recurse(data_index_) {
   )
  }
 
- if(data_.charAt(data_index_) === '\n') { 
+ if(update_function_and_update_data.data.charAt(data_index_) === '\n') { 
   line_number_ = line_number_ + 1;
  }
 
  if(in_function_ === true) { 
-  in_function_build_string_ += data_.charAt(data_index_);
+  in_function_build_string_ += update_function_and_update_data.data.charAt(data_index_);
  }
 
  if(in_tag_ === true) { 
-  in_tag_string += data_.charAt(data_index_);
+  in_tag_string += update_function_and_update_data.data.charAt(data_index_);
  }
 
  if(
-  data_.charAt(data_index_) === '"' && 
-  (in_tag_ === true || (data_.charAt(data_index_ - 1) !== '\\' && in_tag_ === false))
+  update_function_and_update_data.data.charAt(data_index_) === '"' && 
+  (in_tag_ === true || (update_function_and_update_data.data.charAt(data_index_ - 1) !== '\\' && in_tag_ === false))
  ) { 
   data_index_ = data_index_ + 1; 
   return {
