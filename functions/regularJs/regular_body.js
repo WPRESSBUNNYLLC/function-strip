@@ -34,7 +34,8 @@ function build_body_of_function(data_index, line_number) {
  opening_parameter_count = 0; 
  closing_parameter_count = 0;
  in_function_build_string_ = '';
- return recurse(data_index_);
+ recurse(data_index_);
+ return end();
 }
 
 function recurse(data_index_) {  
@@ -47,7 +48,7 @@ function recurse(data_index_) {
  }
 
  if(update_function_and_update_data.data.charAt(data_index_) === '\n') { 
-  line_number_ = line_number_ + 1;
+  line_number_ += 1;
  }
 
  in_function_build_string_ += update_function_and_update_data.data.charAt(data_index_); 
@@ -57,21 +58,21 @@ function recurse(data_index_) {
  }
 
  if(update_function_and_update_data.data.charAt(data_index_) === '"') {
-  data_index_ = data_index_ + 1;
+  data_index_ += 1;
   data_index_and_line_number_update = double_quote_string(data_index_, true, line_number_, false);
   update();
   return recurse(data_index_);
  }
 
  if(update_function_and_update_data.data.charAt(data_index_) === "'") {
-  data_index_ = data_index_ + 1;
+  data_index_ += 1;
   data_index_and_line_number_update = single_quote_string(data_index_, true, line_number_, false);
   update();
   return recurse(data_index_);
  }
 
  if(update_function_and_update_data.data.charAt(data_index_) === '`') { 
-  data_index_ = data_index_ + 1;
+  data_index_ += 1;
   data_index_and_line_number_update = template_string(data_index_, true, line_number_);
   update();
   return recurse(data_index_);
@@ -83,7 +84,7 @@ function recurse(data_index_) {
  ) {
   in_function_build_string_ += '/';
   parameter_string += in_parameter_set === 'in' ? '/' : ''
-  data_index_ = data_index_ + 2;
+  data_index_ += 2;
   data_index_and_line_number_update = singleline_comment(data_index_, true, line_number_);
   update('single_line');
   return recurse(data_index_);
@@ -95,7 +96,7 @@ function recurse(data_index_) {
  ) {
   in_function_build_string_ += '*';
   parameter_string += in_parameter_set === 'in' ? '/' : ''
-  data_index_ = data_index_ + 2;
+  data_index_ += 2;
   data_index_and_line_number_update = multiline_comment(data_index_, true, line_number_);
   update('multi-line');
   return recurse(data_index_);
@@ -107,8 +108,8 @@ function recurse(data_index_) {
   update_function_and_update_data.data.charAt(data_index_ + 1) !== '*'
  ) { 
   in_function_build_string_ += update_function_and_update_data.data.charAt(data_index_ + 1);
-  parameter_string += in_parameter_set === 'in' ? '/' : ''
-  data_index_ = data_index_ + 2;
+  parameter_string += in_parameter_set === 'in' ? update_function_and_update_data.data.charAt(data_index_ + 1) : ''
+  data_index_ += 2;
   data_index_and_line_number_update = regex(data_index_, true, line_number_);
   update();
   return recurse(data_index_);
@@ -132,7 +133,7 @@ function recurse(data_index_) {
   in_parameter_set = 'in';
   parameter_string += update_function_and_update_data.data.charAt(data_index_);
   opening_parameter_count += 1;
-  data_index_ = data_index_ + 1; 
+  data_index_ += 1;
   return recurse(data_index_);
  } 
 
@@ -141,7 +142,7 @@ function recurse(data_index_) {
   update_function_and_update_data.data.charAt(data_index_) === '(' 
  ) { 
   opening_parameter_count += 1;
-  data_index_ = data_index_ + 1; 
+  data_index_ += 1; 
   return recurse(data_index_);
  } 
 
@@ -153,7 +154,7 @@ function recurse(data_index_) {
   if(opening_parameter_count === closing_parameter_count) {
    in_parameter_set = 'done';
   }
-  data_index_ = data_index_ + 1; 
+  data_index_ += 1; 
   return recurse(data_index_);
  }
 
@@ -162,7 +163,7 @@ function recurse(data_index_) {
   update_function_and_update_data.data.charAt(data_index_) === '{' 
  ) { 
   beginning_bracket_count += 1;
-  data_index_ = data_index_ + 1; 
+  data_index_ += 1; 
   return recurse(data_index_);
  }
 
@@ -171,19 +172,19 @@ function recurse(data_index_) {
   update_function_and_update_data.data.charAt(data_index_) === '}' 
  ) { 
   ending_bracket_count += 1;
-  data_index_ = data_index_ + 1; 
+  data_index_ += 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
-   return end();
+   return;
   }
   return recurse(data_index_);
  }
 
- data_index_ = data_index_ + 1; 
+ data_index_ += 1; 
  return recurse(data_index_);
 
 }
 
-function update(neglect_comments_before_parameter_set) {  //if have not reached the parameter set
+function update(neglect_comments_before_parameter_set) {  //if have not reached the parameter set and see a comment (which would be the only valid statement) dont append it to the function body
  data_index_ = data_index_and_line_number_update.data_index_;
  line_number_ = data_index_and_line_number_update.line_number_;
  in_function_build_string_ += data_index_and_line_number_update.build_string; 

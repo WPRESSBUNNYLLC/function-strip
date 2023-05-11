@@ -56,11 +56,14 @@ function is_parameter_set_or_is_name(bt_index) {
 
 function append_parameter_name(bt_index) {
 
- beginning_string.unshift(update_function_and_update_data.data.charAt(bt_index));
-
- if(update_function_and_update_data.data.charAt(bt_index) === '=') { 
+ if(
+  update_function_and_update_data.data.charAt(bt_index) === '=' ||
+  update_function_and_update_data.data.charAt(bt_index) === '('
+ ) { 
   return;
  }
+
+ beginning_string.unshift(update_function_and_update_data.data.charAt(bt_index));
 
  if(
   update_function_and_update_data.data.charAt(bt_index) === ' ' || 

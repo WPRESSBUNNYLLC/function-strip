@@ -28,7 +28,8 @@ function build_body_of_function(data_index, line_number) {
  in_function_build_string_ = '';
  single_statement_ = [''];
  single_statement_index = 0;
- return check_if_single_statement_or_bracket_function(data_index_);
+ check_if_single_statement_or_bracket_function(data_index_);
+ return end();
 }
 
 function check_if_single_statement_or_bracket_function(data_index_) { 
@@ -53,13 +54,15 @@ function check_if_single_statement_or_bracket_function(data_index_) {
  ) { 
   single_statement_[single_statement_index] = update_function_and_update_data.data.charAt(data_index_);
   data_index_ += 1;
-  return single_statement(data_index_);
+  single_statement(data_index_);
+  return;
  }
 
  if(update_function_and_update_data.data.charAt(data_index_) === '{') { 
   beginning_bracket_count += 1;
   data_index_ += 1;
-  return recurse(data_index_);
+  recurse(data_index_);
+  return;
  } 
 
  data_index_ += 1; 
@@ -147,7 +150,7 @@ function recurse(data_index_) {
   ending_bracket_count += 1;
   data_index_ += 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
-   return end();
+   return;
   }
   return recurse(data_index_);
  }
