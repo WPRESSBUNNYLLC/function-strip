@@ -103,10 +103,11 @@ function recurse(data_index_) {
  if(
   currently_inside_of === 'literal' && 
   update_function_and_update_data.data.charAt(data_index_) === '/' && 
-  update_function_and_update_data.data.charAt(data_index_ + 1) === '/'
+  update_function_and_update_data.data.charAt(data_index_ + 1) !== '/' && 
+  update_function_and_update_data.data.charAt(data_index_ + 1) !== '*' 
  ) {
   in_function_ === true ? in_function_build_string_ += update_function_and_update_data.data.charAt(data_index_ + 1) : '';
-  data_index_ = data_index_ + 2;
+  data_index_ += 2;
   data_index_and_line_number_update = regex(data_index_, in_function_, line_number_);
   update();
   return recurse(data_index_);
