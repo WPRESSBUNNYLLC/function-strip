@@ -8,6 +8,8 @@
  a1-b1-a2-b2-a3-a2-b1-a1                            a2-a1-b0-a0
 */
 
+//this will go off of others... just import like in main
+
 let update_function_and_update_data = require('../data');
 let double_quote_string = require('./script_recursive_exit/double_quote_string');
 let single_quote_string = require('./script_recursive_exit/single_quote_string');
@@ -100,7 +102,8 @@ function recurse(data_index_) {
 
  if(
   currently_inside_of === 'literal' && 
-  update_function_and_update_data.data.charAt(data_index_) === '/'
+  update_function_and_update_data.data.charAt(data_index_) === '/' && 
+  update_function_and_update_data.data.charAt(data_index_ + 1) === '/'
  ) {
   in_function_ === true ? in_function_build_string_ += update_function_and_update_data.data.charAt(data_index_ + 1) : '';
   data_index_ = data_index_ + 2;

@@ -43,7 +43,7 @@ function check_if_single_statement_or_bracket_function(data_index_) {
  in_function_build_string_ += update_function_and_update_data.data.charAt(data_index_); 
 
  if(update_function_and_update_data.data.charAt(data_index_) === '\n') { 
-  line_number_ = line_number_ + 1;
+  line_number_ += 1;
  }
 
  if(
@@ -51,8 +51,8 @@ function check_if_single_statement_or_bracket_function(data_index_) {
   update_function_and_update_data.data.charAt(data_index_) !== ' ' && 
   update_function_and_update_data.data.charAt(data_index_) !== '{'
  ) { 
-  data_index_ += 1;
   single_statement_[single_statement_index] = update_function_and_update_data.data.charAt(data_index_);
+  data_index_ += 1;
   return single_statement(data_index_);
  }
 
@@ -79,25 +79,25 @@ function recurse(data_index_) {
  in_function_build_string_ += update_function_and_update_data.data.charAt(data_index_); 
 
  if(update_function_and_update_data.data.charAt(data_index_) === '\n') { 
-  line_number_ = line_number_ + 1;
+  line_number_ += 1;
  }
 
  if(update_function_and_update_data.data.charAt(data_index_) === '"') {
-  data_index_ = data_index_ + 1;
+  data_index_ += 1;
   data_index_and_line_number_update = double_quote_string(data_index_, true, line_number_, false);
   update();
   return recurse(data_index_);
  }
 
  if(update_function_and_update_data.data.charAt(data_index_) === "'") {
-  data_index_ = data_index_ + 1;
+  data_index_ += 1;
   data_index_and_line_number_update = single_quote_string(data_index_, true, line_number_, false);
   update();
   return recurse(data_index_);
  }
 
  if(update_function_and_update_data.data.charAt(data_index_) === '`') { 
-  data_index_ = data_index_ + 1;
+  data_index_ += 1;
   data_index_and_line_number_update = template_string(data_index_, true, line_number_);
   update();
   return recurse(data_index_);
@@ -108,7 +108,7 @@ function recurse(data_index_) {
   update_function_and_update_data.data.charAt(data_index_ + 1) === '/'
  ) {
   in_function_build_string_ += '/';
-  data_index_ = data_index_ + 2;
+  data_index_ += 2;
   data_index_and_line_number_update = singleline_comment(data_index_, true, line_number_);
   update();
   return recurse(data_index_);
@@ -119,15 +119,19 @@ function recurse(data_index_) {
   update_function_and_update_data.data.charAt(data_index_ + 1) === '*'
  ) {
   in_function_build_string_ += '*';
-  data_index_ = data_index_ + 2;
+  data_index_ += 2;
   data_index_and_line_number_update = multiline_comment(data_index_, true, line_number_);
   update();
   return recurse(data_index_);
  }
 
- if(update_function_and_update_data.data.charAt(data_index_) === '/') { 
+ if(
+  update_function_and_update_data.data.charAt(data_index_) === '/' &&
+  update_function_and_update_data.data.charAt(data_index_ + 1) !== '/'  && 
+  update_function_and_update_data.data.charAt(data_index_ + 1) !== '*' 
+ ) { 
   in_function_build_string_ += update_function_and_update_data.data.charAt(data_index_ + 1);
-  data_index_ = data_index_ + 2;
+  data_index_ += 2;
   data_index_and_line_number_update = regex(data_index_, true, line_number_);
   update();
   return recurse(data_index_);
@@ -135,20 +139,20 @@ function recurse(data_index_) {
 
  if(update_function_and_update_data.data.charAt(data_index_) === '{') { 
   beginning_bracket_count += 1;
-  data_index_ = data_index_ + 1; 
+  data_index_ += 1;
   return recurse(data_index_);
  }
 
  if(update_function_and_update_data.data.charAt(data_index_) === '}') { 
   ending_bracket_count += 1;
-  data_index_ = data_index_  + 1; 
+  data_index_ += 1; 
   if(beginning_bracket_count === ending_bracket_count) { 
    return end();
   }
   return recurse(data_index_);
  }
 
- data_index_ = data_index_ + 1; 
+ data_index_ += 1; 
  return recurse(data_index_);
 
 }
@@ -159,13 +163,7 @@ function update() {
  in_function_build_string_ += data_index_and_line_number_update.build_string;
 }
 
-function single_statement(data_index_) { 
- //just take parens as definitions and definitions/operations into consideration... when paren found, continue through and count for closing paren...
-}
-
-function check_expression() { 
-
-}
+function single_statement(data_index_) {} //build a single statement and return
 
 function end() { 
  return {

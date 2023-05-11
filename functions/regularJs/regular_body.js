@@ -37,7 +37,7 @@ function build_body_of_function(data_index, line_number) {
  return recurse(data_index_);
 }
 
-function recurse(data_index_) { 
+function recurse(data_index_) {  
 
  if(data_index_ > data_.length) {
   throw new Error(
@@ -85,7 +85,7 @@ function recurse(data_index_) {
   parameter_string += in_parameter_set === 'in' ? '/' : ''
   data_index_ = data_index_ + 2;
   data_index_and_line_number_update = singleline_comment(data_index_, true, line_number_);
-  update();
+  update('single_line');
   return recurse(data_index_);
  }
 
@@ -97,11 +97,15 @@ function recurse(data_index_) {
   parameter_string += in_parameter_set === 'in' ? '/' : ''
   data_index_ = data_index_ + 2;
   data_index_and_line_number_update = multiline_comment(data_index_, true, line_number_);
-  update();
+  update('multi-line');
   return recurse(data_index_);
  }
 
- if(update_function_and_update_data.data.charAt(data_index_) === '/') { 
+ if(
+  update_function_and_update_data.data.charAt(data_index_) === '/' &&
+  update_function_and_update_data.data.charAt(data_index_ + 1) !== '/' && 
+  update_function_and_update_data.data.charAt(data_index_ + 1) !== '*'
+ ) { 
   in_function_build_string_ += update_function_and_update_data.data.charAt(data_index_ + 1);
   parameter_string += in_parameter_set === 'in' ? '/' : ''
   data_index_ = data_index_ + 2;
@@ -179,10 +183,10 @@ function recurse(data_index_) {
 
 }
 
-function update() {  
+function update(neglect_comments_before_parameter_set) {  //if have not reached the parameter set
  data_index_ = data_index_and_line_number_update.data_index_;
  line_number_ = data_index_and_line_number_update.line_number_;
- in_function_build_string_ += data_index_and_line_number_update.build_string;
+ in_function_build_string_ += data_index_and_line_number_update.build_string; 
  if(in_parameter_set === 'in') { 
   parameter_string += data_index_and_line_number_update.build_string; 
  }
