@@ -86,7 +86,7 @@ function recurse(data_index_) {
   parameter_string += in_parameter_set === 'in' ? '/' : ''
   data_index_ += 2;
   data_index_and_line_number_update = singleline_comment(data_index_, true, line_number_);
-  update('single_line');
+  update('single-line');
   return recurse(data_index_);
  }
 
@@ -184,10 +184,17 @@ function recurse(data_index_) {
 
 }
 
-function update(neglect_comments_before_parameter_set) {  //if have not reached the parameter set and see a comment (which would be the only valid statement) dont append it to the function body
+function update(neglect_comments_before_parameter_set) { 
  data_index_ = data_index_and_line_number_update.data_index_;
  line_number_ = data_index_and_line_number_update.line_number_;
- in_function_build_string_ += data_index_and_line_number_update.build_string; 
+//  if(
+//   in_parameter_set === 'out' && 
+//   typeof(neglect_comments_before_parameter_set) === 'string'
+//  ) { 
+  //if have not reached the parameter set and see a comment (which would be the only valid statement before the parameter set) dont append it to the function body
+//  } else { 
+  in_function_build_string_ += data_index_and_line_number_update.build_string; 
+//  }
  if(in_parameter_set === 'in') { 
   parameter_string += data_index_and_line_number_update.build_string; 
  }

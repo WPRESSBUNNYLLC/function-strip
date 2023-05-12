@@ -176,17 +176,17 @@
    return;
   }
  
-  if(data.charAt(data_index) === '\n') { 
+  if(update_function_and_update_data.data.charAt(data_index) === '\n') { 
    line_number = line_number + 1;
   }
  
   if(
-   data.charAt(data_index) === '<' && 
-   data.charAt(data_index + 1) === '!' && 
-   data.charAt(data_index + 2) === '-' && 
-   data.charAt(data_index + 3) === '-' 
+   update_function_and_update_data.data.charAt(data_index) === '<' && 
+   update_function_and_update_data.data.charAt(data_index + 1) === '!' && 
+   update_function_and_update_data.data.charAt(data_index + 2) === '-' && 
+   update_function_and_update_data.data.charAt(data_index + 3) === '-' 
   ) { 
-   data_index = data_index + 4; 
+   data_index += 4; 
    data_index_and_line_number_update = html_comment(data_index, false, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
@@ -194,13 +194,13 @@
   }
 
   if(
-   data.charAt(data_index) === '<' && 
-   data.charAt(data_index + 1).test(first_valid_character_html_tag) === true
+   update_function_and_update_data.data.charAt(data_index) === '<' && 
+   update_function_and_update_data.data.charAt(data_index + 1).test(first_valid_character_html_tag) === true
   ) { 
    temp_line_number = line_number;
-   bts = '<' +  data.charAt(data_index + 1);
-   data_index = data_index + 2;
-   data_index_and_line_number_update = html_tag(data_index, line_number, bts, data.charAt(data_index + 1));
+   bts = '<' +  update_function_and_update_data.data.charAt(data_index + 1);
+   data_index += 2;
+   data_index_and_line_number_update = html_tag(data_index, line_number, bts, update_function_and_update_data.data.charAt(data_index + 1));
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    tags.push({
@@ -217,14 +217,14 @@
   }
 
   if(
-   data.charAt(data_index) === '<' && 
-   data.charAt(data_index + 1) === '/' &&
-   data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
+   update_function_and_update_data.data.charAt(data_index) === '<' && 
+   update_function_and_update_data.data.charAt(data_index + 1) === '/' &&
+   update_function_and_update_data.data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
   ) { 
    temp_line_number = line_number;
-   bts = '<' + data.charAt(data_index + 1) + data.charAt(data_index + 2);
-   data_index = data_index + 3;
-   data_index_and_line_number_update = html_tag(data_index, line_number, bts, data.charAt(data_index + 2));
+   bts = '<' + update_function_and_update_data.data.charAt(data_index + 1) + update_function_and_update_data.data.charAt(data_index + 2);
+   data_index += 3;
+   data_index_and_line_number_update = html_tag(data_index, line_number, bts, update_function_and_update_data.data.charAt(data_index + 2));
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    tags.push({
@@ -237,7 +237,7 @@
    return run_from_html(data_index);
   }
 
-  data_index = data_index + 1; 
+  data_index += 1; 
   return run_from_html(data_index);
   
  }
@@ -252,15 +252,15 @@
    return;
   }
  
-  if(data.charAt(data_index) === '\n') { 
-   line_number = line_number + 1;
+  if(update_function_and_update_data.data.charAt(data_index) === '\n') { 
+   line_number += 1;
   }
 
   if(
-   data.charAt(data_index) === '/' &&
-   data.charAt(data_index + 1) === '*'
+   update_function_and_update_data.data.charAt(data_index) === '/' &&
+   update_function_and_update_data.data.charAt(data_index + 1) === '*'
   ) { 
-   data_index = data_index + 2; 
+   data_index += 2; 
    data_index_and_line_number_update = multiline_comment(data_index, false, line_number, '');
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
@@ -268,10 +268,10 @@
   }
 
   if(
-   data.charAt(data_index) === '/' &&
-   data.charAt(data_index + 1) === '/'
+   update_function_and_update_data.data.charAt(data_index) === '/' &&
+   update_function_and_update_data.data.charAt(data_index + 1) === '/'
   ) { 
-   data_index = data_index + 2; 
+   data_index += 2; 
    data_index_and_line_number_update = singleline_comment(data_index, false, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
@@ -279,35 +279,35 @@
   }
 
   if(
-   data.charAt(data_index) === '/' && 
-   data.charAt(data_index + 1) !== '/' && 
-   data.charAt(data_index + 1) !== '*'
-   ) {
-   data_index = data_index + 1; 
+   update_function_and_update_data.data.charAt(data_index) === '/' && 
+   update_function_and_update_data.data.charAt(data_index + 1) !== '/' && 
+   update_function_and_update_data.data.charAt(data_index + 1) !== '*'
+  ) {
+   data_index += 2; 
    data_index_and_line_number_update = regex(data_index, false, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    return iterate_through_file_text(data_index);
   }
 
-  if(data.charAt(data_index) === '"') { 
-   data_index = data_index + 1; 
+  if(update_function_and_update_data.data.charAt(data_index) === '"') { 
+   data_index += 1; 
    data_index_and_line_number_update = double_quote_string(data_index, false, line_number, false);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    return iterate_through_file_text(data_index);
   }
 
-  if(data.charAt(data_index) === "'") { 
-   data_index = data_index + 1; 
+  if(update_function_and_update_data.data.charAt(data_index) === "'") { 
+   data_index += 1; 
    data_index_and_line_number_update = single_quote_string(data_index, false, line_number, false);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
    return iterate_through_file_text(data_index);
   }
 
-  if(data.charAt(data_index) === '`') { 
-   data_index = data_index + 1; 
+  if(update_function_and_update_data.data.charAt(data_index) === '`') { 
+   data_index += 1; 
    data_index_and_line_number_update = template_string(data_index, false, line_number);
    data_index = data_index_and_line_number_update.data_index;
    line_number = data_index_and_line_number_update.line_number;
@@ -316,14 +316,14 @@
 
   if(file_type === 'html') { 
    if(
-    data.charAt(data_index) === '<' && 
-    data.charAt(data_index + 1) === '/' &&
-    data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
+    update_function_and_update_data.data.charAt(data_index) === '<' && 
+    update_function_and_update_data.data.charAt(data_index + 1) === '/' &&
+    update_function_and_update_data.data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
    ) { 
     temp_line_number = line_number;
-    bts = '<' + data.charAt(data_index + 1) + data.charAt(data_index + 2);
+    bts = '<' + update_function_and_update_data.data.charAt(data_index + 1) + update_function_and_update_data.data.charAt(data_index + 2);
     data_index = data_index + 3;
-    data_index_and_line_number_update = html_tag(data_index, line_number, bts, data.charAt(data_index + 2));
+    data_index_and_line_number_update = html_tag(data_index, line_number, bts, update_function_and_update_data.data.charAt(data_index + 2));
     data_index = data_index_and_line_number_update.data_index;
     line_number = data_index_and_line_number_update.line_number;
     tags.push({
@@ -356,18 +356,18 @@
     });
     line_number = possibly_push_regular.ending_line_number;
     data_index = possibly_push_regular.data_index;
-    function_index = function_index + 1;
+    function_index += 1;
     return iterate_through_file_text(data_index);
    }
   }
 
-  if(data.charAt(data_index) === '(') { 
+  if(update_function_and_update_data.data.charAt(data_index) === '(') { 
    valid_parens[`${data_index}-opening`] = true;
    data_index += 1;
    return iterate_through_file_text(data_index);
   } 
   
-  if(data.charAt(data_index) === ')') { 
+  if(update_function_and_update_data.data.charAt(data_index) === ')') { 
    valid_parens[`${data_index}-closing`] = true;
    data_index += 1;
    return iterate_through_file_text(data_index);
@@ -388,13 +388,13 @@
     });
     line_number = possibly_push_arrow.ending_line_number;
     data_index = possibly_push_arrow.data_index;
-    function_index = function_index + 1;
+    function_index += 1;
     valid_parens = {};
     return iterate_through_file_text(data_index);
    }
   }
 
-  data_index = data_index + 1; 
+  data_index += 1; 
   return iterate_through_file_text(data_index);
  
  }
