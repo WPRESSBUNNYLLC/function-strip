@@ -23,7 +23,7 @@ let in_function_build_string_ = '';
 let line_number_ = 0;
 let recursive_counter_literal = 0;
 let recursive_counter_template = 0; 
-let currently_inside_of = 'template';
+let currently_inside_of = 'string';
 let data_index_and_line_number_update = {};
 let original_line_number = 0;
 
@@ -35,7 +35,7 @@ function template_string(data_index, in_function, line_number) {
  original_line_number = line_number;
  recursive_counter_template = 1;
  recursive_counter_literal = 0;
- currently_inside_of = 'template';
+ currently_inside_of = 'string';
  return recurse(data_index_);
 }
 
@@ -57,7 +57,7 @@ function recurse(data_index_) {
  }
 
  if(
-  currently_inside_of === 'literal' && 
+  currently_inside_of === 'script' && 
   update_function_and_update_data.data.charAt(data_index_) === '"'
  ) {
   data_index_ = data_index_ + 1;
@@ -67,7 +67,7 @@ function recurse(data_index_) {
  }
 
  if(
-  currently_inside_of === 'literal' && 
+  currently_inside_of === 'script' && 
   update_function_and_update_data.data.charAt(data_index_) === "'"
  ) {
   data_index_ = data_index_ + 1;
@@ -77,7 +77,7 @@ function recurse(data_index_) {
  }
 
  if(
-  currently_inside_of === 'literal' && 
+  currently_inside_of === 'script' && 
   update_function_and_update_data.data.charAt(data_index_) === '/' && 
   update_function_and_update_data.data.charAt(data_index_ + 1) === '/'
  ) {
@@ -89,7 +89,7 @@ function recurse(data_index_) {
  }
 
  if(
-  currently_inside_of === 'literal' && 
+  currently_inside_of === 'script' && 
   update_function_and_update_data.data.charAt(data_index_) === '/' && 
   update_function_and_update_data.data.charAt(data_index_ + 1) === '*'
  ) {
@@ -101,7 +101,7 @@ function recurse(data_index_) {
  }
 
  if(
-  currently_inside_of === 'literal' && 
+  currently_inside_of === 'script' && 
   update_function_and_update_data.data.charAt(data_index_) === '/' && 
   update_function_and_update_data.data.charAt(data_index_ + 1) !== '/' && 
   update_function_and_update_data.data.charAt(data_index_ + 1) !== '*' 
@@ -114,11 +114,11 @@ function recurse(data_index_) {
  }
 
  if(
-  currently_inside_of === 'template' && 
+  currently_inside_of === 'string' && 
   update_function_and_update_data.data.charAt(data_index_) === '$' && 
   update_function_and_update_data.data.charAt(data_index_ + 1) === '{'
  ) { 
-  currently_inside_of === 'literal'
+  currently_inside_of === 'script'
   recursive_counter_literal = recursive_counter_literal + 1; 
   in_function_ === true ? in_function_build_string_ += '{' : '';
   data_index_ = data_index_ + 2; 
@@ -126,30 +126,30 @@ function recurse(data_index_) {
  }
 
  if(
-  currently_inside_of === 'literal' && 
+  currently_inside_of === 'script' && 
   update_function_and_update_data.data.charAt(data_index_) === '}'
  ) {
-  currently_inside_of = 'template'; 
+  currently_inside_of = 'string'; 
   recursive_counter_literal = recursive_counter_literal - 1;
   data_index_ = data_index_ + 1;
   return recurse(data_index_);
  }
 
  if(
-  currently_inside_of === 'literal' && 
+  currently_inside_of === 'script' && 
   update_function_and_update_data.data.charAt(data_index_) === '`'
  ) { 
-  currently_inside_of = 'template'; 
+  currently_inside_of = 'string'; 
   recursive_counter_template = recursive_counter_template + 1;
   data_index_ = data_index_ + 1;
   return recurse(data_index_);
  }
 
  if(
-  currently_inside_of === 'template' && 
+  currently_inside_of === 'string' && 
   update_function_and_update_data.data.charAt(data_index_) === '`'
  ) {
-  currently_inside_of = 'literal'; 
+  currently_inside_of = 'script'; 
   recursive_counter_template = recursive_counter_template - 1;
   data_index_ = data_index_ + 1;
   if(

@@ -50,7 +50,6 @@
    let function_index = 1;
    let possibly_push_arrow = {};
    let possibly_push_regular = {};
-   let data = '';
    let data_length = 0;
    let exported_functions = [];
    let valid_parens = {};
@@ -142,7 +141,6 @@
      if(file_type !== '') {
       data_index = 0;
       update_function_and_update_data.update_data(fs.readFileSync(filepath, 'utf8'));
-      data = update_function_and_update_data.data;
       data_length = data.length;
       fp = filepath;
       line_number = 0;
@@ -322,7 +320,7 @@
    ) { 
     temp_line_number = line_number;
     bts = '<' + update_function_and_update_data.data.charAt(data_index + 1) + update_function_and_update_data.data.charAt(data_index + 2);
-    data_index = data_index + 3;
+    data_index += 3;
     data_index_and_line_number_update = html_tag(data_index, line_number, bts, update_function_and_update_data.data.charAt(data_index + 2));
     data_index = data_index_and_line_number_update.data_index;
     line_number = data_index_and_line_number_update.line_number;

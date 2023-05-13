@@ -1,6 +1,6 @@
 
 /*
- builds the function body
+ builds the function body -- possibly return the original line number and whatever 
 */
 
 let update_function_and_update_data = require('../data');
@@ -187,14 +187,7 @@ function recurse(data_index_) {
 function update(neglect_comments_before_parameter_set) { 
  data_index_ = data_index_and_line_number_update.data_index_;
  line_number_ = data_index_and_line_number_update.line_number_;
-//  if(
-//   in_parameter_set === 'out' && 
-//   typeof(neglect_comments_before_parameter_set) === 'string'
-//  ) { 
-  //if have not reached the parameter set and see a comment (which would be the only valid statement before the parameter set) dont append it to the function body
-//  } else { 
-  in_function_build_string_ += data_index_and_line_number_update.build_string; 
-//  }
+ in_function_build_string_ += data_index_and_line_number_update.build_string;
  if(in_parameter_set === 'in') { 
   parameter_string += data_index_and_line_number_update.build_string; 
  }
