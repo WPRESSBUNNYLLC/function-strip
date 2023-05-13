@@ -1,0 +1,1 @@
+//going through tokens one by one... looking for invalid previous

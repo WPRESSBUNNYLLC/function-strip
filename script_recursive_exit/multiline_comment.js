@@ -31,7 +31,7 @@ function recurse(data_index_) {
  }
 
  if(update_function_and_update_data.data.charAt(data_index_) === '\n') { 
-  line_number_ = line_number_ + 1;
+  line_number_ += 1;
  }
 
  if(
@@ -39,7 +39,7 @@ function recurse(data_index_) {
   update_function_and_update_data.data.charAt(data_index_ + 1) === '/'
  ) { 
   in_function_ === true ? in_function_build_string_ += '/' : '';
-  data_index_ = data_index_ + 2; 
+  data_index_ += 2; 
   return {
    data_index: data_index_, 
    line_number: line_number_,
@@ -47,7 +47,7 @@ function recurse(data_index_) {
   }
  }
 
- data_index_ = data_index_ + 1; 
+ data_index_ += 1; 
  return recurse(data_index_);
 
 }

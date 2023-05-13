@@ -6,22 +6,22 @@ let tokens = [];
 let ast = {};
 
 function update_data(data_) { 
- return data = data_;
+ data = data_;
 }
 
 function update_line_number(line_number_) { 
- return line_number = line_number_
+ line_number += line_number_
 }
 
 function update_data_index(data_index_) { 
- return data_index = data_index_;
+ data_index += data_index_;
 }
 
 function update_tokens(token_, type_) { 
- return tokens.push({ token: token_, type: type_ }) 
+ tokens.push({ token: token_, type: type_ })// https://dyclassroom.com/js/js-basic-concepts === more reserved key words
 }
 
-function run_ast() { }
+function build_ast() { } //just figure it out with the tokens and go in and out
 
 module.exports = {
  data: data, 
@@ -33,7 +33,7 @@ module.exports = {
 }
 
 
-//random tree practice
+//random tree practice -- remove might be wrong not sure didnt run
 
 let wow = { 
     root: 5, 

@@ -175,7 +175,7 @@
   }
  
   if(update_function_and_update_data.data.charAt(data_index) === '\n') { 
-   line_number = line_number + 1;
+   line_number += 1;
   }
  
   if(
