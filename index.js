@@ -45,7 +45,26 @@
    let tags = [];
    let temp_line_number = 0;
    let data_index = 0;
-   let first_valid_character_html_tag = /a-zA-Z0-9/;
+   let in_script_mode = false;
+   const first_valid_character_html_tag = /[a-zA-Z0-9_]/; 
+   const operator = /[=|\||<|>|!|+|\-|*|/|,|.|%|~|?|:|;|&|^|(|)|[|\]|{|}]/;
+   const look_through_operator_ = { 
+    '=': 'equals', 
+    '>': 'greater_than', 
+    '<': 'less_than', 
+    '!': 'exclamation', 
+    '+': 'plus', 
+    '-': 'minice', 
+    '*': 'times', 
+    '/': 'division', 
+    '%': 'percent', 
+    '&': 'and', 
+    '|': 'or', 
+    '^': 'power',
+    '.': 'period' // ...args in invokation maybe just keep this the same
+   }
+   const number = /[0-9]/;
+   const definition_or_key_word = /[A-Za-z$_]/;
    let data_index_and_line_number_update = {}; 
    let function_index = 1;
    let possibly_push_arrow = {};
@@ -193,7 +212,7 @@
 
   if(
    update_function_and_update_data.data.charAt(data_index) === '<' && 
-   update_function_and_update_data.data.charAt(data_index + 1).test(first_valid_character_html_tag) === true
+   update_function_and_update_data.data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
   ) { 
    temp_line_number = line_number;
    bts = '<' +  update_function_and_update_data.data.charAt(data_index + 1);
@@ -312,6 +331,33 @@
    return iterate_through_file_text(data_index);
   }
 
+  if(update_function_and_update_data.data.charAt(data_index).test(number) === true) { 
+   data_index += 1; 
+   data_index_and_line_number_update = number_(data_index, false, line_number);
+   data_index = data_index_and_line_number_update.data_index;
+   line_number = data_index_and_line_number_update.line_number;
+   return iterate_through_file_text(data_index);
+  }
+
+  if(update_function_and_update_data.data.charAt(data_index).test(definition_or_key_word) === true) { 
+   data_index += 1; 
+   data_index_and_line_number_update = definition_or_key_word_(data_index, false, line_number);
+   data_index = data_index_and_line_number_update.data_index;
+   line_number = data_index_and_line_number_update.line_number;
+   return iterate_through_file_text(data_index);
+  }
+
+  if(update_function_and_update_data.data.charAt(data_index).test(operator) === true) { 
+   if(look_through_operator_[update_function_and_update_data.data.charAt(data_index)] === false) { 
+    update_function_and_update_data.
+   }
+   data_index += 1; 
+   data_index_and_line_number_update = operator_(data_index, false, line_number);
+   data_index = data_index_and_line_number_update.data_index;
+   line_number = data_index_and_line_number_update.line_number;
+   return iterate_through_file_text(data_index);
+  }
+
   if(file_type === 'html') { 
    if(
     update_function_and_update_data.data.charAt(data_index) === '<' && 
@@ -338,6 +384,8 @@
     }
    }
   }
+
+  //below is old code used. works but not really for some things.. just going to go the long way
 
   if(function_types.regular === true) {
    possibly_push_regular = initiate_regular(data_index, line_number); 

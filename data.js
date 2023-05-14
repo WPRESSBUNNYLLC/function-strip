@@ -3,14 +3,13 @@ let data = '';
 let line_number = 0; 
 let data_index = 0; 
 let tokens = [];
-let ast = {};
 
 function update_data(data_) { 
  data = data_;
 }
 
 function update_line_number(line_number_) { 
- line_number += line_number_
+ line_number += line_number_;
 }
 
 function update_data_index(data_index_) { 
@@ -18,21 +17,37 @@ function update_data_index(data_index_) {
 }
 
 function update_tokens(token_, type_) { 
- tokens.push({ token: token_, type: type_ })// https://dyclassroom.com/js/js-basic-concepts === more reserved key words
+ tokens.push({ token: token_, type: type_ }); // value, (punctuator, number, identifier, key_word) ... will think of other things
 }
 
-function build_ast() { } //just figure it out with the tokens and go in and out
+function get_data_index() { 
+ return data_index;
+}
+
+function get_line_number() { 
+ return line_number;
+}
+
+function get_tokens() { 
+ return tokens;
+}
+
+function get_data() { 
+ return data;
+}
 
 module.exports = {
- data: data, 
- data_index: data_index, 
- line_number: line_number, 
+ get_data: get_data, 
+ get_data_index: get_data_index, 
+ get_line_number: get_line_number, 
+ get_tokens: get_tokens, 
  update_data: update_data, 
  update_data_index: update_data_index, 
- update_line_number: update_line_number
+ update_line_number: update_line_number,
+ update_tokens: update_tokens
 }
 
-//random tree practice -- remove might be wrong not sure didnt run
+//random tree practice -- remove might be wrong... not sure didnt run
 
 let wow = { 
     root: 5, 
@@ -216,6 +231,12 @@ let wow = {
   }
   
   find_one(wow, v);
+
+  function bfs() { 
+
+  }
+
+  bfs
   
   //bfs
   //reverse
