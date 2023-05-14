@@ -1,0 +1,2 @@
+first way is finding key word of function and building... just going to create sets and do this recursively for all data structures.
+This works fine but not that nice.

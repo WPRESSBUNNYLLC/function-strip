@@ -6,3 +6,6 @@ add class functions
 add the other function types in javascript 
 update_function_and_update_data.data instead of data_ -- get rid of copies after
 possibly add data_index and line_number to data.js
+
+just create a token set and iterate through that and build values recursively... then push recursively into an array to format for user.
+key word works for functions but going to get everything else
