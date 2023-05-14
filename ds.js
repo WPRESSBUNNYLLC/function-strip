@@ -1,1 +1,20 @@
-//imports tokens.. builds data structures, references etc... not a compiler
+
+let ds = {};
+
+function expect() { 
+
+}
+
+function definition() { 
+    
+}
+
+function build() {
+
+}
+
+function parse() { 
+
+}
+
+module.exports = ds;

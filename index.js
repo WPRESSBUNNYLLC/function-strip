@@ -2,14 +2,14 @@
   /* 
 
    Title: function parser
-   description: strips functions from files
+   description: strips and labels data structures from files with references
 
    Author: Alex
    
   */
 
    let fs = require('file-system');
-   let update_function_and_update_data = require('./data');
+   let vip = require('./data');
 
    let initiate_arrow = require('generate/functions/arrowJs/arrow_main');
    let initiate_regular = require('generate/functions/regularJs/regular_main');
@@ -17,12 +17,12 @@
    let html_tag = require('generate/html_recursive_exit/html_tag');
    let html_comment = require('./html_recursive_exit/html_comment');
 
-   let double_quote_string = require('./script_recursive_exit/double_quote_string');
-   let multiline_comment = require('./script_recursive_exit/multiline_comment');
+   let double_quote_string = require('generate/script_recursive_exit/double-quote-string');
+   let multiline_comment = require('generate/script_recursive_exit/multiline-comment');
    let regex = require('./script_recursive_exit/regex');
-   let single_quote_string = require('./script_recursive_exit/single_quote_string');
-   let singleline_comment = require('./script_recursive_exit/singleline_comment');
-   let template_string = require('./script_recursive_exit/template_string');
+   let single_quote_string = require('generate/script_recursive_exit/single-quote-string');
+   let singleline_comment = require('generate/script_recursive_exit/singleline-comment');
+   let template_string = require('generate/script_recursive_exit/template-string');
 
    /* 
    * data about the file. line_number and fp used in the build string description
@@ -158,17 +158,13 @@
       file_type = '';
      }
      if(file_type !== '') {
-      data_index = 0;
-      update_function_and_update_data.update_data(fs.readFileSync(filepath, 'utf8'));
-      data_length = data.length;
-      fp = filepath;
-      line_number = 0;
+      vip.update_data(fs.readFileSync(filepath, 'utf8'), filepath);
       valid_parens = {};
       try {
        if(file_type === 'html') { 
-        run_from_html(data_index);
+        run_from_html();
        } else { 
-        iterate_through_file_text(data_index);
+        iterate_through_file_text();
        }
       } catch(err) { 
        console.log(err.message + '\n' + 'filepath: ' + filepath); 
@@ -179,74 +175,66 @@
    
   }
 
+  //run and return data structures...
+
   return exported_functions;
  
  }
 
- /*
-  when in an html file, find script tag and run the script function
- */
-
  function run_from_html(data_index) { 
  
-  if(data_index > data_length) { 
+  if(vip.get_data_index() > vip.get_data_length()) { 
    return;
   }
  
-  if(update_function_and_update_data.data.charAt(data_index) === '\n') { 
-   line_number += 1;
+  if(vip.get_data().charAt(data_index) === '\n') { 
+   vip.update_line_number(1);
   }
  
   if(
-   update_function_and_update_data.data.charAt(data_index) === '<' && 
-   update_function_and_update_data.data.charAt(data_index + 1) === '!' && 
-   update_function_and_update_data.data.charAt(data_index + 2) === '-' && 
-   update_function_and_update_data.data.charAt(data_index + 3) === '-' 
+   vip.get_data().charAt(vip.get_data_index()) === '<' && 
+   vip.get_data().charAt(vip.get_data_index()  + 1) === '!' && 
+   vip.data.charAt(vip.get_data_index() + 2) === '-' && 
+   vip.data.charAt(vip.get_data_index() + 3) === '-' 
   ) { 
-   data_index += 4; 
-   data_index_and_line_number_update = html_comment(data_index, false, line_number);
-   data_index = data_index_and_line_number_update.data_index;
-   line_number = data_index_and_line_number_update.line_number;
-   return run_from_html(data_index);
+   vip.update_data_index(4);
+   html_comment(false);
+   return run_from_html();
   }
 
   if(
-   update_function_and_update_data.data.charAt(data_index) === '<' && 
-   update_function_and_update_data.data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
+   vip.get_data().charAt(vip.get_data_index()) === '<' && 
+   vip.get_data().charAt(vip.get_data_index() + 2).test(first_valid_character_html_tag) === true
   ) { 
-   temp_line_number = line_number;
-   bts = '<' +  update_function_and_update_data.data.charAt(data_index + 1);
-   data_index += 2;
-   data_index_and_line_number_update = html_tag(data_index, line_number, bts, update_function_and_update_data.data.charAt(data_index + 1));
-   data_index = data_index_and_line_number_update.data_index;
-   line_number = data_index_and_line_number_update.line_number;
+   temp_line_number = vip.get_line_number();
+   bts = '<' +  vip.get_data().charAt(vip.get_data_index()  + 1);
+   vip.update_data_index(2);
+   data_index_and_line_number_update = html_tag(data_index, line_number, bts, vip.get_data().charAt(vip.get_data_index()  + 1));
    tags.push({
     tag_line_number_start: temp_line_number, 
-    tag_line_number_end: line_number, 
+    tag_line_number_end: vip.get_line_number(), 
     type: 'opening', 
     name: data_index_and_line_number_update.script_name.toLowerCase(), 
     tag_string: data_index_and_line_number_update.tag_string
    })
    if(data_index_and_line_number_update.script_name.toLowerCase() === 'script') { 
-    iterate_through_file_text(data_index);
+    iterate_through_file_text();
    } 
-   return run_from_html(data_index);
+   return run_from_html();
   }
 
   if(
-   update_function_and_update_data.data.charAt(data_index) === '<' && 
-   update_function_and_update_data.data.charAt(data_index + 1) === '/' &&
-   update_function_and_update_data.data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
+   vip.get_data().charAt(vip.get_data_index()) === '<' && 
+   vip.get_data().charAt(vip.get_data_index()  + 1) === '/' &&
+   vip.get_data().charAt(vip.get_data_index() + 2).test(first_valid_character_html_tag) === true
   ) { 
-   temp_line_number = line_number;
-   bts = '<' + update_function_and_update_data.data.charAt(data_index + 1) + update_function_and_update_data.data.charAt(data_index + 2);
-   data_index += 3;
-   data_index_and_line_number_update = html_tag(data_index, line_number, bts, update_function_and_update_data.data.charAt(data_index + 2));
-   data_index = data_index_and_line_number_update.data_index;
-   line_number = data_index_and_line_number_update.line_number;
+   temp_line_number = vip.get_line_number();
+   bts = '<' + vip.get_data().charAt(vip.get_data_index()  + 1) + vip.get_data().charAt(vip.get_data_index() + 2);
+   vip.update_data_index(3);
+   data_index_and_line_number_update = html_tag(bts, vip.data.charAt(vip.get_data_index() + 2));
    tags.push({
     tag_line_number_start: temp_line_number, 
-    tag_line_number_end: line_number, 
+    tag_line_number_end: vip.get_line_number(), 
     type: 'closing', 
     name: data_index_and_line_number_update.script_name.toLowerCase(), 
     tag_string: data_index_and_line_number_update.tag_string
@@ -254,130 +242,131 @@
    return run_from_html(data_index);
   }
 
-  data_index += 1; 
+  vip.update_data_index(1); 
   return run_from_html(data_index);
   
  }
  
- /*
-  building the function outside of certain things like comments etc...
- */
+ function iterate_through_file_text() {
  
- function iterate_through_file_text(data_index) {
- 
-  if(data_index > data_length) { 
+  if(vip.get_data_index() > vip.get_data_length()) { 
    return;
   }
  
-  if(update_function_and_update_data.data.charAt(data_index) === '\n') { 
-   line_number += 1;
+  if(vip.get_data().charAt(data_index) === '\n') { 
+   vip.update_line_number(1)
   }
 
   if(
-   update_function_and_update_data.data.charAt(data_index) === '/' &&
-   update_function_and_update_data.data.charAt(data_index + 1) === '*'
+   vip.get_data().charAt(vip.get_data_index()) === '/' &&
+   vip.get_data().charAt(vip.get_data_index()  + 1) === '*'
   ) { 
-   data_index += 2; 
-   data_index_and_line_number_update = multiline_comment(data_index, false, line_number, '');
-   data_index = data_index_and_line_number_update.data_index;
-   line_number = data_index_and_line_number_update.line_number;
-   return iterate_through_file_text(data_index);
+   vip.update_data_index(2); 
+   multiline_comment(false, '');
+   return iterate_through_file_text();
   }
 
   if(
-   update_function_and_update_data.data.charAt(data_index) === '/' &&
-   update_function_and_update_data.data.charAt(data_index + 1) === '/'
+   vip.get_data().charAt(vip.get_data_index()) === '/' &&
+   vip.get_data().charAt(vip.get_data_index()  + 1) === '/'
   ) { 
-   data_index += 2; 
-   data_index_and_line_number_update = singleline_comment(data_index, false, line_number);
-   data_index = data_index_and_line_number_update.data_index;
-   line_number = data_index_and_line_number_update.line_number;
-   return iterate_through_file_text(data_index);
+   vip.update_data_index(2); 
+   singleline_comment(false);
+   return iterate_through_file_text();
   }
 
   if(
-   update_function_and_update_data.data.charAt(data_index) === '/' && 
-   update_function_and_update_data.data.charAt(data_index + 1) !== '/' && 
-   update_function_and_update_data.data.charAt(data_index + 1) !== '*'
+   vip.get_data().charAt(vip.get_data_index()) === '/' &&
+   vip.get_data().charAt(vip.get_data_index()  + 1) !== '/' && 
+   vip.get_data().charAt(vip.get_data_index()  + 1) !== '*'
   ) {
-   data_index += 2; 
-   data_index_and_line_number_update = regex(data_index, false, line_number);
-   data_index = data_index_and_line_number_update.data_index;
-   line_number = data_index_and_line_number_update.line_number;
-   return iterate_through_file_text(data_index);
+   vip.update_current_token_type('regex');
+   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
+   vip.update_current_token(vip.get_data().charAt(vip.get_data_index() + 1));
+   vip.update_data_index(2); 
+   regex(false);
+   vip.update_tokens();
+   return iterate_through_file_text();
   }
 
-  if(update_function_and_update_data.data.charAt(data_index) === '"') { 
-   data_index += 1; 
-   data_index_and_line_number_update = double_quote_string(data_index, false, line_number, false);
-   data_index = data_index_and_line_number_update.data_index;
-   line_number = data_index_and_line_number_update.line_number;
-   return iterate_through_file_text(data_index);
+  if(vip.get_data().charAt(vip.get_data_index()) === '"') { 
+   vip.update_current_token_type('single-quote');
+   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
+   vip.update_data_index(1); 
+   double_quote_string(false, false);
+   vip.update_tokens();
+   return iterate_through_file_text();
   }
 
-  if(update_function_and_update_data.data.charAt(data_index) === "'") { 
-   data_index += 1; 
-   data_index_and_line_number_update = single_quote_string(data_index, false, line_number, false);
-   data_index = data_index_and_line_number_update.data_index;
-   line_number = data_index_and_line_number_update.line_number;
-   return iterate_through_file_text(data_index);
+  if(vip.get_data().charAt(vip.get_data_index()) === "'") { 
+   vip.update_current_token_type('double-quote');
+   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
+   vip.update_data_index(1); 
+   single_quote_string(false, false);
+   vip.update_tokens();
+   return iterate_through_file_text();
   }
 
-  if(update_function_and_update_data.data.charAt(data_index) === '`') { 
-   data_index += 1; 
-   data_index_and_line_number_update = template_string(data_index, false, line_number);
-   data_index = data_index_and_line_number_update.data_index;
-   line_number = data_index_and_line_number_update.line_number;
-   return iterate_through_file_text(data_index);
+  if(vip.get_data().charAt(vip.get_data_index()) === '`') { 
+   vip.update_current_token_type('template-string');
+   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
+   vip.update_data_index(1); 
+   template_string(false);
+   vip.update_tokens();
+   return iterate_through_file_text();
   }
 
-  if(update_function_and_update_data.data.charAt(data_index).test(number) === true) { 
-   data_index += 1; 
-   data_index_and_line_number_update = number_(data_index, false, line_number);
-   data_index = data_index_and_line_number_update.data_index;
-   line_number = data_index_and_line_number_update.line_number;
-   return iterate_through_file_text(data_index);
+  if(vip.get_data().charAt(vip.get_data_index()).test(number) === true) { 
+   vip.update_current_token_type('number');
+   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
+   vip.update_data_index(1); 
+   number_(false);
+   vip.update_tokens();
+   return iterate_through_file_text();
   }
 
-  if(update_function_and_update_data.data.charAt(data_index).test(definition_or_key_word) === true) { 
-   data_index += 1; 
-   data_index_and_line_number_update = definition_or_key_word_(data_index, false, line_number);
-   data_index = data_index_and_line_number_update.data_index;
-   line_number = data_index_and_line_number_update.line_number;
-   return iterate_through_file_text(data_index);
+  if(vip.get_data().charAt(vip.get_data_index()).test(definition_or_key_word) === true) { 
+   vip.update_current_token_type('to be determined as key word or identifier');
+   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
+   vip.update_data_index(1); 
+   key_word_or_identifier_(false);
+   vip.update_tokens();
+   return iterate_through_file_text();
   }
 
-  if(update_function_and_update_data.data.charAt(data_index).test(operator) === true) { 
-   if(look_through_operator_[update_function_and_update_data.data.charAt(data_index)] === false) { 
-    update_function_and_update_data.
+  if(vip.get_data().charAt(vip.get_data_index()).test(operator) === true) { 
+   if(look_through_operator_[vip.get_data().charAt(vip.get_data_index())] === false) {
+    vip.update_tokens(vip.get_data().charAt(vip.get_data_index()), 'punctuator');
+    vip.update_tokens();
+    vip.update_data_index(1);
+    return iterate_through_file_text();
    }
-   data_index += 1; 
-   data_index_and_line_number_update = operator_(data_index, false, line_number);
-   data_index = data_index_and_line_number_update.data_index;
-   line_number = data_index_and_line_number_update.line_number;
-   return iterate_through_file_text(data_index);
+   vip.update_current_token_type('operator');
+   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
+   vip.update_data_index(1); 
+   operator_(false);
+   vip.update_tokens();
+   return iterate_through_file_text();
   }
 
   if(file_type === 'html') { 
    if(
-    update_function_and_update_data.data.charAt(data_index) === '<' && 
-    update_function_and_update_data.data.charAt(data_index + 1) === '/' &&
-    update_function_and_update_data.data.charAt(data_index + 2).test(first_valid_character_html_tag) === true
+    vip.get_data().charAt(vip.get_data_index()) === '<' && 
+    vip.get_data().charAt(vip.get_data_index()  + 1) === '/' &&
+    vip.get_data().charAt(vip.get_data_index() + 2).test(first_valid_character_html_tag) === true
    ) { 
-    temp_line_number = line_number;
-    bts = '<' + update_function_and_update_data.data.charAt(data_index + 1) + update_function_and_update_data.data.charAt(data_index + 2);
-    data_index += 3;
-    data_index_and_line_number_update = html_tag(data_index, line_number, bts, update_function_and_update_data.data.charAt(data_index + 2));
-    data_index = data_index_and_line_number_update.data_index;
-    line_number = data_index_and_line_number_update.line_number;
+    temp_line_number = vip.get_line_number();
+    bts = '<' + vip.get_data().charAt(vip.get_data_index()  + 1) + vip.data.charAt(vip.get_data_index() + 2);
+    vip.update_data_index(3);
+    data_index_and_line_number_update = html_tag(bts, vip.data.charAt(data_index + 2));
     tags.push({
      tag_line_number_start: temp_line_number, 
-     tag_line_number_end: line_number, 
+     tag_line_number_end: vip.get_line_number(), 
      type: 'closing', 
      name: data_index_and_line_number_update.script_name.toLowerCase(), 
      tag_string: data_index_and_line_number_update.tag_string
     })
-    if(data_index_and_line_number_update.script_name.toLowerCase() === 'script') { //should always be script
+    if(data_index_and_line_number_update.script_name.toLowerCase() === 'script') {
      return;
     } else { 
      return iterate_through_file_text(data_index);
@@ -385,63 +374,13 @@
    }
   }
 
-  //below is old code used. works but not really for some things.. just going to go the long way
+  vip.update_current_token_type('unknown');
+  vip.reset_current_token();
+  vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
+  vip.update_tokens();
 
-  if(function_types.regular === true) {
-   possibly_push_regular = initiate_regular(data_index, line_number); 
-   if(possibly_push_regular.is_function === true) { 
-    exported_functions.push({ 
-     index: function_index, 
-     filepath: fp, 
-     beginning_line_number: possibly_push_regular.beginning_line_number,
-     ending_line_number: possibly_push_regular.ending_line_number,
-     function_: possibly_push_regular.build_string, 
-     is_async: possibly_push_regular.is_async, 
-     has_name: possibly_push_regular.has_name, 
-     parameters: possibly_push_regular.parameters
-    });
-    line_number = possibly_push_regular.ending_line_number;
-    data_index = possibly_push_regular.data_index;
-    function_index += 1;
-    return iterate_through_file_text(data_index);
-   }
-  }
-
-  if(update_function_and_update_data.data.charAt(data_index) === '(') { 
-   valid_parens[`${data_index}-opening`] = true;
-   data_index += 1;
-   return iterate_through_file_text(data_index);
-  } 
-  
-  if(update_function_and_update_data.data.charAt(data_index) === ')') { 
-   valid_parens[`${data_index}-closing`] = true;
-   data_index += 1;
-   return iterate_through_file_text(data_index);
-  }
-
-  if(function_types.arrow === true) {
-   possibly_push_arrow = initiate_arrow(data_index, line_number, valid_parens);
-   if(possibly_push_arrow.is_function === true) { 
-    exported_functions.push({ 
-     index: function_index, 
-     filepath: fp, 
-     beginning_line_number: possibly_push_arrow.beginning_line_number,
-     ending_line_number: possibly_push_arrow.ending_line_number,
-     function_: possibly_push_arrow.build_string, 
-     is_async: possibly_push_arrow.is_async, 
-     has_name: possibly_push_arrow.has_name, 
-     parameters: possibly_push_arrow.parameters
-    });
-    line_number = possibly_push_arrow.ending_line_number;
-    data_index = possibly_push_arrow.data_index;
-    function_index += 1;
-    valid_parens = {};
-    return iterate_through_file_text(data_index);
-   }
-  }
-
-  data_index += 1; 
-  return iterate_through_file_text(data_index);
+  vip.update_data_index(1); 
+  return iterate_through_file_text();
  
  }
 

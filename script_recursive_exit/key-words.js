@@ -39,7 +39,7 @@ module.exports = {
 'long' : true,	
 'native' : true,	
 'new' : true,
-'null' : true,	//riht side
+'null' : true,	//right side
 'package' : true,	
 'private' : true,	
 'protected' : true,

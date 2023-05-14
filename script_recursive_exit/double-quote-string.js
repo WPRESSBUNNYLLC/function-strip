@@ -3,7 +3,7 @@
  determines when ending a single quote string
 */
 
-let update_function_and_update_data = require('../data');
+let update_function_and_update_data = require('generate/data');
 
 let data_index_ = 0;
 let in_function_ = false
