@@ -1,4 +1,4 @@
-  
+    
   /* 
 
    Title: function parser
@@ -9,7 +9,7 @@
   */
 
    let fs = require('file-system');
-   let vip = require('./data');
+   let shared = require('./data');
 
    let initiate_arrow = require('generate/functions/arrowJs/arrow_main');
    let initiate_regular = require('generate/functions/regularJs/regular_main');
@@ -37,18 +37,16 @@
    * @param {file_type} whether a .html, .js or .ts file. Used for determining certain types of functions and when to check for functions. example <script
    * @param {function_types} types of functions being stripped
    * @param {valid_parens} valid parens for backtracking beginning of regular
-   * @param {data_index_and_line_number_update} used to copy index and line number back over from other file to main
+   * @param {tagg_update} used to copy index and line number back over from other file to main
    * @param {function_types} the different functions to execute
    */
 
    let bts = '';
    let tags = [];
    let temp_line_number = 0;
-   let data_index = 0;
-   let in_script_mode = false;
    const first_valid_character_html_tag = /[a-zA-Z0-9_]/; 
-   const operator = /[=|\||<|>|!|+|\-|*|/|,|.|%|~|?|:|;|&|^|(|)|[|\]|{|}]/;
-   const look_through_operator_ = { 
+   const punctuator = /[=|\||<|>|!|+|\-|*|/|,|.|%|~|?|:|;|&|^|(|)|[|\]|{|}]/;
+   const look_through_punctuator_ = { 
     '=': 'equals', 
     '>': 'greater_than', 
     '<': 'less_than', 
@@ -61,25 +59,13 @@
     '&': 'and', 
     '|': 'or', 
     '^': 'power',
-    '.': 'period' // ...args in invokation maybe just keep this the same
+    '.': 'period'
    }
    const number = /[0-9]/;
-   const definition_or_key_word = /[A-Za-z$_]/;
-   let data_index_and_line_number_update = {}; 
-   let function_index = 1;
-   let possibly_push_arrow = {};
-   let possibly_push_regular = {};
-   let data_length = 0;
-   let exported_functions = [];
-   let valid_parens = {};
-   let fp = '';
-   let line_number = 0;
+   const identifier = /[A-Za-z$_]/;
+   let tagg_update = {}; 
    let folders = [];
    let file_type = '';
-   let function_types = {
-     regular: true,
-     arrow: true, 
-   }
  
  /* 
    * search folders, files and get all arrow functions with and without brackets regular functions with brackets. line numbers, filepaths, function names.
@@ -158,8 +144,7 @@
       file_type = '';
      }
      if(file_type !== '') {
-      vip.update_data(fs.readFileSync(filepath, 'utf8'), filepath);
-      valid_parens = {};
+      shared.update_data(fs.readFileSync(filepath, 'utf8'), filepath);
       try {
        if(file_type === 'html') { 
         run_from_html();
@@ -177,196 +162,192 @@
 
   //run and return data structures...
 
-  return exported_functions;
- 
  }
 
  function run_from_html(data_index) { 
  
-  if(vip.get_data_index() > vip.get_data_length()) { 
+  if(shared.get_data_index() > shared.get_data_length()) { 
    return;
   }
  
-  if(vip.get_data().charAt(data_index) === '\n') { 
-   vip.update_line_number(1);
+  if(shared.get_data().charAt(data_index) === '\n') { 
+   shared.update_line_number(1);
   }
  
   if(
-   vip.get_data().charAt(vip.get_data_index()) === '<' && 
-   vip.get_data().charAt(vip.get_data_index()  + 1) === '!' && 
-   vip.data.charAt(vip.get_data_index() + 2) === '-' && 
-   vip.data.charAt(vip.get_data_index() + 3) === '-' 
+   shared.get_data().charAt(shared.get_data_index()) === '<' && 
+   shared.get_data().charAt(shared.get_data_index()  + 1) === '!' && 
+   shared.data.charAt(shared.get_data_index() + 2) === '-' && 
+   shared.data.charAt(shared.get_data_index() + 3) === '-' 
   ) { 
-   vip.update_data_index(4);
+   shared.update_data_index(4);
    html_comment(false);
    return run_from_html();
   }
 
   if(
-   vip.get_data().charAt(vip.get_data_index()) === '<' && 
-   vip.get_data().charAt(vip.get_data_index() + 2).test(first_valid_character_html_tag) === true
+   shared.get_data().charAt(shared.get_data_index()) === '<' && 
+   shared.get_data().charAt(shared.get_data_index() + 2).test(first_valid_character_html_tag) === true
   ) { 
-   temp_line_number = vip.get_line_number();
-   bts = '<' +  vip.get_data().charAt(vip.get_data_index()  + 1);
-   vip.update_data_index(2);
-   data_index_and_line_number_update = html_tag(data_index, line_number, bts, vip.get_data().charAt(vip.get_data_index()  + 1));
+   temp_line_number = shared.get_line_number();
+   bts = '<' +  shared.get_data().charAt(shared.get_data_index()  + 1);
+   shared.update_data_index(2);
+   tagg_update = html_tag(data_index, line_number, bts, shared.get_data().charAt(shared.get_data_index()  + 1));
    tags.push({
     tag_line_number_start: temp_line_number, 
-    tag_line_number_end: vip.get_line_number(), 
+    tag_line_number_end: shared.get_line_number(), 
     type: 'opening', 
-    name: data_index_and_line_number_update.script_name.toLowerCase(), 
-    tag_string: data_index_and_line_number_update.tag_string
+    name: tagg_update.script_name.toLowerCase(), 
+    tag_string: tagg_update.tag_string
    })
-   if(data_index_and_line_number_update.script_name.toLowerCase() === 'script') { 
+   if(tagg_update.script_name.toLowerCase() === 'script') { 
     iterate_through_file_text();
    } 
    return run_from_html();
   }
 
   if(
-   vip.get_data().charAt(vip.get_data_index()) === '<' && 
-   vip.get_data().charAt(vip.get_data_index()  + 1) === '/' &&
-   vip.get_data().charAt(vip.get_data_index() + 2).test(first_valid_character_html_tag) === true
+   shared.get_data().charAt(shared.get_data_index()) === '<' && 
+   shared.get_data().charAt(shared.get_data_index() + 1) === '/' &&
+   shared.get_data().charAt(shared.get_data_index() + 2).test(first_valid_character_html_tag) === true
   ) { 
-   temp_line_number = vip.get_line_number();
-   bts = '<' + vip.get_data().charAt(vip.get_data_index()  + 1) + vip.get_data().charAt(vip.get_data_index() + 2);
-   vip.update_data_index(3);
-   data_index_and_line_number_update = html_tag(bts, vip.data.charAt(vip.get_data_index() + 2));
+   temp_line_number = shared.get_line_number();
+   bts = '<' + shared.get_data().charAt(shared.get_data_index() + 1) + shared.get_data().charAt(shared.get_data_index() + 2);
+   shared.update_data_index(3);
+   tagg_update = html_tag(bts, shared.data.charAt(shared.get_data_index() + 2));
    tags.push({
     tag_line_number_start: temp_line_number, 
-    tag_line_number_end: vip.get_line_number(), 
+    tag_line_number_end: shared.get_line_number(), 
     type: 'closing', 
-    name: data_index_and_line_number_update.script_name.toLowerCase(), 
-    tag_string: data_index_and_line_number_update.tag_string
+    name: tagg_update.script_name.toLowerCase(), 
+    tag_string: tagg_update.tag_string
    })
    return run_from_html(data_index);
   }
 
-  vip.update_data_index(1); 
+  shared.update_data_index(1); 
   return run_from_html(data_index);
   
  }
  
  function iterate_through_file_text() {
  
-  if(vip.get_data_index() > vip.get_data_length()) { 
+  if(shared.get_data_index() > shared.get_data_length()) { 
    return;
   }
  
-  if(vip.get_data().charAt(data_index) === '\n') { 
-   vip.update_line_number(1)
+  if(shared.get_data().charAt(data_index) === '\n') { 
+   shared.update_line_number(1)
   }
 
   if(
-   vip.get_data().charAt(vip.get_data_index()) === '/' &&
-   vip.get_data().charAt(vip.get_data_index()  + 1) === '*'
+   shared.get_data().charAt(shared.get_data_index()) === '/' &&
+   shared.get_data().charAt(shared.get_data_index() + 1) === '*'
   ) { 
-   vip.update_data_index(2); 
+   shared.update_data_index(2); 
    multiline_comment(false, '');
    return iterate_through_file_text();
   }
 
   if(
-   vip.get_data().charAt(vip.get_data_index()) === '/' &&
-   vip.get_data().charAt(vip.get_data_index()  + 1) === '/'
+   shared.get_data().charAt(shared.get_data_index()) === '/' &&
+   shared.get_data().charAt(shared.get_data_index() + 1) === '/'
   ) { 
-   vip.update_data_index(2); 
+   shared.update_data_index(2); 
    singleline_comment(false);
    return iterate_through_file_text();
   }
 
   if(
-   vip.get_data().charAt(vip.get_data_index()) === '/' &&
-   vip.get_data().charAt(vip.get_data_index()  + 1) !== '/' && 
-   vip.get_data().charAt(vip.get_data_index()  + 1) !== '*'
+   shared.get_data().charAt(shared.get_data_index()) === '/' &&
+   shared.get_data().charAt(shared.get_data_index() + 1) !== '/' && 
+   shared.get_data().charAt(shared.get_data_index() + 1) !== '*'
   ) {
-   vip.update_current_token_type('regex');
-   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
-   vip.update_current_token(vip.get_data().charAt(vip.get_data_index() + 1));
-   vip.update_data_index(2); 
+   shared.update_current_token_type('regex-literal');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
+   shared.update_data_index(2); 
    regex(false);
-   vip.update_tokens();
+   shared.update_tokens();
    return iterate_through_file_text();
   }
 
-  if(vip.get_data().charAt(vip.get_data_index()) === '"') { 
-   vip.update_current_token_type('single-quote');
-   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
-   vip.update_data_index(1); 
+  if(shared.get_data().charAt(shared.get_data_index()) === '"') { 
+   shared.update_current_token_type('string-literal');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_data_index(1); 
    double_quote_string(false, false);
-   vip.update_tokens();
+   shared.update_tokens();
    return iterate_through_file_text();
   }
 
-  if(vip.get_data().charAt(vip.get_data_index()) === "'") { 
-   vip.update_current_token_type('double-quote');
-   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
-   vip.update_data_index(1); 
+  if(shared.get_data().charAt(shared.get_data_index()) === "'") { 
+   shared.update_current_token_type('string-literal');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_data_index(1); 
    single_quote_string(false, false);
-   vip.update_tokens();
+   shared.update_tokens();
    return iterate_through_file_text();
   }
 
-  if(vip.get_data().charAt(vip.get_data_index()) === '`') { 
-   vip.update_current_token_type('template-string');
-   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
-   vip.update_data_index(1); 
+  if(shared.get_data().charAt(shared.get_data_index()) === '`') { 
+   shared.update_current_token_type('template-literal');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_data_index(1); 
    template_string(false);
-   vip.update_tokens();
+   shared.update_tokens();
    return iterate_through_file_text();
   }
 
-  if(vip.get_data().charAt(vip.get_data_index()).test(number) === true) { 
-   vip.update_current_token_type('number');
-   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
-   vip.update_data_index(1); 
+  if(shared.get_data().charAt(shared.get_data_index()).test(number) === true) { 
+   shared.update_current_token_type('numeric-literal');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_data_index(1); 
    number_(false);
-   vip.update_tokens();
+   shared.update_tokens();
    return iterate_through_file_text();
   }
 
-  if(vip.get_data().charAt(vip.get_data_index()).test(definition_or_key_word) === true) { 
-   vip.update_current_token_type('to be determined as key word or identifier');
-   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
-   vip.update_data_index(1); 
-   key_word_or_identifier_(false);
-   vip.update_tokens();
+  if(shared.get_data().charAt(shared.get_data_index()).test(identifier) === true) { 
+   shared.update_current_token_type('identifier');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_data_index(1); 
+   identifier_(false);
+   shared.update_tokens();
    return iterate_through_file_text();
   }
 
-  if(vip.get_data().charAt(vip.get_data_index()).test(operator) === true) { 
-   if(look_through_operator_[vip.get_data().charAt(vip.get_data_index())] === false) {
-    vip.update_tokens(vip.get_data().charAt(vip.get_data_index()), 'punctuator');
-    vip.update_tokens();
-    vip.update_data_index(1);
+  if(shared.get_data().charAt(shared.get_data_index()).test(punctuator) === true) { 
+   shared.update_current_token_type('punctuator');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_data_index(1);
+   if(look_through_punctuator_[shared.get_data().charAt(shared.get_data_index())] === false) {
+    shared.update_tokens();
     return iterate_through_file_text();
    }
-   vip.update_current_token_type('operator');
-   vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
-   vip.update_data_index(1); 
-   operator_(false);
-   vip.update_tokens();
+   punctuator_(false);
+   shared.update_tokens();
    return iterate_through_file_text();
   }
 
   if(file_type === 'html') { 
    if(
-    vip.get_data().charAt(vip.get_data_index()) === '<' && 
-    vip.get_data().charAt(vip.get_data_index()  + 1) === '/' &&
-    vip.get_data().charAt(vip.get_data_index() + 2).test(first_valid_character_html_tag) === true
+    shared.get_data().charAt(shared.get_data_index()) === '<' && 
+    shared.get_data().charAt(shared.get_data_index()  + 1) === '/' &&
+    shared.get_data().charAt(shared.get_data_index() + 2).test(first_valid_character_html_tag) === true
    ) { 
-    temp_line_number = vip.get_line_number();
-    bts = '<' + vip.get_data().charAt(vip.get_data_index()  + 1) + vip.data.charAt(vip.get_data_index() + 2);
-    vip.update_data_index(3);
-    data_index_and_line_number_update = html_tag(bts, vip.data.charAt(data_index + 2));
+    temp_line_number = shared.get_line_number();
+    bts = '<' + shared.get_data().charAt(shared.get_data_index() + 1) + shared.data.charAt(shared.get_data_index() + 2);
+    shared.update_data_index(3);
+    tagg_update = html_tag(bts, shared.data.charAt(data_index + 2));
     tags.push({
      tag_line_number_start: temp_line_number, 
-     tag_line_number_end: vip.get_line_number(), 
+     tag_line_number_end: shared.get_line_number(), 
      type: 'closing', 
-     name: data_index_and_line_number_update.script_name.toLowerCase(), 
-     tag_string: data_index_and_line_number_update.tag_string
+     name: tagg_update.script_name.toLowerCase(), 
+     tag_string: tagg_update.tag_string
     })
-    if(data_index_and_line_number_update.script_name.toLowerCase() === 'script') {
+    if(tagg_update.script_name.toLowerCase() === 'script') {
      return;
     } else { 
      return iterate_through_file_text(data_index);
@@ -374,12 +355,16 @@
    }
   }
 
-  vip.update_current_token_type('unknown');
-  vip.reset_current_token();
-  vip.update_current_token(vip.get_data().charAt(vip.get_data_index()));
-  vip.update_tokens();
+  if(
+   shared.get_data().charAt(shared.get_data_index()) !== ' ' && 
+   shared.get_data().charAt(shared.get_data_index()) !== '\n'
+  ) {
+   shared.update_current_token_type('unknown');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_tokens();
+  }
 
-  vip.update_data_index(1); 
+  shared.update_data_index(1); 
   return iterate_through_file_text();
  
  }

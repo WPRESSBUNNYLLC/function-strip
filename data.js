@@ -8,6 +8,7 @@ let token_file_path = '';
 let current_look_ahead_token = '';
 let current_look_ahead_token_type = '';
 let in_script_mode_ = false;
+let in_value_error = ''; //if in a regular expression and encounter a new line before termination... etc
 
 function update_data(data_, file_name) { 
  data = data_;
@@ -35,10 +36,12 @@ function update_tokens() {
  tokens.push({ 
   token: current_look_ahead_token, 
   type: current_look_ahead_token_type, 
-  file_path: token_file_path 
+  file_path: token_file_path, 
+  error: in_value_error
  });
  current_look_ahead_token = '';
  current_look_ahead_token_type = '';
+ in_value_error = '';
 }
 
 function update_current_token(token_character) { 
@@ -81,6 +84,10 @@ function in_script_mode(mode) {
  in_script_mode_ = mode;
 }
 
+function set_in_value_error(error) { 
+ in_value_error = '';
+}
+
 module.exports = {
  get_data: get_data, 
  get_data_index: get_data_index, 
@@ -96,5 +103,6 @@ module.exports = {
  set_data_index: set_data_index,
  update_line_number: update_line_number,
  update_tokens: update_tokens, 
- in_script_mode: in_script_mode
+ in_script_mode: in_script_mode, 
+ set_in_value_error: set_in_value_error
 }
