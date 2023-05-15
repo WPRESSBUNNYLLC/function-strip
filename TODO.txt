@@ -16,7 +16,9 @@ track new line errors in token...
   // /
 
 
-//random tree practice -- remove might be wrong... not sure didnt run just like i didnt run this entire program let alone doing it my way. 
+//random tree practice -- remove might be wrong... not sure didnt run just like i didnt run this entire program let alone doing it my way.
+//make sure to rid multiple opening parens i token set
+//create defintitions and check for same 
 
 let wow = { 
     root: 5, 
@@ -220,59 +222,3 @@ let wow = {
   //reverse
   //if balanced
   ///...
-
-
-    // //below is old code used. works but not really for some things.. just going to go the long way
-
-  // if(function_types.regular === true) {
-  //  possibly_push_regular = initiate_regular(data_index, line_number); 
-  //  if(possibly_push_regular.is_function === true) { 
-  //   exported_functions.push({ 
-  //    index: function_index, 
-  //    filepath: fp, 
-  //    beginning_line_number: possibly_push_regular.beginning_line_number,
-  //    ending_line_number: possibly_push_regular.ending_line_number,
-  //    function_: possibly_push_regular.build_string, 
-  //    is_async: possibly_push_regular.is_async, 
-  //    has_name: possibly_push_regular.has_name, 
-  //    parameters: possibly_push_regular.parameters
-  //   });
-  //   line_number = possibly_push_regular.ending_line_number;
-  //   data_index = possibly_push_regular.data_index;
-  //   function_index += 1;
-  //   return iterate_through_file_text(data_index);
-  //  }
-  // }
-
-  // if(vip.get_data().charAt(data_index) === '(') { 
-  //  valid_parens[`${data_index}-opening`] = true;
-  //  vip.update_data_index(1);
-  //  return iterate_through_file_text(data_index);
-  // } 
-  
-  // if(vip.get_data().charAt(data_index) === ')') { 
-  //  valid_parens[`${data_index}-closing`] = true;
-  //  vip.update_data_index(1);
-  //  return iterate_through_file_text(data_index);
-  // }
-
-  // if(function_types.arrow === true) {
-  //  possibly_push_arrow = initiate_arrow(data_index, line_number, valid_parens);
-  //  if(possibly_push_arrow.is_function === true) { 
-  //   exported_functions.push({ 
-  //    index: function_index, 
-  //    filepath: fp, 
-  //    beginning_line_number: possibly_push_arrow.beginning_line_number,
-  //    ending_line_number: possibly_push_arrow.ending_line_number,
-  //    function_: possibly_push_arrow.build_string, 
-  //    is_async: possibly_push_arrow.is_async, 
-  //    has_name: possibly_push_arrow.has_name, 
-  //    parameters: possibly_push_arrow.parameters
-  //   });
-  //   line_number = possibly_push_arrow.ending_line_number;
-  //   data_index = possibly_push_arrow.data_index;
-  //   function_index += 1;
-  //   valid_parens = {};
-  //   return iterate_through_file_text(data_index);
-  //  }
-  // }

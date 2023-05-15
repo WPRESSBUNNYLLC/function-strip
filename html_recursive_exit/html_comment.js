@@ -5,16 +5,7 @@
 
 var update_function_and_update_data = require('../data');
 
-var data_ = '';
-var data_index_ = 0;
-var line_number_ = 0;
-var original_line_number = 0;
-
-function html_comment(data_index, line_number) { 
- data_ = update_function_and_update_data.data;
- data_index_ = data_index;
- line_number_ = line_number;
- original_line_number = line_number;
+function html_comment() { 
  return recurse(data_index_);
 }
 

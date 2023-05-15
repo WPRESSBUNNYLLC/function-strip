@@ -5,12 +5,7 @@
 
 let update_function_and_update_data = require('generate/data');
 
-let in_function_ = false;
-let in_function_build_string_ = '';
-
-function multiline(in_function) { 
- in_function_ = in_function;
- in_function_build_string_ = '';
+function multiline() { 
  return recurse(data_index_);
 }
 

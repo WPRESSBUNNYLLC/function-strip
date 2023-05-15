@@ -1,71 +1,56 @@
-    
-  /* 
-
-   Title: function parser
-   description: strips and labels data structures from files with references
-
-   Author: Alex
-   
-  */
-
-   let fs = require('file-system');
-   let shared = require('./data');
-
-   let initiate_arrow = require('generate/functions/arrowJs/arrow_main');
-   let initiate_regular = require('generate/functions/regularJs/regular_main');
-
-   let html_tag = require('generate/html_recursive_exit/html_tag');
-   let html_comment = require('./html_recursive_exit/html_comment');
-
-   let double_quote_string = require('generate/script_recursive_exit/double-quote-string');
-   let multiline_comment = require('generate/script_recursive_exit/multiline-comment');
-   let regex = require('./script_recursive_exit/regex');
-   let single_quote_string = require('generate/script_recursive_exit/single-quote-string');
-   let singleline_comment = require('generate/script_recursive_exit/singleline-comment');
-   let template_string = require('generate/script_recursive_exit/template-string');
-
-   /* 
-   * data about the file. line_number and fp used in the build string description
-   * @param {data_index} the character index in the file
-   * @param {data} the files text
-   * @param {data_length} used to end the file... could use error
-   * @param {exported_functions} the long string of functions placed in file
-   * @param {fp} the file path of the function
-   * @param {line_number} the current line number
-   * @param {function_index} the index for each function
-   * @param {folders} folders of all the files to test
-   * @param {file_type} whether a .html, .js or .ts file. Used for determining certain types of functions and when to check for functions. example <script
-   * @param {function_types} types of functions being stripped
-   * @param {valid_parens} valid parens for backtracking beginning of regular
-   * @param {tagg_update} used to copy index and line number back over from other file to main
-   * @param {function_types} the different functions to execute
-   */
-
-   let bts = '';
-   let tags = [];
-   let temp_line_number = 0;
-   const first_valid_character_html_tag = /[a-zA-Z0-9_]/; 
-   const punctuator = /[=|\||<|>|!|+|\-|*|/|,|.|%|~|?|:|;|&|^|(|)|[|\]|{|}]/;
-   const look_through_punctuator_ = { 
-    '=': 'equals', 
-    '>': 'greater_than', 
-    '<': 'less_than', 
-    '!': 'exclamation', 
-    '+': 'plus', 
-    '-': 'minice', 
-    '*': 'times', 
-    '/': 'division', 
-    '%': 'percent', 
-    '&': 'and', 
-    '|': 'or', 
-    '^': 'power',
-    '.': 'period'
-   }
-   const number = /[0-9]/;
-   const identifier = /[A-Za-z$_]/;
-   let tagg_update = {}; 
-   let folders = [];
-   let file_type = '';
+let fs = require('file-system');
+let shared = require('./data');
+let initiate_arrow = require('generate/functions/arrowJs/arrow_main');
+let initiate_regular = require('generate/functions/regularJs/regular_main');
+let html_tag = require('generate/html_recursive_exit/html_tag');
+let html_comment = require('./html_recursive_exit/html_comment');
+let double_quote_string = require('generate/script_recursive_exit/double-quote-string');
+let multiline_comment = require('generate/script_recursive_exit/multiline-comment');
+let regex = require('./script_recursive_exit/regex');
+let single_quote_string = require('generate/script_recursive_exit/single-quote-string');
+let singleline_comment = require('generate/script_recursive_exit/singleline-comment');
+let template_string = require('generate/script_recursive_exit/template-string');
+let equals = require('generate/script_recursive_exit/equals');
+let greater_than = require('generate/script_recursive_exit/greater-than');
+let less_than = require('generate/script_recursive_exit/less-than');
+let exclamation = require('generate/script_recursive_exit/exclamation');
+let plus = require('generate/script_recursive_exit/plus');
+let minice = require('generate/script_recursive_exit/minice');
+let times = require('generate/script_recursive_exit/times');
+let division = require('generate/script_recursive_exit/division');
+let percent = require('generate/script_recursive_exit/percent');
+let and = require('generate/script_recursive_exit/and');
+let or = require('generate/script_recursive_exit/or');
+let power = require('generate/script_recursive_exit/power');
+let period = require('generate/script_recursive_exit/period');
+let identifier_ = require('generate/script_recursive_exit/identifier');
+let number_ = require('generate/script_recursive_exit/numbers');
+let bts = '';
+let tags = [];
+let temp_line_number = 0;
+const first_valid_character_html_tag = /[a-zA-Z0-9_]/; 
+const punctuator = /[=|\||<|>|!|+|\-|*|/|,|.|%|~|?|:|;|&|^|(|)|[|\]|{|}]/;
+const look_through_punctuator_ = { 
+'=': 'equals', 
+'>': 'greater_than', 
+'<': 'less_than', 
+'!': 'exclamation', 
+'+': 'plus', 
+'-': 'minice', 
+'*': 'times', 
+'/': 'division', 
+'%': 'percent', 
+'&': 'and', 
+'|': 'or', 
+'^': 'power',
+'.': 'period'
+}
+const punctuator_ = (op) => look_through_punctuator_[op]();
+const number = /[0-9]/;
+const identifier = /[A-Za-z$_]/;
+let tag_update = {}; 
+let folders = [];
+let file_type = '';
  
  /* 
    * search folders, files and get all arrow functions with and without brackets regular functions with brackets. line numbers, filepaths, function names.
@@ -148,9 +133,9 @@
       try {
        if(file_type === 'html') { 
         run_from_html();
-       } else { 
-        iterate_through_file_text();
-       }
+       } else if(file_type === 'javascript') { 
+        js();
+       } 
       } catch(err) { 
        console.log(err.message + '\n' + 'filepath: ' + filepath); 
       }
@@ -160,7 +145,7 @@
    
   }
 
-  //run and return data structures...
+  //run, clean, find errors, and return data structures...
 
  }
 
@@ -176,12 +161,12 @@
  
   if(
    shared.get_data().charAt(shared.get_data_index()) === '<' && 
-   shared.get_data().charAt(shared.get_data_index()  + 1) === '!' && 
+   shared.get_data().charAt(shared.get_data_index() + 1) === '!' && 
    shared.data.charAt(shared.get_data_index() + 2) === '-' && 
    shared.data.charAt(shared.get_data_index() + 3) === '-' 
   ) { 
    shared.update_data_index(4);
-   html_comment(false);
+   html_comment();
    return run_from_html();
   }
 
@@ -190,18 +175,18 @@
    shared.get_data().charAt(shared.get_data_index() + 2).test(first_valid_character_html_tag) === true
   ) { 
    temp_line_number = shared.get_line_number();
-   bts = '<' +  shared.get_data().charAt(shared.get_data_index()  + 1);
+   bts = '<' +  shared.get_data().charAt(shared.get_data_index() + 1);
    shared.update_data_index(2);
-   tagg_update = html_tag(bts, shared.get_data().charAt(shared.get_data_index()  + 1));
+   tag_update = html_tag(bts, shared.get_data().charAt(shared.get_data_index() + 1));
    tags.push({
     tag_line_number_start: temp_line_number, 
     tag_line_number_end: shared.get_line_number(), 
     type: 'opening', 
-    name: tagg_update.script_name.toLowerCase(), 
-    tag_string: tagg_update.tag_string
+    name: tag_update.script_name.toLowerCase(), 
+    tag_string: tag_update.tag_string
    })
-   if(tagg_update.script_name.toLowerCase() === 'script') { 
-    iterate_through_file_text();
+   if(tag_update.script_name.toLowerCase() === 'script') { 
+    js();
    } 
    return run_from_html();
   }
@@ -214,13 +199,13 @@
    temp_line_number = shared.get_line_number();
    bts = '<' + shared.get_data().charAt(shared.get_data_index() + 1) + shared.get_data().charAt(shared.get_data_index() + 2);
    shared.update_data_index(3);
-   tagg_update = html_tag(bts, shared.data.charAt(shared.get_data_index() + 2));
+   tag_update = html_tag(bts, shared.data.charAt(shared.get_data_index() + 2));
    tags.push({
     tag_line_number_start: temp_line_number, 
     tag_line_number_end: shared.get_line_number(), 
     type: 'closing', 
-    name: tagg_update.script_name.toLowerCase(), 
-    tag_string: tagg_update.tag_string
+    name: tag_update.script_name.toLowerCase(), 
+    tag_string: tag_update.tag_string
    })
    return run_from_html();
   }
@@ -230,32 +215,61 @@
   
  }
  
- function iterate_through_file_text() {
+ function js() {
  
   if(shared.get_data_index() > shared.get_data_length()) { 
    return;
   }
  
   if(shared.get_data().charAt(shared.get_data_index()) === '\n') { 
+   shared.update_current_token_type('new-line');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
    shared.update_line_number(1)
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   return js();
+  }
+
+  if(shared.get_data().charAt(shared.get_data_index()) === ' ') {
+   shared.update_current_token_type('spaces');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_data_index(1); 
+   spaces_();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   return js();
   }
 
   if(
    shared.get_data().charAt(shared.get_data_index()) === '/' &&
    shared.get_data().charAt(shared.get_data_index() + 1) === '*'
   ) { 
+   shared.update_current_token_type('multi-line-comment');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_data_index(2); 
-   multiline_comment(false, '');
-   return iterate_through_file_text();
+   multiline_comment();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   return js();
   }
 
   if(
    shared.get_data().charAt(shared.get_data_index()) === '/' &&
    shared.get_data().charAt(shared.get_data_index() + 1) === '/'
   ) { 
+   shared.update_current_token_type('single-line-comment');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_data_index(2); 
-   singleline_comment(false);
-   return iterate_through_file_text();
+   singleline_comment();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   return js();
   }
 
   if(
@@ -266,68 +280,84 @@
    shared.update_current_token_type('regex-literal');
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_data_index(2); 
-   regex(false);
+   regex();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_tokens();
-   return iterate_through_file_text();
+   return js();
   }
 
   if(shared.get_data().charAt(shared.get_data_index()) === '"') { 
    shared.update_current_token_type('string-literal');
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_data_index(1); 
-   double_quote_string(false, false);
+   double_quote_string(false);
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_tokens();
-   return iterate_through_file_text();
+   return js();
   }
 
   if(shared.get_data().charAt(shared.get_data_index()) === "'") { 
    shared.update_current_token_type('string-literal');
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_data_index(1); 
-   single_quote_string(false, false);
+   single_quote_string(false);
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_tokens();
-   return iterate_through_file_text();
+   return js();
   }
 
   if(shared.get_data().charAt(shared.get_data_index()) === '`') { 
    shared.update_current_token_type('template-literal');
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_data_index(1); 
-   template_string(false);
+   template_string();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_tokens();
-   return iterate_through_file_text();
+   return js();
   }
 
   if(shared.get_data().charAt(shared.get_data_index()).test(number) === true) { 
    shared.update_current_token_type('numeric-literal');
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_data_index(1); 
-   number_(false);
+   number_();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_tokens();
-   return iterate_through_file_text();
+   return js();
   }
 
   if(shared.get_data().charAt(shared.get_data_index()).test(identifier) === true) { 
    shared.update_current_token_type('identifier');
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_data_index(1); 
-   identifier_(false);
+   identifier_();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_tokens();
-   return iterate_through_file_text();
+   return js();
   }
 
   if(shared.get_data().charAt(shared.get_data_index()).test(punctuator) === true) { 
    shared.update_current_token_type('punctuator');
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.update_data_index(1);
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    if(look_through_punctuator_[shared.get_current_token()] === false) {
+    shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
     shared.update_tokens();
-    return iterate_through_file_text();
+    shared.update_data_index(1);
+    return js();
    }
-   punctuator_(false);
+   punctuator_(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_tokens();
-   return iterate_through_file_text();
+   shared.update_data_index(1);
+   return js();
   }
 
   if(file_type === 'html') { 
@@ -339,33 +369,34 @@
     temp_line_number = shared.get_line_number();
     bts = '<' + shared.get_data().charAt(shared.get_data_index() + 1) + shared.data.charAt(shared.get_data_index() + 2);
     shared.update_data_index(3);
-    tagg_update = html_tag(bts, shared.data.charAt(shared.get_data_index() + 2));
+    tag_update = html_tag(bts, shared.data.charAt(shared.get_data_index() + 2));
     tags.push({
      tag_line_number_start: temp_line_number, 
      tag_line_number_end: shared.get_line_number(), 
      type: 'closing', 
-     name: tagg_update.script_name.toLowerCase(), 
-     tag_string: tagg_update.tag_string
+     name: tag_update.script_name.toLowerCase(), 
+     tag_string: tag_update.tag_string
     })
-    if(tagg_update.script_name.toLowerCase() === 'script') {
+    if(tag_update.script_name.toLowerCase() === 'script') {
      return;
     } else { 
-     return iterate_through_file_text();
+     return js();
     }
    }
   }
 
-  if(
-   shared.get_data().charAt(shared.get_data_index()) !== ' ' && 
-   shared.get_data().charAt(shared.get_data_index()) !== '\n'
-  ) {
+  if(shared.get_data().charAt(shared.get_data_index()) !== ' ') {
    shared.update_current_token_type('unknown');
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_tokens();
+   shared.update_data_index(1);
+   return js();
   }
 
   shared.update_data_index(1); 
-  return iterate_through_file_text();
+  return js();
  
  }
 

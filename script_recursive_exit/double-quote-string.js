@@ -5,16 +5,10 @@
 
 let update_function_and_update_data = require('generate/data');
 
-let in_function_ = false
-let in_function_build_string_ = '';
-let original_line_number = 0;
 let in_tag_ = false;
 let in_tag_string = '';
 
-function double_quote_string(in_function, in_tag) { 
- in_function_ = in_function;
- original_line_number = line_number;
- in_function_build_string_ = '';
+function double_quote_string(in_tag) { 
  in_tag_ = in_tag;
  in_tag_string = '';
  return recurse(data_index_);

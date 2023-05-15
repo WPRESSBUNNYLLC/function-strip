@@ -3,10 +3,7 @@
  determines when ending a single line comment
 */
 
-let update_function_and_update_data = require('generate/data');
-
-let in_function_ = false;
-let in_function_build_string_ = '';
+let shared = require('generate/data');
 
 function singleline(in_function) { 
  in_function_ = in_function;
