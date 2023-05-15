@@ -321,7 +321,7 @@
    shared.update_current_token_type('punctuator');
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
    shared.update_data_index(1);
-   if(look_through_punctuator_[shared.get_data().charAt(shared.get_data_index() - 1)] === false) {
+   if(look_through_punctuator_[shared.get_current_token()] === false) {
     shared.update_tokens();
     return iterate_through_file_text();
    }
