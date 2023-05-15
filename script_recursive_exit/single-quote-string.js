@@ -5,18 +5,14 @@
 
 let update_function_and_update_data = require('generate/data');
 
-let data_index_ = 0;
 let in_function_ = false;
 let in_function_build_string_ = '';
-let line_number_ = 0;
 let original_line_number = 0;
 let in_tag_ = false;
 let in_tag_string = '';
 
-function single_quote_string(data_index, in_function, line_number, in_tag) { 
- data_index_ = data_index;
+function single_quote_string(in_function, in_tag) { 
  in_function_ = in_function;
- line_number_ = line_number;
  original_line_number = line_number;
  in_function_build_string_ = '';
  in_tag_ = in_tag;

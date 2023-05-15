@@ -15,21 +15,17 @@ let multiline_comment = require('./script_recursive_exit/multiline_comment');
 let singleline_comment = require('./script_recursive_exit/singleline_comment');
 let regex = require('./script_recursive_exit/regex');
 
-let data_index_ = 0; 
 let in_function_ = false
 let in_function_build_string_ = '';
-let line_number_ = 0;
 let recursive_counter_script = 0;
 let recursive_counter_string = 0; 
 let currently_inside_of = 'string';
 let data_index_and_line_number_update = {};
 let original_line_number = 0;
 
-function template_string(data_index, in_function, line_number) { 
- data_index_ = data_index;
+function template_string(in_function) { 
  in_function_ = in_function;
  in_function_build_string_ = '';
- line_number_ = line_number;
  original_line_number = line_number;
  recursive_counter_string = 1;
  recursive_counter_script = 0;

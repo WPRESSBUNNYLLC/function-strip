@@ -164,13 +164,13 @@
 
  }
 
- function run_from_html(data_index) { 
+ function run_from_html() { 
  
   if(shared.get_data_index() > shared.get_data_length()) { 
    return;
   }
  
-  if(shared.get_data().charAt(data_index) === '\n') { 
+  if(shared.get_data().charAt(shared.get_data_index()) === '\n') { 
    shared.update_line_number(1);
   }
  
@@ -192,7 +192,7 @@
    temp_line_number = shared.get_line_number();
    bts = '<' +  shared.get_data().charAt(shared.get_data_index()  + 1);
    shared.update_data_index(2);
-   tagg_update = html_tag(data_index, line_number, bts, shared.get_data().charAt(shared.get_data_index()  + 1));
+   tagg_update = html_tag(bts, shared.get_data().charAt(shared.get_data_index()  + 1));
    tags.push({
     tag_line_number_start: temp_line_number, 
     tag_line_number_end: shared.get_line_number(), 
@@ -222,11 +222,11 @@
     name: tagg_update.script_name.toLowerCase(), 
     tag_string: tagg_update.tag_string
    })
-   return run_from_html(data_index);
+   return run_from_html();
   }
 
   shared.update_data_index(1); 
-  return run_from_html(data_index);
+  return run_from_html();
   
  }
  
@@ -236,7 +236,7 @@
    return;
   }
  
-  if(shared.get_data().charAt(data_index) === '\n') { 
+  if(shared.get_data().charAt(shared.get_data_index()) === '\n') { 
    shared.update_line_number(1)
   }
 
@@ -321,7 +321,7 @@
    shared.update_current_token_type('punctuator');
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
    shared.update_data_index(1);
-   if(look_through_punctuator_[shared.get_data().charAt(shared.get_data_index())] === false) {
+   if(look_through_punctuator_[shared.get_data().charAt(shared.get_data_index() - 1)] === false) {
     shared.update_tokens();
     return iterate_through_file_text();
    }
@@ -333,13 +333,13 @@
   if(file_type === 'html') { 
    if(
     shared.get_data().charAt(shared.get_data_index()) === '<' && 
-    shared.get_data().charAt(shared.get_data_index()  + 1) === '/' &&
+    shared.get_data().charAt(shared.get_data_index() + 1) === '/' &&
     shared.get_data().charAt(shared.get_data_index() + 2).test(first_valid_character_html_tag) === true
    ) { 
     temp_line_number = shared.get_line_number();
     bts = '<' + shared.get_data().charAt(shared.get_data_index() + 1) + shared.data.charAt(shared.get_data_index() + 2);
     shared.update_data_index(3);
-    tagg_update = html_tag(bts, shared.data.charAt(data_index + 2));
+    tagg_update = html_tag(bts, shared.data.charAt(shared.get_data_index() + 2));
     tags.push({
      tag_line_number_start: temp_line_number, 
      tag_line_number_end: shared.get_line_number(), 
@@ -350,7 +350,7 @@
     if(tagg_update.script_name.toLowerCase() === 'script') {
      return;
     } else { 
-     return iterate_through_file_text(data_index);
+     return iterate_through_file_text();
     }
    }
   }

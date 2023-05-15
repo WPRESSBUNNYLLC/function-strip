@@ -5,16 +5,12 @@
 
 let update_function_and_update_data = require('generate/data');
 
-let data_index_ = 0; 
 let in_function_ = false;
 let in_function_build_string_ = '';
-let line_number_ = 0;
 
-function singleline(data_index, in_function, line_number) { 
- data_index_ = data_index;
+function singleline(in_function) { 
  in_function_ = in_function;
  in_function_build_string_ = '';
- line_number_ = line_number;
  return recurse(data_index_);
 }
 
