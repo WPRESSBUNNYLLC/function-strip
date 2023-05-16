@@ -17,8 +17,8 @@ let in_value_error = '';
 function update_data(data_, file_path) { 
  tokens[file_path] = { 
   tokens: [],
-  assignmet_errors: [], 
-  expect_errors: [], 
+  assignment_errors: {}, 
+  expect_errors: {}, 
   ds: {}
  }
  data = data_;
@@ -52,7 +52,12 @@ function update_tokens() {
   ending_index: ending_token_index, 
   beginning_line_number: beginning_token_line_number, 
   ending_line_number: ending_token_line_number,
-  error: in_value_error
+  error: in_value_error, 
+  skip: (
+   current_look_ahead_token_type === 'single-line-comment' || 
+   current_look_ahead_token_type === 'multi-line-comment' || 
+   current_look_ahead_token_type === 'spaces' || 
+   current_look_ahead_token_type === 'new-line') ? true : false
  });
  current_look_ahead_token = '';
  current_look_ahead_token_type = '';

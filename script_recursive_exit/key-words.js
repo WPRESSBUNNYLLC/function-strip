@@ -39,7 +39,7 @@ module.exports = {
 'long' : true,	
 'native' : true,	
 'new' : true,
-'null' : true,	//right side
+'null' : true,
 'package' : true,	
 'private' : true,	
 'protected' : true,
@@ -62,5 +62,6 @@ module.exports = {
 'volatile': true,	
 'while': true,
 'with': true,
-'yield': true
+'yield': true, 
+'=>': true
 };

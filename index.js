@@ -42,8 +42,7 @@ const look_through_punctuator_ = {
 '%': 'percent', 
 '&': 'and', 
 '|': 'or', 
-'^': 'power',
-'.': 'period'
+'^': 'power'
 }
 const punctuator_ = (op) => look_through_punctuator_[op]();
 const number = /[0-9]/;
@@ -224,9 +223,9 @@ let file_type = '';
   if(shared.get_data().charAt(shared.get_data_index()) === '\n') { 
    shared.update_current_token_type('new-line');
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.update_line_number(1)
    shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_line_number(1);
    shared.update_tokens();
    return js();
   }
@@ -399,5 +398,7 @@ let file_type = '';
   return js();
  
  }
+
+ wow  . cool();
 
  module.exports = generate;
