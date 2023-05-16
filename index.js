@@ -29,7 +29,7 @@ let bts = '';
 let tags = [];
 let temp_line_number = 0;
 const first_valid_character_html_tag = /[a-zA-Z0-9_]/; 
-const punctuator = /[=\|<>!+\-*/,.%~?:;&^()[\]|{}]/;
+const punctuator = /[=<>\\!+\-*/,.%~?:;&^()[\]|{}]/;
 const look_through_punctuator_ = { 
 '=': 'equals', 
 '>': 'greater_than', 

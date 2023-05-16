@@ -1,6 +1,6 @@
 let t = require('./data');
 
-function expect() { 
+function reassignment() { 
  tokens = t.get_tokens();
  iterate();
 }
@@ -9,4 +9,4 @@ function iterate() {
 
 }
 
-module.exports = expect;
+module.exports = reassignment;

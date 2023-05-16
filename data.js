@@ -7,19 +7,29 @@ let beginning_token_index = 0;
 let ending_token_index = 0; 
 let beginning_token_line_number = 0; 
 let ending_token_line_number = 0;
-let tokens = [];
+let tokens = {};
 let token_file_path = '';
 let current_look_ahead_token = '';
 let current_look_ahead_token_type = '';
 let in_script_mode_ = false;
 let in_value_error = '';
 
-function update_data(data_, file_name) { 
+function update_data(data_, file_path) { 
+ tokens[file_path] = { 
+  tokens: [],
+  assignmet_errors: [], 
+  expect_errors: [], 
+  ds: {}
+ }
  data = data_;
  data_length = data.length;
  data_index = 0; 
  line_number = 0; 
- token_file_path = file_name;
+ token_file_path = file_path;
+ current_look_ahead_token = '';
+ current_look_ahead_token_type = '';
+ in_value_error = '';
+ in_script_mode_ = false;
 }
 
 function update_line_number(line_number_) { 
@@ -35,10 +45,9 @@ function set_data_index(data_index_) {
 }
 
 function update_tokens() { 
- tokens.push({ 
+ tokens[token_file_path].tokens.push({ 
   token: current_look_ahead_token, 
   type: current_look_ahead_token_type, 
-  file_path: token_file_path, 
   beginning_index: beginning_token_index, 
   ending_index: ending_token_index, 
   beginning_line_number: beginning_token_line_number, 
