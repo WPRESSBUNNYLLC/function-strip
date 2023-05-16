@@ -29,7 +29,7 @@ let bts = '';
 let tags = [];
 let temp_line_number = 0;
 const first_valid_character_html_tag = /[a-zA-Z0-9_]/; 
-const punctuator = /[=|\||<|>|!|+|\-|*|/|,|.|%|~|?|:|;|&|^|(|)|[|\]|{|}]/;
+const punctuator = /[=\|<>!+\-*/,.%~?:;&^()[\]|{}]/;
 const look_through_punctuator_ = { 
 '=': 'equals', 
 '>': 'greater_than', 
@@ -51,7 +51,7 @@ const identifier = /[A-Za-z$_]/;
 let tag_update = {}; 
 let folders = [];
 let file_type = '';
- 
+
  /* 
    * search folders, files and get all arrow functions with and without brackets regular functions with brackets. line numbers, filepaths, function names.
    * @param {fldr} folders being traversed
