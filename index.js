@@ -399,6 +399,4 @@ let file_type = '';
  
  }
 
- wow  . cool();
-
  module.exports = generate;

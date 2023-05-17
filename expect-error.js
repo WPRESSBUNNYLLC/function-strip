@@ -1,12 +1,9 @@
 let t = require('./data');
 
-function expect() { 
- tokens = t.get_tokens();
- iterate();
-}
+let current_expression = [];
 
-function iterate() { 
-
+function expect_errors() { 
+ //check next based of curent and some of previous / patterns of previous
 }
 
 module.exports = expect;
