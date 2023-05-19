@@ -1,6 +1,6 @@
 module.exports = {
  'identifier': ['(','+','-','*','/','=','[','=>','<','>','==','===','<=','>=','!=','!==',',','.','%','>>>=','>>=','<<=','>>>','>>','<<','^=','/=','*=','-=','+=','%=','|','||','|=','&','&&','&=','^','?',':',';','++','--'], 
- 'await'	: true,
+ 'await' : true,
  'boolean' : true,
  'break' : true,
  'byte' : true,
@@ -105,14 +105,15 @@ module.exports = {
  '<<=': ['identifier','numeric-literal', 'string-literal', '(', 'template-literal'],
  '>>=': ['identifier','numeric-literal', 'string-literal', '(', 'template-literal'],
  '>>>=': ['identifier','numeric-literal', 'string-literal', '(', 'template-literal'],
- '(': ['identifier','numeric-literal', 'string-literal', '(', 'template-literal'],
- ')': ['identifier','numeric-literal', 'string-literal', '(', 'template-literal'],
+ '(': ['identifier','numeric-literal', 'string-literal', '(', 'template-literal'], //and a few key words
+ ')': [],
  '[': ['identifier','numeric-literal', 'string-literal', '(', 'template-literal'],
  ']': ['identifier','numeric-literal', 'string-literal', '(', 'template-literal'],
  '{': ['identifier','numeric-literal', 'string-literal', '(', 'template-literal'],
  '}': ['identifier','numeric-literal', 'string-literal', '(', 'template-literal'],
  'numeric-literal': ['+','-','*','/','=','=>','<','>','==','===','<=','>=','!=','!==',',','.','%','>>>=','>>=','<<=','>>>','>>','<<','^=','/=','*=','-=','+=','%=','|','||','|=','&','&&','&=','^','?',';','++','--'],
  'string-literal': ['+','-','*','/','=','=>','<','>','==','===','<=','>=','!=','!==',',','.','%','>>>=','>>=','<<=','>>>','>>','<<','^=','/=','*=','-=','+=','%=','|','||','|=','&','&&','&=','^','?',';','++','--'], 
- 'template-literal': ['+','-','*','/','=','=>','<','>','==','===','<=','>=','!=','!==',',','.','%','>>>=','>>=','<<=','>>>','>>','<<','^=','/=','*=','-=','+=','%=','|','||','|=','&','&&','&=','^','?',';','++','--']
+ 'template-literal': ['+','<','>','==','===','<=','>=','!=','!==',',','>>>=','>>=','<<=','>>>','>>','<<','+=','|','||','|=','&','&&','&=','?',';', ']']
 }
 
+let wow = cool;

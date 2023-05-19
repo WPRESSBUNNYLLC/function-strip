@@ -144,7 +144,7 @@ let file_type = '';
    
   }
 
-  //run, clean, find errors, and return data structures...
+  //run, clean, find errors, and return data structures... or maybe do this after each token gets inserted at the last place
 
  }
 
@@ -219,147 +219,8 @@ let file_type = '';
   if(shared.get_data_index() > shared.get_data_length()) { 
    return;
   }
- 
-  if(shared.get_data().charAt(shared.get_data_index()) === '\n') { 
-   shared.update_current_token_type('new-line');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_line_number(1);
-   shared.update_tokens();
-   return js();
-  }
 
-  if(shared.get_data().charAt(shared.get_data_index()) === ' ') {
-   shared.update_current_token_type('spaces');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(1); 
-   spaces_();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   return js();
-  }
-
-  if(
-   shared.get_data().charAt(shared.get_data_index()) === '/' &&
-   shared.get_data().charAt(shared.get_data_index() + 1) === '*'
-  ) { 
-   shared.update_current_token_type('multi-line-comment');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(2); 
-   multiline_comment();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   return js();
-  }
-
-  if(
-   shared.get_data().charAt(shared.get_data_index()) === '/' &&
-   shared.get_data().charAt(shared.get_data_index() + 1) === '/'
-  ) { 
-   shared.update_current_token_type('single-line-comment');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(2); 
-   singleline_comment();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   return js();
-  }
-
-  if(
-   shared.get_data().charAt(shared.get_data_index()) === '/' &&
-   shared.get_data().charAt(shared.get_data_index() + 1) !== '/' && 
-   shared.get_data().charAt(shared.get_data_index() + 1) !== '*'
-  ) {
-   shared.update_current_token_type('regex-literal');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(2); 
-   regex();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()) === '"') { 
-   shared.update_current_token_type('string-literal');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(1); 
-   double_quote_string(false);
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()) === "'") { 
-   shared.update_current_token_type('string-literal');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(1); 
-   single_quote_string(false);
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()) === '`') { 
-   shared.update_current_token_type('template-literal');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(1); 
-   template_string();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()).test(number) === true) { 
-   shared.update_current_token_type('numeric-literal');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(1); 
-   number_();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()).test(identifier) === true) { 
-   shared.update_current_token_type('identifier');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(1); 
-   identifier_();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()).test(punctuator) === true) { 
-   shared.update_current_token_type('punctuator');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   if(look_through_punctuator_[shared.get_current_token()] === false) {
-    shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-    shared.update_tokens();
-    shared.update_data_index(1);
-    return js();
-   }
-   punctuator_(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.update_data_index(1);
-   return js();
-  }
-
-  if(file_type === 'html') { 
+  if(file_type === 'html') { //this would be assuming out of all scopes -- would have to do this on the fly... ill figure it out
    if(
     shared.get_data().charAt(shared.get_data_index()) === '<' && 
     shared.get_data().charAt(shared.get_data_index() + 1) === '/' &&
@@ -383,6 +244,167 @@ let file_type = '';
     }
    }
   }
+ 
+  if(shared.get_data().charAt(shared.get_data_index()) === '\n') { 
+   shared.update_current_token_type('new-line');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   shared.update_line_number(1);
+   shared.build_data_structure();
+   shared.update_data_index(1);
+   return js();
+  }
+
+  if(shared.get_data().charAt(shared.get_data_index()) === ' ') {
+   shared.update_current_token_type('spaces');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_data_index(1); 
+   spaces_();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   shared.build_data_structure();
+   shared.update_data_index(1);
+   return js();
+  }
+
+  if(
+   shared.get_data().charAt(shared.get_data_index()) === '/' &&
+   shared.get_data().charAt(shared.get_data_index() + 1) === '*'
+  ) { 
+   shared.update_current_token_type('multi-line-comment');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_data_index(2); 
+   multiline_comment();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   shared.build_data_structure();
+   shared.update_data_index(1);
+   return js();
+  }
+
+  if(
+   shared.get_data().charAt(shared.get_data_index()) === '/' &&
+   shared.get_data().charAt(shared.get_data_index() + 1) === '/'
+  ) { 
+   shared.update_current_token_type('single-line-comment');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_data_index(2); 
+   singleline_comment();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   shared.build_data_structure();
+   shared.update_data_index(1);
+   return js();
+  }
+
+  if(
+   shared.get_data().charAt(shared.get_data_index()) === '/' &&
+   shared.get_data().charAt(shared.get_data_index() + 1) !== '/' && 
+   shared.get_data().charAt(shared.get_data_index() + 1) !== '*'
+  ) {
+   shared.update_current_token_type('regex-literal');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_data_index(2); 
+   regex();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   shared.build_data_structure();
+   shared.update_data_index(1);
+   return js();
+  }
+
+  if(shared.get_data().charAt(shared.get_data_index()) === '"') { 
+   shared.update_current_token_type('string-literal');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_data_index(1); 
+   double_quote_string(false);
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   shared.build_data_structure();
+   shared.update_data_index(1);
+   return js();
+  }
+
+  if(shared.get_data().charAt(shared.get_data_index()) === "'") { 
+   shared.update_current_token_type('string-literal');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_data_index(1); 
+   single_quote_string(false);
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   shared.build_data_structure();
+   shared.update_data_index(1);
+   return js();
+  }
+
+  if(shared.get_data().charAt(shared.get_data_index()) === '`') { 
+   shared.update_current_token_type('template-literal');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_data_index(1); 
+   template_string();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   shared.build_data_structure();
+   shared.update_data_index(1);
+   return js();
+  }
+
+  if(shared.get_data().charAt(shared.get_data_index()).test(number) === true) { 
+   shared.update_current_token_type('numeric-literal');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_data_index(1); 
+   number_();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   shared.build_data_structure();
+   shared.update_data_index(1);
+   return js();
+  }
+
+  if(shared.get_data().charAt(shared.get_data_index()).test(identifier) === true) { 
+   shared.update_current_token_type('identifier');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_data_index(1); 
+   identifier_();
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   shared.build_data_structure();
+   shared.update_data_index(1);
+   return js();
+  }
+
+  if(shared.get_data().charAt(shared.get_data_index()).test(punctuator) === true) { 
+   shared.update_current_token_type('punctuator');
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   if(look_through_punctuator_[shared.get_current_token()] === false) {
+    shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+    shared.update_tokens();
+    shared.build_data_structure();
+    shared.update_data_index(1);
+    return js();
+   }
+   punctuator_(shared.get_data().charAt(shared.get_data_index()));
+   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+   shared.update_tokens();
+   shared.build_data_structure();
+   shared.update_data_index(1);
+   return js();
+  }
 
   if(shared.get_data().charAt(shared.get_data_index()) !== ' ') {
    shared.update_current_token_type('unknown');
@@ -390,6 +412,7 @@ let file_type = '';
    shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_tokens();
+   shared.build_data_structure();
    shared.update_data_index(1);
    return js();
   }
@@ -398,5 +421,5 @@ let file_type = '';
   return js();
  
  }
-
+ 
  module.exports = generate;
