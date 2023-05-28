@@ -40,6 +40,10 @@ function update_data_index(data_index_) {
  data_index += data_index_;
 }
 
+function decrease_data_index_for_correct_data_index_and_line_number(data_index_) { 
+ data_index -= data_index_;
+}
+
 function set_data_index(data_index_) { 
  data_index = data_index_;
 }
@@ -136,5 +140,6 @@ module.exports = {
  in_script_mode: in_script_mode, 
  set_in_value_error: set_in_value_error, 
  set_beginning_token_line_number_and_data_index: set_beginning_token_line_number_and_data_index, 
- set_ending_token_line_number_and_data_index: set_ending_token_line_number_and_data_index
+ set_ending_token_line_number_and_data_index: set_ending_token_line_number_and_data_index, 
+ decrease_data_index_for_correct_data_index_and_line_number: decrease_data_index_for_correct_data_index_and_line_number
 }
