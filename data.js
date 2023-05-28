@@ -13,7 +13,6 @@ let current_look_ahead_token = '';
 let current_look_ahead_token_type = '';
 let in_script_mode_ = false;
 let in_value_error = '';
-let data_structures = {};
 
 function update_data(data_, file_path) { 
  tokens[file_path] = { 
@@ -117,75 +116,6 @@ function in_script_mode(mode) {
 
 function set_in_value_error(error) { 
  in_value_error = error;
-}
-
-let current_expression = [];
-let current_tokens = [];
-let last_token = ''
-let current_file = ''
-let block_count = 0;
-let index = 0;
-
-function build_data_structure() { 
- for(const property in get_tokens()) {
-  current_tokens = property.tokens;
-  current_file = property;
-  block_set();
- }
-}
-
-function block_set() { //jsut create a recursive block set for each thing and handle some other things...
-
- if(current_tokens.length < 1) { 
-  return;
- }
-
- if(
-  current_tokens[i].type === 'key-word' && 
-  current_tokens[i].value === 'function'
- ) { 
-
- }
-
- if(
-  current_tokens[i].type === 'key-word' && 
-  current_tokens[i].value === 'while'
- ) { 
-
- }
-
- if(
-  current_tokens[i].type === 'key-word' && 
-  current_tokens[i].value === 'if'
- ) { 
-
- }
-
- if(
-  current_tokens[i].type === 'key-word' && 
-  current_tokens[i].value === 'else'
- ) { 
-
- }
-
- if(
-  current_tokens[i].type === 'key-word' && 
-  current_tokens[i].value === 'for'
- ) { 
-
- }
-
- if(
-  current_tokens[i].type === 'key-word' && 
-  current_tokens[i].value === 'do'
- ) { 
-
- }
-
- //if identifier and ( then get parameters... and continue and count through
-
- //if identifier then =, get expression
-
 }
 
 module.exports = {
