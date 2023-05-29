@@ -1,2 +1,0 @@
-let error = {};
-let tree = {};

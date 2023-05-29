@@ -33,6 +33,7 @@ function template_string(in_function) {
  return recurse(data_index_);
 }
 
+
 function recurse(data_index_) { 
 
  if(data_index_ > data_.length) {

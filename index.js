@@ -42,7 +42,8 @@ const look_through_punctuator_ = {
 '%': 'percent', 
 '&': 'and', 
 '|': 'or', 
-'^': 'power'
+'^': 'power',
+'.': 'period'
 }
 const punctuator_ = (op) => look_through_punctuator_[op]();
 const number = /[0-9]/;

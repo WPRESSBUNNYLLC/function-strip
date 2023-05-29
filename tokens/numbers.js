@@ -1,9 +1,9 @@
 //all numbers
 
-function initiate_number() { 
+let found_decimal = false;
 
+function numbers() { 
+ 
 }
 
-function build_number() { 
-    
-}
+module.exports = numbers;

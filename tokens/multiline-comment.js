@@ -3,13 +3,9 @@
  determines when ending a multi line comment... 
 */
 
-let update_function_and_update_data = require('generate/data');
+let shared = require('generate/data');
 
-function multiline() { 
- return recurse(data_index_);
-}
-
-function recurse(data_index_) { 
+function multiline_comment(data_index_) { 
 
  if(data_index_ > data_.length) {
   throw new Error(
@@ -43,4 +39,4 @@ function recurse(data_index_) {
 
 }
 
-module.exports = multiline;
+module.exports = multiline_comment;

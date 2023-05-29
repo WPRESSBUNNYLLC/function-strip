@@ -5,13 +5,7 @@
 
 let shared = require('generate/data');
 
-function singleline(in_function) { 
- in_function_ = in_function;
- in_function_build_string_ = '';
- return recurse(data_index_);
-}
-
-function recurse(data_index_) { 
+function singleline_comment(data_index_) { 
 
  if(data_index_ > data_.length) {
   throw new Error(
@@ -38,4 +32,4 @@ function recurse(data_index_) {
 
 }
 
-module.exports = singleline;
+module.exports = singleline_comment;

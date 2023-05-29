@@ -1,4 +1,4 @@
-//   / --1 iteration
+//   / 
 //   /=
 
 let shared = require('../data');
