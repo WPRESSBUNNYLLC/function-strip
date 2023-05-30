@@ -106,6 +106,10 @@ function get_tokens() {
  return tokens;
 }
 
+function pop_current_token() { 
+ current_look_ahead_token = current_look_ahead_token.substring(0, current_look_ahead_token.length-1);
+}
+
 function get_data() { 
  return data;
 }
@@ -141,5 +145,6 @@ module.exports = {
  set_in_value_error: set_in_value_error, 
  set_beginning_token_line_number_and_data_index: set_beginning_token_line_number_and_data_index, 
  set_ending_token_line_number_and_data_index: set_ending_token_line_number_and_data_index, 
- decrease_data_index_for_correct_data_index_and_line_number: decrease_data_index_for_correct_data_index_and_line_number
+ decrease_data_index_for_correct_data_index_and_line_number: decrease_data_index_for_correct_data_index_and_line_number, 
+ pop_current_token: pop_current_token
 }

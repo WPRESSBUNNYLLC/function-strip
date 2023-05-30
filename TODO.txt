@@ -1,24 +1,4 @@
-take equals into consideration
-possibly get rid of charAt and split across
-find a compiler that reutrns errors to skip over bad files 
-get enclosed and invoked in a different way
-add class functions
-add the other function types in javascript 
-update_function_and_update_data.data instead of data_ -- get rid of copies after
-possibly add data_index and line_number to data.js
-
-just create a token set and iterate through that and build values recursively... then push recursively into an array to format for user.
-key word works for functions but going to get everything else
-
-track new line errors in token...
-
-  // /ffdf //push this and update error
-  // /
-
-
-//random tree practice -- remove might be wrong... not sure didnt run just like i didnt run this entire program let alone doing it my way.
-//make sure to rid multiple opening parens i token set
-//create defintitions and check for same 
+might not need in_value_error... maybe just check expect errors
 
 let wow = { 
     root: 5, 
