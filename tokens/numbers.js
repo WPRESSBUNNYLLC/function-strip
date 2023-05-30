@@ -7,9 +7,7 @@ let has_exponent = false;
 let numeric_type = '';
 
 function numbers() { 
-
  while(true) {
-
   if(shared.get_current_token().test(number_error_regular) === false) { 
    if(check_if_might_be_valid() === true) {
     continue;
@@ -25,52 +23,37 @@ function numbers() {
    numeric_type = '';
    break;
   }
-
-  if(shared.get_data().charAt(shared.get_data_index()) === '.') {
+  if(has_decimal === false && shared.get_data().charAt(shared.get_data_index()) === '.') {
    has_decimal = true;
   }
-
-  if(shared.get_data().charAt(shared.get_data_index()) === 'e') { 
+  if(has_exponent === false && shared.get_data().charAt(shared.get_data_index()) === 'e') { 
    has_exponent = true;
   }
-
-  if(
-   numeric_type === '' && 
-   shared.get_current_token().test(/0o([0-9]+)?$/) === true
-  ) { 
-   numeric_type = 'octal;'
+  if(numeric_type === '') {
+   check_numeric_type();
   }
-
-  if(
-   numeric_type === '' && 
-   shared.get_current_token().test(/^0b([0-9]+)?$/) === true
-  ) { 
-   numeric_type = 'binary;'
-  }
-
-  if(
-   numeric_type === '' && 
-   shared.get_current_token().test(/^([0-9]+)(\.)?([0-9]+)?([0-9]e[\-+][0-9]+)?$/) === true
-  ) { 
-   numeric_type = 'regular;'
-  }
-
-  if(
-   numeric_type === '' && 
-   shared.get_current_token().test(/^0x([a-zA-Z0-9]+)?$/) === true
-  ) { 
-   numeric_type = 'hex;'
-  }
-
   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
   shared.update_data_index(1);
-
  }
+}
 
+function check_numeric_type() { 
+  if(shared.get_current_token().test(/0o([0-9]+)?$/) === true) { 
+   numeric_type = 'octal;'
+  }
+  if(shared.get_current_token().test(/^0b([0-9]+)?$/) === true) { 
+   numeric_type = 'binary;'
+  }
+  if(shared.get_current_token().test(/^([0-9]+)(\.)?([0-9]+)?([0-9]e[\-+][0-9]+)?$/) === true) { 
+   numeric_type = 'regular;'
+  }
+  if(shared.get_current_token().test(/^0x([a-zA-Z0-9]+)?$/) === true) { 
+   numeric_type = 'hex;'
+  }    
 }
 
 function check_if_might_be_valid() { 
- if(shared.get_current_token().slice(-1) === 'e' && has_exponent === false && numeric_type === 'regular') {
+ if(shared.get_current_token().slice(-1) === 'e' && numeric_type === 'regular') {
   //if next token is either +,- and next is a number ...add to tokens, increase data index and continue
   return true;
  } else {
