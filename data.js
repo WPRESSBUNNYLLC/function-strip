@@ -114,6 +114,10 @@ function get_data() {
  return data;
 }
 
+function get_file_name() {
+ return token_file_path;
+}
+
 function get_data_length() { 
  return data_length;
 }
@@ -146,5 +150,6 @@ module.exports = {
  set_beginning_token_line_number_and_data_index: set_beginning_token_line_number_and_data_index, 
  set_ending_token_line_number_and_data_index: set_ending_token_line_number_and_data_index, 
  decrease_data_index_for_correct_data_index_and_line_number: decrease_data_index_for_correct_data_index_and_line_number, 
- pop_current_token: pop_current_token
+ pop_current_token: pop_current_token, 
+ get_file_name: get_file_name
 }
