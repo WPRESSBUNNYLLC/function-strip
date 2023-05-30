@@ -1,5 +1,4 @@
-//   / 
-//   /=
+// / /=
 
 let shared = require('../data');
 

@@ -145,8 +145,6 @@ let file_type = '';
    
   }
 
-  //run, clean, find errors, and return data structures... or maybe do this after each token gets inserted at the last place
-
  }
 
  function run_from_html() { 
@@ -252,8 +250,8 @@ let file_type = '';
    shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_tokens();
-   shared.update_line_number(1);
    shared.build_data_structure();
+   shared.update_line_number(1);
    shared.update_data_index(1);
    return js();
   }
@@ -328,7 +326,7 @@ let file_type = '';
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
    shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_data_index(1); 
-   double_quote_string(false);
+   double_quote_string();
    shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_tokens();
    shared.build_data_structure();
@@ -341,7 +339,7 @@ let file_type = '';
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
    shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_data_index(1); 
-   single_quote_string(false);
+   single_quote_string();
    shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
    shared.update_tokens();
    shared.build_data_structure();

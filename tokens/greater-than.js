@@ -3,7 +3,7 @@
 let shared = require('../data');
 
 function greater_than() { 
-   if(
+  if(
    shared.get_data().charAt(shared.get_data_index()) === '>' && 
    shared.get_data().charAt(shared.get_data_index() + 1) === '>' && 
    shared.get_data().charAt(shared.get_data_index() + 2) === '='
@@ -26,8 +26,7 @@ function greater_than() {
    shared.update_current_token('>');
    shared.update_current_token('>');
    shared.update_data_index(1);  
-  } else if(
-   shared.get_data().charAt(shared.get_data_index()) === '>'
+  } else if(shared.get_data().charAt(shared.get_data_index()) === '>'
   ) { 
    shared.update_current_token('>');
   } else if(
