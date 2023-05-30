@@ -18,7 +18,7 @@ function numbers() {
    shared.decrease_data_index_for_correct_data_index_and_line_number(1);
    if(has_decimal === false) {
     let tokens = shared.get_tokens()[shared.get_file_name()].tokens;
-    tokens[tokens.length - 1] === '.' ? combine_previous() : '';
+    tokens[tokens.length - 1] === '.' && numeric_type === 'regular' ? combine_previous() : '';
    }
    has_decimal = false;
    has_exponent = false;
