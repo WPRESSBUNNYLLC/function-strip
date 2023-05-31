@@ -1,11 +1,10 @@
-//checks for number
 
 let shared = require('../data');
 let numeric_type = '';
 
 function numbers() { 
  while(true) {
-  if(shared.get_current_token().test(/^0b([10]+)$|^0o([0-7]+)$|^0x([a-fA-f0-9]+)$|^([0-9]+)(\.)?([0-9]+)?([0-9]*e[\-+][0-9]+)?$/) === false) { //zero or more before e? ahould be 1... also need to fix decimals
+  if(shared.get_current_token().test(/^0b([10]+)$|^0o([0-7]+)$|^0x([a-fA-f0-9]+)$|^(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?$/) === false) { //boom
    if(check_if_might_be_valid() === true) {
     continue;
    }
@@ -27,7 +26,7 @@ function check_numeric_type() {
    numeric_type = 'octal;'
   } else if(shared.get_current_token().test(/^0b([10]+)$/) === true) { 
    numeric_type = 'binary;'
-  } else if(shared.get_current_token().test(/^([0-9]+)(\.)?([0-9]+)?([0-9]*e[\-+][0-9]+)?$/) === true) { //either trim leading zeros on decimal or... change beginning... maybe just trim
+  } else if(shared.get_current_token().test(/^(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?$/) === true) { // a decimal or number can come before e
    numeric_type = 'regular;'
   } else if(shared.get_current_token().test(/^0x([a-fA-f0-9]+)$/) === true) { 
    numeric_type = 'hex;'
