@@ -5,7 +5,7 @@ let numeric_type = '';
 
 function numbers() { 
  while(true) {
-  if(shared.get_current_token().test(/^0b([0-9]+)?$|^0o([0-9]+)?$|^0x([a-zA-Z0-9]+)?$|^([0-9]+)(\.)?([0-9]+)?([0-9]e[\-+][0-9]+)?$/) === false) {
+  if(shared.get_current_token().test(/^0b([10]+)$|^0o([0-7]+)$|^0x([a-fA-f0-9]+)$|^([0-9]+)(\.)?([0-9]+)?([0-9]*e[\-+][0-9]+)?$/) === false) { //zero or more before e? ahould be 1... also need to fix decimals
    if(check_if_might_be_valid() === true) {
     continue;
    }
@@ -23,13 +23,13 @@ function numbers() {
 }
 
 function check_numeric_type() { 
-  if(shared.get_current_token().test(/0o([0-9]+)?$/) === true) { 
+  if(shared.get_current_token().test(/0o([0-7]+)$/) === true) { 
    numeric_type = 'octal;'
-  } else if(shared.get_current_token().test(/^0b([0-9]+)?$/) === true) { 
+  } else if(shared.get_current_token().test(/^0b([10]+)$/) === true) { 
    numeric_type = 'binary;'
-  } else if(shared.get_current_token().test(/^([0-9]+)(\.)?([0-9]+)?([0-9]e[\-+][0-9]+)?$/) === true) {
+  } else if(shared.get_current_token().test(/^([0-9]+)(\.)?([0-9]+)?([0-9]*e[\-+][0-9]+)?$/) === true) { //either trim leading zeros on decimal or... change beginning... maybe just trim
    numeric_type = 'regular;'
-  } else if(shared.get_current_token().test(/^0x([a-zA-Z0-9]+)?$/) === true) { 
+  } else if(shared.get_current_token().test(/^0x([a-fA-f0-9]+)$/) === true) { 
    numeric_type = 'hex;'
   } else {
    numeric_type = 'regular';
@@ -37,6 +37,7 @@ function check_numeric_type() {
 }
 
 function check_if_might_be_valid() { 
+
  if(shared.get_current_token().slice(-1) === 'e' && numeric_type === 'regular') {
   if(
    (shared.get_data().charAt(shared.get_data_index() + 1) === '+' || shared.get_data().charAt(shared.get_data_index() + 1) === '-') && 
@@ -48,7 +49,33 @@ function check_if_might_be_valid() {
    return true;
   }
  }
+
+ if(shared.get_current_token().slice(-1) === 'o' && numeric_type === 'octal') {
+  if(shared.get_data().charAt(shared.get_data_index() + 1).test(/[0-7]/)) { 
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1))
+   shared.update_data_index(2);
+   return true;
+  }
+ }
+
+ if(shared.get_current_token().slice(-1) === 'x' && numeric_type === 'hex') {
+  if(shared.get_data().charAt(shared.get_data_index() + 1).test(/[a-fA-f0-9]/)) { 
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1))
+   shared.update_data_index(2);
+   return true;
+  }
+ }
+
+ if(shared.get_current_token().slice(-1) === 'b' && numeric_type === 'binary') {
+  if(shared.get_data().charAt(shared.get_data_index() + 1).test(/[10]/)) { 
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1))
+   shared.update_data_index(2);
+   return true;
+  }
+ }
+
  return false;
+
 }
 
 module.exports = numbers;

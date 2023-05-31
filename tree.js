@@ -2,7 +2,7 @@ let error = {};
 let tree = {};
 
 function tree() { 
- //beeld
+ //beehld
 }
 
 module.exports = build_tree;
