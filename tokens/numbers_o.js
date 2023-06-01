@@ -47,6 +47,18 @@ const hex = {
  E: true, 
  F: true
 }
+let zero_nine = { 
+ 0: true,
+ 1: true,
+ 2: true,
+ 3: true,
+ 4: true,
+ 5: true,
+ 6: true,
+ 7: true, 
+ 8: true,
+ 9: true,     
+}
 const binary = {
  0: true,
  1: true,
@@ -69,7 +81,7 @@ function initiate_number() {
       run_octal();
    } else if( typeof reguar_expecting_only[next] !== 'undefined') { 
       if(reguar_expecting_only[next] === '.') { delete reguar_expecting_only['.'];  }
-      else if(reguar_expecting_only[next] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; }
+      else if(reguar_expecting_only[next] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; if(!attach()) { return } }
       else { delete reguar_expecting_only['.'];  }
       shared.update_current_token(next);
       shared.update_data_index(2);
@@ -80,7 +92,7 @@ function initiate_number() {
   } else { 
     if(typeof reguar_expecting_only[next] !== 'undefined') { 
      if(reguar_expecting_only[next] === '.') { delete reguar_expecting_only['.'];  }
-     else if(reguar_expecting_only[next] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; };     
+     else if(reguar_expecting_only[next] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; if(!attach()) { return }  };     
      shared.update_current_token(next);
      shared.update_data_index(2);
      run_regular();
@@ -124,19 +136,35 @@ function run_hex() {
  }
 }
 
+let bad_attachment = false;
 function run_regular() { 
  while(true) {
   let d_i = shared.get_data().charAt(shared.get_data_index());
-  if(typeof reguar_expecting_only[d_i] === 'undefined') {
+  if(typeof reguar_expecting_only[d_i] === 'undefined' || bad_attachment === true) {
    shared.pop_current_token();
    shared.decrease_data_index_for_correct_data_index_and_line_number(1);
    reguar_expecting_only['e'] = true; 
    reguar_expecting_only['.'] = true;
+   bad_attachment = false;
    break;
   }
-  if(reguar_expecting_only[d_i] === '.') { delete reguar_expecting_only['.'];  }
-  if(reguar_expecting_only[d_i] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; };
+  if(typeof reguar_expecting_only[d_i] !== 'undefined' && reguar_expecting_only[d_i] === '.') { delete reguar_expecting_only['.'];  }
+  else if(typeof reguar_expecting_only[d_i] !== 'undefined' && reguar_expecting_only[d_i] === 'e') { typeof reguar_expecting_only['.'] !== 'undefined' ? delete reguar_expecting_only['.'] : '', delete reguar_expecting_only['e']; attach(); continue; };
   shared.update_current_token(d_i);
   shared.update_data_index(1);
+ }
+}
+
+function attach() {
+ let next = shared.get_data().charAt(shared.get_data_index() + 1);
+ let next2 = shared.get_data().charAt(shared.get_data_index() + 2);
+ if((next === '+' || next === '-') && typeof zero_nine[next2] !== 'undefined') { 
+  shared.update_current_token(next);
+  shared.update_current_token(next2);
+  shared.update_data_index(3);
+  return true;
+ } else { 
+   bad_attachment = true; //land on an e and a bad attachment... stop on next iteration
+   return false;
  }
 }
