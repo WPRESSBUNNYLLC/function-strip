@@ -1,6 +1,4 @@
-
 let shared = require('../data');
-
 let reguar_expecting_only = { 
  0: true,
  1: true,
@@ -15,7 +13,6 @@ let reguar_expecting_only = {
  '.': true, 
  'e': true
 }
-
 const octal = {
  0: true,
  1: true,
@@ -26,7 +23,6 @@ const octal = {
  6: true,
  7: true
 }
-
 const zero_nine = {
  0: true,
  1: true,
@@ -39,7 +35,6 @@ const zero_nine = {
  8: true,
  9: true, 
 }
-
 const hex = {
  0: true,
  1: true,
@@ -64,43 +59,41 @@ const hex = {
  E: true, 
  F: true
 }
-
 const binary = {
   0: true,
   1: true,
 }
 
 function initiate_number() { 
-  let b = shared.get_data().charAt(shared.get_data_index() + 1);
+  let next = shared.get_data().charAt(shared.get_data_index() + 1);
   if(shared.get_data().charAt(shared.get_data_index()) === '0') {
-   if(b === 'b') { 
-     shared.update_current_token('b');
-     shared.update_data_index(2);
-     run_binary();
-   } else if(b === 'x') { 
-     shared.update_current_token('x');
-     shared.update_data_index(2);
+   if(next === 'b') { 
+    shared.update_current_token('b');
+    shared.update_data_index(2);
+    run_binary();
+   } else if(next === 'x') { 
+      shared.update_current_token('x');
+      shared.update_data_index(2);
      run_hex();
-   } else if(b === 'o') { 
-     shared.update_current_token('o');
-     shared.update_data_index(2);
-     run_octal();
+   } else if(next === 'o') { 
+      shared.update_current_token('o');
+      shared.update_data_index(2);
+      run_octal();
    } else if( typeof reguar_expecting_only[b] !== 'undefined') { 
-     leading_zero = true;
-     if(reguar_expecting_only[b] === '.') { delete reguar_expecting_only['.'];  }
-     if(reguar_expecting_only[b] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; };
-     if(reguar_expecting_only[b][zero_nine] === true) { delete reguar_expecting_only['.'];  }
-     shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
-     shared.update_data_index(2);
-     run_regular();
+      if(reguar_expecting_only[next] === '.') { delete reguar_expecting_only['.'];  }
+      if(reguar_expecting_only[next] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; };
+      if(reguar_expecting_only[next][zero_nine] === true) { delete reguar_expecting_only['.'];  }
+      shared.update_current_token(next);
+      shared.update_data_index(2);
+      run_regular();
    } else { 
-     return
+      return
    }
   } else { 
-    if(typeof reguar_expecting_only[b] !== 'undefined') { 
-     if(reguar_expecting_only[b] === '.') { delete reguar_expecting_only['.'];  }
-     if(reguar_expecting_only[b] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; };     
-     shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
+    if(typeof reguar_expecting_only[next] !== 'undefined') { 
+     if(reguar_expecting_only[next] === '.') { delete reguar_expecting_only['.'];  }
+     if(reguar_expecting_only[next] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; };     
+     shared.update_current_token(next);
      shared.update_data_index(2);
      run_regular();
     }
@@ -159,9 +152,3 @@ function run_regular() {
   shared.update_data_index(1);
  }
 }
-
-//03 delete periof 
-//0e delete e and period
-//0. delete period
-//12323e delete e and periof 
-//232. delete period
