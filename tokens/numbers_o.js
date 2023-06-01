@@ -1,5 +1,5 @@
 let shared = require('../data');
-let reguar_expecting_only = { 
+let regular_expecting_only = { 
  0: true,
  1: true,
  2: true,
@@ -79,10 +79,10 @@ function initiate_number() {
       shared.update_current_token('o');
       shared.update_data_index(2);
       run_octal();
-   } else if( typeof reguar_expecting_only[next] !== 'undefined') { 
-      if(reguar_expecting_only[next] === '.') { delete reguar_expecting_only['.'];  }
-      else if(reguar_expecting_only[next] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; if(!attach()) { return } }
-      else { delete reguar_expecting_only['.'];  }
+   } else if( typeof regular_expecting_only[next] !== 'undefined') { 
+      if(regular_expecting_only[next] === '.') { delete regular_expecting_only['.'];  }
+      else if(regular_expecting_only[next] === 'e') { delete regular_expecting_only['.']; delete regular_expecting_only['e']; if(!attach()) { return } }
+      else { delete regular_expecting_only['.'];  }
       shared.update_current_token(next);
       shared.update_data_index(2);
       run_regular();
@@ -90,9 +90,9 @@ function initiate_number() {
       return
    }
   } else { 
-    if(typeof reguar_expecting_only[next] !== 'undefined') { 
-     if(reguar_expecting_only[next] === '.') { delete reguar_expecting_only['.'];  }
-     else if(reguar_expecting_only[next] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; if(!attach()) { return }  };     
+    if(typeof regular_expecting_only[next] !== 'undefined') { 
+     if(regular_expecting_only[next] === '.') { delete regular_expecting_only['.'];  }
+     else if(regular_expecting_only[next] === 'e') { delete regular_expecting_only['.']; delete regular_expecting_only['e']; if(!attach()) { return }  };     
      shared.update_current_token(next);
      shared.update_data_index(2);
      run_regular();
@@ -140,16 +140,16 @@ let bad_attachment = false;
 function run_regular() { 
  while(true) {
   let d_i = shared.get_data().charAt(shared.get_data_index());
-  if(typeof reguar_expecting_only[d_i] === 'undefined' || bad_attachment === true) {
+  if(typeof regular_expecting_only[d_i] === 'undefined' || bad_attachment === true) {
    shared.pop_current_token();
    shared.decrease_data_index_for_correct_data_index_and_line_number(1);
-   reguar_expecting_only['e'] = true; 
-   reguar_expecting_only['.'] = true;
+   regular_expecting_only['e'] = true; 
+   regular_expecting_only['.'] = true;
    bad_attachment = false;
    break;
   }
-  if(typeof reguar_expecting_only[d_i] !== 'undefined' && reguar_expecting_only[d_i] === '.') { delete reguar_expecting_only['.'];  }
-  else if(typeof reguar_expecting_only[d_i] !== 'undefined' && reguar_expecting_only[d_i] === 'e') { typeof reguar_expecting_only['.'] !== 'undefined' ? delete reguar_expecting_only['.'] : '', delete reguar_expecting_only['e']; attach(); continue; };
+  if(typeof regular_expecting_only[d_i] !== 'undefined' && regular_expecting_only[d_i] === '.') { delete regular_expecting_only['.'];  }
+  else if(typeof regular_expecting_only[d_i] !== 'undefined' && regular_expecting_only[d_i] === 'e') { typeof regular_expecting_only['.'] !== 'undefined' ? delete regular_expecting_only['.'] : '', delete regular_expecting_only['e']; attach(); continue; };
   shared.update_current_token(d_i);
   shared.update_data_index(1);
  }
