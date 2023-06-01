@@ -3,10 +3,11 @@ let shared = require('../data');
 let checked_valid = false;
 
 //slower than numbers_o
+//if(shared.get_current_token().test(/^0b([10]+)$|^0o([0-7]+)$|^0x([a-fA-f0-9]+)$|^(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?$/) === false) { //or typeof number.. thought it wouldnt work but i think so
 
 function numbers() { 
  while(true) {
-  if(shared.get_current_token().test(/^0b([10]+)$|^0o([0-7]+)$|^0x([a-fA-f0-9]+)$|^(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?$/) === false) {
+  if(typeof shared.get_current_token() !== 'number') {
    if(checked_valid === false && check_if_might_be_valid(shared.get_current_token().slice(-1)) === true) {
     continue;
    }

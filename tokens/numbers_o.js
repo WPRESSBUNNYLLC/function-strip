@@ -47,7 +47,7 @@ const hex = {
  E: true, 
  F: true
 }
-let zero_nine = { 
+const zero_nine = { 
  0: true,
  1: true,
  2: true,
@@ -80,24 +80,24 @@ function initiate_number() {
     shared.update_data_index(2);
     run_octal();
    } else if(typeof regular_expecting_only[next] !== 'undefined') { 
-     let att = false;
-     if(next === '.') { 
-      delete regular_expecting_only['.'];  
-     } else if(next === 'e') { 
-      delete regular_expecting_only['.']; 
-      delete regular_expecting_only['e']; 
-      if(!attach()) { 
-       return 
-      }; 
-      att = true; 
-     } else { 
-      delete regular_expecting_only['.'];  
-     }
-     if(att === false) {
-      shared.update_current_token(next);
-      shared.update_data_index(2);
-     }
-     run_regular();
+    let att = false;
+    if(next === '.') { 
+     delete regular_expecting_only['.'];  
+    } else if(next === 'e') { 
+    delete regular_expecting_only['.']; 
+    delete regular_expecting_only['e']; 
+    if(!attach()) { 
+     return 
+    }; 
+    att = true; 
+    } else { 
+     delete regular_expecting_only['.'];  
+    }
+    if(att === false) {
+     shared.update_current_token(next);
+     shared.update_data_index(2);
+    }
+    run_regular();
    }
   } else { 
     if(typeof regular_expecting_only[next] !== 'undefined') {
@@ -174,6 +174,7 @@ function run_regular() {
   } else if(typeof regular_expecting_only[d_i] !== 'undefined' && d_i === 'e') { 
    typeof regular_expecting_only['.'] !== 'undefined' ? delete regular_expecting_only['.'] : ''
    delete regular_expecting_only['e']; 
+   shared.update_current_token(d_i);
    attach(); 
    continue; 
   };
@@ -191,7 +192,7 @@ function attach() {
   shared.update_data_index(3);
   return true;
  } else { 
-  bad_attachment = true; //land on an e and a bad attachment... stop on next iteration
+  bad_attachment = true; //land on an e and a bad attachment... stop on next iteration and pop the e
   return false;
  }
 }
