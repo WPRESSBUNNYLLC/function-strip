@@ -2,10 +2,12 @@
 let shared = require('../data');
 let checked_valid = false;
 
+//slower than numbers_o
+
 function numbers() { 
  while(true) {
   if(shared.get_current_token().test(/^0b([10]+)$|^0o([0-7]+)$|^0x([a-fA-f0-9]+)$|^(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?$/) === false) {
-   if(checked_valid === false && check_if_might_be_valid() === true) {
+   if(checked_valid === false && check_if_might_be_valid(shared.get_current_token().slice(-1)) === true) {
     continue;
    }
    shared.pop_current_token();
@@ -18,10 +20,9 @@ function numbers() {
  }
 }
 
-function check_if_might_be_valid() { 
+function check_if_might_be_valid(last) { 
 
  checked_valid = true;
- let last = shared.get_current_token().slice(-1);
 
  if(last === 'e') {
   if(

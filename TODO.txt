@@ -1,4 +1,5 @@
 might not need in_value_error... maybe just check expect errors
+compare regex look ahead with while loops... if regex look ahead is faster, use last_index and just do it like that in the same file
 
 let wow = { 
     root: 5, 

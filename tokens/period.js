@@ -9,7 +9,7 @@ function period() {
   ) { 
    shared.update_current_token('.');
    shared.update_current_token('.');
-   shared.update_data_index(1);
+   shared.update_data_index(1); //execute decimal number
   } else { 
    shared.decrease_data_index_for_correct_data_index_and_line_number(1);
   }
