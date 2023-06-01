@@ -80,21 +80,27 @@ function initiate_number() {
       shared.update_data_index(2);
       run_octal();
    } else if( typeof regular_expecting_only[next] !== 'undefined') { 
+      let att = false;
       if(regular_expecting_only[next] === '.') { delete regular_expecting_only['.'];  }
-      else if(regular_expecting_only[next] === 'e') { delete regular_expecting_only['.']; delete regular_expecting_only['e']; if(!attach()) { return } }
+      else if(regular_expecting_only[next] === 'e') { delete regular_expecting_only['.']; delete regular_expecting_only['e']; if(!attach()) { return } att = true; }
       else { delete regular_expecting_only['.'];  }
-      shared.update_current_token(next);
-      shared.update_data_index(2);
+      if(att = false) {
+       shared.update_current_token(next);
+       shared.update_data_index(2);
+      }
       run_regular();
    } else { 
       return
    }
   } else { 
-    if(typeof regular_expecting_only[next] !== 'undefined') { 
+    if(typeof regular_expecting_only[next] !== 'undefined') {
+     let att = false; 
      if(regular_expecting_only[next] === '.') { delete regular_expecting_only['.'];  }
-     else if(regular_expecting_only[next] === 'e') { delete regular_expecting_only['.']; delete regular_expecting_only['e']; if(!attach()) { return }  };     
-     shared.update_current_token(next);
-     shared.update_data_index(2);
+     else if(regular_expecting_only[next] === 'e') { delete regular_expecting_only['.']; delete regular_expecting_only['e']; if(!attach()) { return } att = true; };     
+     if(att === false) {
+      shared.update_current_token(next);
+      shared.update_data_index(2);
+     }
      run_regular();
     }
   }
@@ -136,6 +142,7 @@ function run_hex() {
  }
 }
 
+//going until a bad value and getting out... if period found, delete period, e delete e and period attach and check for bad attachment else continue
 let bad_attachment = false;
 function run_regular() { 
  while(true) {
@@ -164,7 +171,7 @@ function attach() {
   shared.update_data_index(3);
   return true;
  } else { 
-   bad_attachment = true; //land on an e and a bad attachment... stop on next iteration
-   return false;
+    bad_attachment = true; //land on an e and a bad attachment... stop on next iteration
+    return false;
  }
 }
