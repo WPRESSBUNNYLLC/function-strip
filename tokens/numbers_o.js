@@ -23,18 +23,6 @@ const octal = {
  6: true,
  7: true
 }
-const zero_nine = {
- 0: true,
- 1: true,
- 2: true,
- 3: true,
- 4: true,
- 5: true,
- 6: true,
- 7: true, 
- 8: true,
- 9: true, 
-}
 const hex = {
  0: true,
  1: true,
@@ -60,8 +48,8 @@ const hex = {
  F: true
 }
 const binary = {
-  0: true,
-  1: true,
+ 0: true,
+ 1: true,
 }
 
 function initiate_number() { 
@@ -74,15 +62,15 @@ function initiate_number() {
    } else if(next === 'x') { 
       shared.update_current_token('x');
       shared.update_data_index(2);
-     run_hex();
+      run_hex();
    } else if(next === 'o') { 
       shared.update_current_token('o');
       shared.update_data_index(2);
       run_octal();
-   } else if( typeof reguar_expecting_only[b] !== 'undefined') { 
+   } else if( typeof reguar_expecting_only[next] !== 'undefined') { 
       if(reguar_expecting_only[next] === '.') { delete reguar_expecting_only['.'];  }
-      if(reguar_expecting_only[next] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; };
-      if(reguar_expecting_only[next][zero_nine] === true) { delete reguar_expecting_only['.'];  }
+      else if(reguar_expecting_only[next] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; }
+      else { delete reguar_expecting_only['.'];  }
       shared.update_current_token(next);
       shared.update_data_index(2);
       run_regular();
@@ -92,7 +80,7 @@ function initiate_number() {
   } else { 
     if(typeof reguar_expecting_only[next] !== 'undefined') { 
      if(reguar_expecting_only[next] === '.') { delete reguar_expecting_only['.'];  }
-     if(reguar_expecting_only[next] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; };     
+     else if(reguar_expecting_only[next] === 'e') { delete reguar_expecting_only['.']; delete reguar_expecting_only['e']; };     
      shared.update_current_token(next);
      shared.update_data_index(2);
      run_regular();
