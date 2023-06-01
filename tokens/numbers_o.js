@@ -72,31 +72,46 @@ function initiate_number() {
     shared.update_data_index(2);
     run_binary();
    } else if(next === 'x') { 
-      shared.update_current_token('x');
-      shared.update_data_index(2);
-      run_hex();
+    shared.update_current_token('x');
+    shared.update_data_index(2);
+    run_hex();
    } else if(next === 'o') { 
-      shared.update_current_token('o');
+    shared.update_current_token('o');
+    shared.update_data_index(2);
+    run_octal();
+   } else if(typeof regular_expecting_only[next] !== 'undefined') { 
+     let att = false;
+     if(next === '.') { 
+      delete regular_expecting_only['.'];  
+     } else if(next === 'e') { 
+      delete regular_expecting_only['.']; 
+      delete regular_expecting_only['e']; 
+      if(!attach()) { 
+       return 
+      }; 
+      att = true; 
+     } else { 
+      delete regular_expecting_only['.'];  
+     }
+     if(att === false) {
+      shared.update_current_token(next);
       shared.update_data_index(2);
-      run_octal();
-   } else if( typeof regular_expecting_only[next] !== 'undefined') { 
-      let att = false;
-      if(regular_expecting_only[next] === '.') { delete regular_expecting_only['.'];  }
-      else if(regular_expecting_only[next] === 'e') { delete regular_expecting_only['.']; delete regular_expecting_only['e']; if(!attach()) { return } att = true; }
-      else { delete regular_expecting_only['.'];  }
-      if(att = false) {
-       shared.update_current_token(next);
-       shared.update_data_index(2);
-      }
-      run_regular();
-   } else { 
-      return
+     }
+     run_regular();
    }
   } else { 
     if(typeof regular_expecting_only[next] !== 'undefined') {
      let att = false; 
-     if(regular_expecting_only[next] === '.') { delete regular_expecting_only['.'];  }
-     else if(regular_expecting_only[next] === 'e') { delete regular_expecting_only['.']; delete regular_expecting_only['e']; if(!attach()) { return } att = true; };     
+     if(next === '.') { 
+      delete regular_expecting_only['.'];  
+     } else if(next === 'e') { 
+      delete regular_expecting_only['.']; 
+      delete regular_expecting_only['e']; 
+      if(!attach()) { 
+       return 
+      } 
+      att = true; 
+     }  
      if(att === false) {
       shared.update_current_token(next);
       shared.update_data_index(2);
@@ -142,7 +157,6 @@ function run_hex() {
  }
 }
 
-//going until a bad value and getting out... if period found, delete period, e delete e and period attach and check for bad attachment else continue
 let bad_attachment = false;
 function run_regular() { 
  while(true) {
@@ -155,8 +169,14 @@ function run_regular() {
    bad_attachment = false;
    break;
   }
-  if(typeof regular_expecting_only[d_i] !== 'undefined' && regular_expecting_only[d_i] === '.') { delete regular_expecting_only['.'];  }
-  else if(typeof regular_expecting_only[d_i] !== 'undefined' && regular_expecting_only[d_i] === 'e') { typeof regular_expecting_only['.'] !== 'undefined' ? delete regular_expecting_only['.'] : '', delete regular_expecting_only['e']; attach(); continue; };
+  if(typeof regular_expecting_only[d_i] !== 'undefined' && d_i === '.') { 
+   delete regular_expecting_only['.'];  
+  } else if(typeof regular_expecting_only[d_i] !== 'undefined' && d_i === 'e') { 
+   typeof regular_expecting_only['.'] !== 'undefined' ? delete regular_expecting_only['.'] : ''
+   delete regular_expecting_only['e']; 
+   attach(); 
+   continue; 
+  };
   shared.update_current_token(d_i);
   shared.update_data_index(1);
  }
@@ -171,7 +191,7 @@ function attach() {
   shared.update_data_index(3);
   return true;
  } else { 
-    bad_attachment = true; //land on an e and a bad attachment... stop on next iteration
-    return false;
+  bad_attachment = true; //land on an e and a bad attachment... stop on next iteration
+  return false;
  }
 }
