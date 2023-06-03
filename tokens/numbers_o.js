@@ -1,18 +1,4 @@
 let shared = require('../data');
-let regular_expecting_only = { 
- 0: true,
- 1: true,
- 2: true,
- 3: true,
- 4: true,
- 5: true,
- 6: true,
- 7: true, 
- 8: true,
- 9: true, 
- '.': true, 
- 'e': true
-}
 const octal = {
  0: true,
  1: true,
@@ -79,45 +65,17 @@ function initiate_number() {
     shared.update_current_token('o');
     shared.update_data_index(2);
     run_octal();
-   } else if(typeof regular_expecting_only[next] !== 'undefined') { 
-    let att = false;
-    if(next === '.') { 
-     delete regular_expecting_only['.'];  
-    } else if(next === 'e') { 
-    delete regular_expecting_only['.']; 
-    delete regular_expecting_only['e']; 
-    if(!attach()) { 
-     return 
-    }; 
-    att = true; 
-    } else { 
-     delete regular_expecting_only['.'];  
-    }
-    if(att === false) {
-     shared.update_current_token(next);
-     shared.update_data_index(2);
+   } else { 
+    if(next === 'e') { 
+     if(!attach()) return;
     }
     run_regular();
    }
   } else { 
-    if(typeof regular_expecting_only[next] !== 'undefined') {
-     let att = false; 
-     if(next === '.') { 
-      delete regular_expecting_only['.'];  
-     } else if(next === 'e') { 
-      delete regular_expecting_only['.']; 
-      delete regular_expecting_only['e']; 
-      if(!attach()) { 
-       return 
-      } 
-      att = true; 
-     }  
-     if(att === false) {
-      shared.update_current_token(next);
-      shared.update_data_index(2);
-     }
-     run_regular();
+    if(next === 'e') { 
+     if(!attach()) return;
     }
+    run_regular();
   }
 }
 
@@ -157,30 +115,16 @@ function run_hex() {
  }
 }
 
-let bad_attachment = false;
 function run_regular() { 
- while(true) {
-  let d_i = shared.get_data().charAt(shared.get_data_index());
-  if(typeof regular_expecting_only[d_i] === 'undefined' || bad_attachment === true) {
-   shared.pop_current_token();
-   shared.decrease_data_index_for_correct_data_index_and_line_number(1);
-   regular_expecting_only['e'] = true; 
-   regular_expecting_only['.'] = true;
-   bad_attachment = false;
-   break;
+  while(true) {
+   if(isNaN(shared.get_current_token())) {
+    shared.pop_current_token();
+    shared.decrease_data_index_for_correct_data_index_and_line_number(1);
+    break;
+   }
+   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+   shared.update_data_index(1);
   }
-  if(typeof regular_expecting_only[d_i] !== 'undefined' && d_i === '.') { 
-   delete regular_expecting_only['.'];  
-  } else if(typeof regular_expecting_only[d_i] !== 'undefined' && d_i === 'e') { 
-   typeof regular_expecting_only['.'] !== 'undefined' ? delete regular_expecting_only['.'] : ''
-   delete regular_expecting_only['e']; 
-   shared.update_current_token(d_i);
-   attach(); 
-   continue; 
-  };
-  shared.update_current_token(d_i);
-  shared.update_data_index(1);
- }
 }
 
 function attach() {
@@ -192,7 +136,6 @@ function attach() {
   shared.update_data_index(3);
   return true;
  } else { 
-  bad_attachment = true; //land on an e and a bad attachment... stop on next iteration and pop the e
   return false;
  }
 }
