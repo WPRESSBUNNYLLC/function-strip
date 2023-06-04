@@ -1,14 +1,18 @@
 
 let shared = require('../data');
 let checked_valid = false;
+let has_zero = false;
 
 //slower than numbers_o
-//if(shared.get_current_token().test(/^0b([10]+)$|^0o([0-7]+)$|^0x([a-fA-f0-9]+)$|^(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?$/) === false) { //or typeof number.. thought it wouldnt work but i think so
+//if(shared.get_current_token().test(/^0b([10]+)$|^0o([0-7]+)$|^0x([a-fA-f0-9]+)$|^(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?$/) === false) { //make this a look ahead if faster
+// function look_ahead() { 
+// } ---> /0b([10]+)$|^0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?/g --- how to start regular expression look ahead at a specific index
+//or use the function where removing object values and adding them back after... checking one index at a time...
 
 function numbers() { 
  while(true) {
-  if(typeof shared.get_current_token() !== 'number') {
-   if(checked_valid === false && check_if_might_be_valid(shared.get_current_token().slice(-1)) === true) {
+  if(isNaN(shared.get_current_token())) {
+   if(checked_valid === false && check_if_might_be_valid() === true) {
     continue;
    }
    shared.pop_current_token();
@@ -21,11 +25,11 @@ function numbers() {
  }
 }
 
-function check_if_might_be_valid(last) { 
+function check_if_might_be_valid() { 
 
  checked_valid = true;
 
- if(last === 'e') {
+ if(shared.get_current_token().slice(-1) === 'e') { //if last value is an e... follwing must be a number
   if(
    (shared.get_data().charAt(shared.get_data_index() + 1) === '+' || shared.get_data().charAt(shared.get_data_index() + 1) === '-') && 
    shared.get_data().charAt(shared.get_data_index() + 2).test(/[0-9]/) === true
@@ -37,7 +41,7 @@ function check_if_might_be_valid(last) {
   }
  }
 
- if(last === 'o') {
+ if(shared.get_current_token() === '0o') {
   if(shared.get_data().charAt(shared.get_data_index() + 1).test(/[0-7]/)) { 
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1))
    shared.update_data_index(2);
@@ -45,7 +49,7 @@ function check_if_might_be_valid(last) {
   }
  }
 
- if(last === 'x') {
+ if(shared.get_current_token() === '0x') {
   if(shared.get_data().charAt(shared.get_data_index() + 1).test(/[a-fA-f0-9]/)) { 
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1))
    shared.update_data_index(2);
@@ -53,7 +57,7 @@ function check_if_might_be_valid(last) {
   }
  }
 
- if(last === 'b') {
+ if(shared.get_current_token() === 'ob') {
   if(shared.get_data().charAt(shared.get_data_index() + 1).test(/[10]/)) { 
    shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1))
    shared.update_data_index(2);
