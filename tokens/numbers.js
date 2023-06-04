@@ -1,12 +1,11 @@
 
 let shared = require('../data');
 let checked_valid = false;
-let has_zero = false;
 
 //slower than numbers_o
 //if(shared.get_current_token().test(/^0b([10]+)$|^0o([0-7]+)$|^0x([a-fA-f0-9]+)$|^(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?$/) === false) { //make this a look ahead if faster
 // function look_ahead() { 
-// } ---> /0b([10]+)$|^0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?/g --- how to start regular expression look ahead at a specific index
+// } ---> /0b([10]+)$|^0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?/g --- how to start regular expression look ahead at a specific index without lastIndex
 //or use the function where removing object values and adding them back after... checking one index at a time...
 
 function numbers() { 
@@ -29,7 +28,7 @@ function check_if_might_be_valid() {
 
  checked_valid = true;
 
- if(shared.get_current_token().slice(-1) === 'e') { //if last value is an e... follwing must be a number
+ if(shared.get_current_token().slice(-1) === 'e') {
   if(
    (shared.get_data().charAt(shared.get_data_index() + 1) === '+' || shared.get_data().charAt(shared.get_data_index() + 1) === '-') && 
    shared.get_data().charAt(shared.get_data_index() + 2).test(/[0-9]/) === true

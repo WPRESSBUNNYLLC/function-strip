@@ -4,53 +4,64 @@ let initiate_arrow = require('generate/functions/arrowJs/arrow_main');
 let initiate_regular = require('generate/functions/regularJs/regular_main');
 let html_tag = require('generate/html_recursive_exit/html_tag');
 let html_comment = require('./html_recursive_exit/html_comment');
-let double_quote_string = require('generate/tokens/double-quote-string');
-let multiline_comment = require('generate/tokens/multiline-comment');
+// let double_quote_string = require('generate/tokens/double-quote-string');
+// let multiline_comment = require('generate/tokens/multiline-comment');
 let regex = require('./tokens/regex');
-let single_quote_string = require('generate/tokens/single-quote-string');
-let singleline_comment = require('generate/tokens/singleline-comment');
+// let single_quote_string = require('generate/tokens/single-quote-string');
+// let singleline_comment = require('generate/tokens/singleline-comment');
 let template_string = require('generate/tokens/template-string');
-let equals = require('generate/tokens/equals');
-let greater_than = require('generate/tokens/greater-than');
-let less_than = require('generate/tokens/less-than');
-let exclamation = require('generate/tokens/exclamation');
-let plus = require('generate/tokens/plus');
-let minice = require('generate/tokens/minice');
-let times = require('generate/tokens/times');
-let division = require('generate/tokens/division');
-let percent = require('generate/tokens/percent');
-let and = require('generate/tokens/and');
-let or = require('generate/tokens/or');
-let power = require('generate/tokens/power');
-let period = require('generate/tokens/period');
-let identifier_ = require('generate/tokens/identifier');
-let number_ = require('generate/tokens/numbers');
-let bts = '';
-let tags = [];
-let temp_line_number = 0;
-const first_valid_character_html_tag = /[a-zA-Z0-9_]/; 
-const punctuator = /[=<>\\!+\-*/,.%~?:;&^()[\]|{}]/;
-const look_through_punctuator_ = { 
-'=': 'equals', 
-'>': 'greater_than', 
-'<': 'less_than', 
-'!': 'exclamation', 
-'+': 'plus', 
-'-': 'minice', 
-'*': 'times', 
-'/': 'division', 
-'%': 'percent', 
-'&': 'and', 
-'|': 'or', 
-'^': 'power',
-'.': 'period'
-}
-const punctuator_ = (op) => look_through_punctuator_[op]();
-const number = /[0-9]/;
-const identifier = /[A-Za-z$_]/;
+// let equals = require('generate/tokens/equals');
+// let greater_than = require('generate/tokens/greater-than');
+// let less_than = require('generate/tokens/less-than');
+// let exclamation = require('generate/tokens/exclamation');
+// let plus = require('generate/tokens/plus');
+// let minice = require('generate/tokens/minice');
+// let times = require('generate/tokens/times');
+// let division = require('generate/tokens/division');
+// let percent = require('generate/tokens/percent');
+// let and = require('generate/tokens/and');
+// let or = require('generate/tokens/or');
+// let power = require('generate/tokens/power');
+// let period = require('generate/tokens/period');
+// let identifier_ = require('generate/tokens/identifier');
+// let number_ = require('generate/tokens/numbers');
+// let bts = '';
+// let tags = [];
+// let temp_line_number = 0;
+// const first_valid_character_html_tag = /[a-zA-Z0-9_]/; 
+// const punctuator = /[=<>\\!+\-*/,.%~?:;&^()[\]|{}]/;
+// const look_through_punctuator_ = { 
+// '=': 'equals', 
+// '>': 'greater_than', 
+// '<': 'less_than', 
+// '!': 'exclamation', 
+// '+': 'plus', 
+// '-': 'minice', 
+// '*': 'times', 
+// '/': 'division', 
+// '%': 'percent', 
+// '&': 'and', 
+// '|': 'or', 
+// '^': 'power',
+// '.': 'period'
+// }
+// const punctuator_ = (op) => look_through_punctuator_[op]();
+// const number = /[0-9]/;
+// const identifier = /[A-Za-z$_]/;
 let tag_update = {}; 
 let folders = [];
 let file_type = '';
+const regex_tokenizer = { //manually count line numbers per index srart just check the first variable and increase... push last index on top
+  number: /0b([10]+)$|^0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?/,
+  identifier_or_key_word: /\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})/,
+  double_string: /"(.){0,}?"/,
+  single_string: /'(.){0,}?'/,
+  template_string: /a/, //may need to do this like in the other
+  multi_line_comment: /(\/\*)(.|\n){0,}?(\*\/)/,
+  single_line_comment: /(\/\/)(.){0,}?/,
+  punctuator: /(&&|&=|&)|(\/=|\/)|(===|==|=>|=)(!==|!==|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)(\|\||\|\=|\|)|(%=|%)|(...)|(++|+=|+)|(^=|=)|(*=|*)/,
+  white_space: /( |\n|\t|\r)+/ 
+}
 
  /* 
    * search folders, files and get all arrow functions with and without brackets regular functions with brackets. line numbers, filepaths, function names.
@@ -213,7 +224,7 @@ let file_type = '';
   
  }
  
- function js() {
+ function js_manual_tokenizer() { //no regex.. objects
  
   if(shared.get_data_index() > shared.get_data_length()) { 
    return;
@@ -421,5 +432,33 @@ let file_type = '';
   return js();
  
  }
+
+ function js_regex_tokenzier(last_index) { 
+
+  if(regex_tokenizer.number) { 
+
+  } else if(regex_tokenizer.double_string) { 
+    shared.update_current_token_type('string-literal');
+  } else if(regex_tokenizer.single_string) { 
+    shared.update_current_token('string-literal');
+  } else if(regex_tokenizer.identifier_or_key_word) { 
+   
+  } else if(regex_tokenizer.punctuator) { 
+
+  } else if(regex_tokenizer.multi_line_comment) { 
+
+  } else if(regex_tokenizer.single_line_comment) { 
+
+  } else if(regex_tokenizer.template_string) { 
+
+  }
+ 
+  return js_regex_tokenzier(last_index);
+
+ }
  
  module.exports = generate;
+
+ /*
+
+ */
