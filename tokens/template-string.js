@@ -1,15 +1,7 @@
-/*
- determines the exit of a template string... gets very funky
- ",',//,/* <-- handled inside of template literal via outside functions 
- `, ${ handled with a recursive counter and single boolean value for what i am immediately inside of
- console.log(`${`${`//
- `}` + console.log('hello '+ 'world') + ``}`); 
- a1-b1-a2-b2-a3-a2-b1-a1                            a2-a1-b0-a0
-*/
+const regex_tokenizer = /(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(^=|=)|(\*=|\*)|([{}[\];\?\:]))|(?<whitespace>(( |\n|\t|\r)+?))|(?<regex>(\/([^=\/\*].)+([^\\]\/)[a-zA-Z]*))/g;
+const template_string = '`';
 
-//not sure how to do this
-
-let update_function_and_update_data = require('generate/data');
+let shared = require('generate/data');
 
 let recursive_counter_script = 0;
 let recursive_counter_string = 0; 
