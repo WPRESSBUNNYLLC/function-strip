@@ -1,75 +1,27 @@
 let fs = require('file-system');
 let shared = require('./data');
-let initiate_arrow = require('generate/functions/arrowJs/arrow_main');
-let initiate_regular = require('generate/functions/regularJs/regular_main');
 let html_tag = require('generate/html_recursive_exit/html_tag');
 let html_comment = require('./html_recursive_exit/html_comment');
-// let double_quote_string = require('generate/tokens/double-quote-string');
-// let multiline_comment = require('generate/tokens/multiline-comment');
-let regex = require('./tokens/regex');
-// let single_quote_string = require('generate/tokens/single-quote-string');
-// let singleline_comment = require('generate/tokens/singleline-comment');
 let template_string = require('generate/tokens/template-string');
-// let equals = require('generate/tokens/equals');
-// let greater_than = require('generate/tokens/greater-than');
-// let less_than = require('generate/tokens/less-than');
-// let exclamation = require('generate/tokens/exclamation');
-// let plus = require('generate/tokens/plus');
-// let minice = require('generate/tokens/minice');
-// let times = require('generate/tokens/times');
-// let division = require('generate/tokens/division');
-// let percent = require('generate/tokens/percent');
-// let and = require('generate/tokens/and');
-// let or = require('generate/tokens/or');
-// let power = require('generate/tokens/power');
-// let period = require('generate/tokens/period');
-// let identifier_ = require('generate/tokens/identifier');
-// let number_ = require('generate/tokens/numbers');
-// let bts = '';
-// let tags = [];
-// let temp_line_number = 0;
-// const first_valid_character_html_tag = /[a-zA-Z0-9_]/; 
-// const punctuator = /[=<>\\!+\-*/,.%~?:;&^()[\]|{}]/;
-// const look_through_punctuator_ = { 
-// '=': 'equals', 
-// '>': 'greater_than', 
-// '<': 'less_than', 
-// '!': 'exclamation', 
-// '+': 'plus', 
-// '-': 'minice', 
-// '*': 'times', 
-// '/': 'division', 
-// '%': 'percent', 
-// '&': 'and', 
-// '|': 'or', 
-// '^': 'power',
-// '.': 'period'
-// }
-// const punctuator_ = (op) => look_through_punctuator_[op]();
-// const number = /[0-9]/;
-// const identifier = /[A-Za-z$_]/;
 let tag_update = {}; 
 let folders = [];
 let file_type = '';
-const regex_tokenizer = { //manually count line numbers per index srart just check the first variable and increase... push last index on top
-  number: /0b([10]+)$|^0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?/,
+const regex_tokenizer = {
+  number: /0b([10]+)|0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?/,
   identifier_or_key_word: /\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})/,
   double_string: /"(.){0,}?"/,
   single_string: /'(.){0,}?'/,
-  template_string: /a/, //may need to do this like in the other
+  template_string: /(?<wow>(`text(\${(\k<wow>|expressions)})?text`))/, //?
   multi_line_comment: /(\/\*)(.|\n){0,}?(\*\/)/,
   single_line_comment: /(\/\/)(.){0,}?/,
-  punctuator: /(&&|&=|&)|(\/=|\/)|(===|==|=>|=)(!==|!==|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)(\|\||\|\=|\|)|(%=|%)|(...)|(++|+=|+)|(^=|=)|(*=|*)/,
-  white_space: /( |\n|\t|\r)+/ 
+  punctuator: /(&&|&=|&)|(\/=|\/)|(===|==|=>|=)(!==|!==|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)(\|\||\|\=|\|)|(%=|%)|(...)|(++|+=|+)|(^=|=)|(*=|*)|([{}[\];?:])/,
+  white_space: /( |\n|\t|\r)+/,
+  regex_literal: /\/(.)+([^\\]\/)[a-ZA-Z]*/, 
+  html_tag: /<script[[\]+=)(*&^%$#@!.,?<]*[.]/ //?
 }
 
- /* 
-   * search folders, files and get all arrow functions with and without brackets regular functions with brackets. line numbers, filepaths, function names.
-   * @param {fldr} folders being traversed
-   * @param {f_t_g} The function file path being written to. if non existant, is created.
-   * @param {f_t} The function types you would like to strip
- */
- 
+let result_from_execute = [];
+
  function generate(fldrs, f_t_g, f_t) {
  
   let error_initial = '';
@@ -223,242 +175,23 @@ const regex_tokenizer = { //manually count line numbers per index srart just che
   return run_from_html();
   
  }
- 
- function js_manual_tokenizer() { //no regex.. objects
- 
-  if(shared.get_data_index() > shared.get_data_length()) { 
-   return;
-  }
-
-  if(file_type === 'html') { //this would be assuming out of all scopes -- would have to do this on the fly... ill figure it out
-   if(
-    shared.get_data().charAt(shared.get_data_index()) === '<' && 
-    shared.get_data().charAt(shared.get_data_index() + 1) === '/' &&
-    shared.get_data().charAt(shared.get_data_index() + 2).test(first_valid_character_html_tag) === true
-   ) { 
-    temp_line_number = shared.get_line_number();
-    bts = '<' + shared.get_data().charAt(shared.get_data_index() + 1) + shared.data.charAt(shared.get_data_index() + 2);
-    shared.update_data_index(3);
-    tag_update = html_tag(bts, shared.data.charAt(shared.get_data_index() + 2));
-    tags.push({
-     tag_line_number_start: temp_line_number, 
-     tag_line_number_end: shared.get_line_number(), 
-     type: 'closing', 
-     name: tag_update.script_name.toLowerCase(), 
-     tag_string: tag_update.tag_string
-    })
-    if(tag_update.script_name.toLowerCase() === 'script') {
-     return;
-    } else { 
-     return js();
-    }
-   }
-  }
- 
-  if(shared.get_data().charAt(shared.get_data_index()) === '\n') { 
-   shared.update_current_token_type('new-line');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.build_data_structure();
-   shared.update_line_number(1);
-   shared.update_data_index(1);
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()) === ' ') {
-   shared.update_current_token_type('spaces');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(1); 
-   spaces_();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.build_data_structure();
-   shared.update_data_index(1);
-   return js();
-  }
-
-  if(
-   shared.get_data().charAt(shared.get_data_index()) === '/' &&
-   shared.get_data().charAt(shared.get_data_index() + 1) === '*'
-  ) { 
-   shared.update_current_token_type('multi-line-comment');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(2); 
-   multiline_comment();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.build_data_structure();
-   shared.update_data_index(1);
-   return js();
-  }
-
-  if(
-   shared.get_data().charAt(shared.get_data_index()) === '/' &&
-   shared.get_data().charAt(shared.get_data_index() + 1) === '/'
-  ) { 
-   shared.update_current_token_type('single-line-comment');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(2); 
-   singleline_comment();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.build_data_structure();
-   shared.update_data_index(1);
-   return js();
-  }
-
-  if(
-   shared.get_data().charAt(shared.get_data_index()) === '/' &&
-   shared.get_data().charAt(shared.get_data_index() + 1) !== '/' && 
-   shared.get_data().charAt(shared.get_data_index() + 1) !== '*'
-  ) {
-   shared.update_current_token_type('regex-literal');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index() + 1));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(2); 
-   regex();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.build_data_structure();
-   shared.update_data_index(1);
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()) === '"') { 
-   shared.update_current_token_type('string-literal');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(1); 
-   double_quote_string();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.build_data_structure();
-   shared.update_data_index(1);
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()) === "'") { 
-   shared.update_current_token_type('string-literal');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(1); 
-   single_quote_string();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.build_data_structure();
-   shared.update_data_index(1);
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()) === '`') { 
-   shared.update_current_token_type('template-literal');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(1); 
-   template_string();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.build_data_structure();
-   shared.update_data_index(1);
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()).test(number) === true) { 
-   shared.update_current_token_type('numeric-literal');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(1); 
-   number_();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.build_data_structure();
-   shared.update_data_index(1);
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()).test(identifier) === true) { 
-   shared.update_current_token_type('identifier');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_data_index(1); 
-   identifier_();
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.build_data_structure();
-   shared.update_data_index(1);
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()).test(punctuator) === true) { 
-   shared.update_current_token_type('punctuator');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   if(look_through_punctuator_[shared.get_current_token()] === false) {
-    shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-    shared.update_tokens();
-    shared.build_data_structure();
-    shared.update_data_index(1);
-    return js();
-   }
-   shared.update_data_index(1); 
-   punctuator_(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.build_data_structure();
-   shared.update_data_index(1);
-   return js();
-  }
-
-  if(shared.get_data().charAt(shared.get_data_index()) !== ' ') {
-   shared.update_current_token_type('unknown');
-   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
-   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
-   shared.update_tokens();
-   shared.build_data_structure();
-   shared.update_data_index(1);
-   return js();
-  }
-
-  shared.update_data_index(1); 
-  return js();
- 
- }
 
  function js_regex_tokenzier(last_index) { 
 
-  if(regex_tokenizer.number) { 
-
-  } else if(regex_tokenizer.double_string) { 
-    shared.update_current_token_type('string-literal');
-  } else if(regex_tokenizer.single_string) { 
-    shared.update_current_token('string-literal');
-  } else if(regex_tokenizer.identifier_or_key_word) { 
-   
-  } else if(regex_tokenizer.punctuator) { 
-
-  } else if(regex_tokenizer.multi_line_comment) { 
-
-  } else if(regex_tokenizer.single_line_comment) { 
-
-  } else if(regex_tokenizer.template_string) { 
-
-  }
+ 
  
   return js_regex_tokenzier(last_index);
 
  }
- 
+  
+//   shared.update_current_token_type('string-literal');
+//   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
+//   shared.set_beginning_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+//   shared.update_data_index(1); 
+//   double_quote_string();
+//   shared.set_ending_token_line_number_and_data_index(shared.get_data_index(), shared.get_line_number());
+//   shared.update_tokens();
+//   shared.build_data_structure();
+//   shared.update_data_index(1);
+
  module.exports = generate;
-
- /*
-
- */
