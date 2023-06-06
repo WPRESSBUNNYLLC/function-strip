@@ -1,4 +1,3 @@
-
 let data = '';
 let data_length = 0;
 let line_number = 0; 

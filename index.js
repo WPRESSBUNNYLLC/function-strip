@@ -2,25 +2,20 @@ let fs = require('file-system');
 let shared = require('./data');
 let html_tag = require('generate/html_recursive_exit/html_tag');
 let html_comment = require('./html_recursive_exit/html_comment');
-let template_string = require('generate/tokens/template-string');
 let tag_update = {}; 
 let folders = [];
 let file_type = '';
-const regex_tokenizer = {
-  number: /0b([10]+)|0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?/,
-  identifier_or_key_word: /\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})/,
-  double_string: /"(.){0,}?"/,
-  single_string: /'(.){0,}?'/,
-  template_string: /(?<wow>(`text(\${(\k<wow>|expressions)})?text`))/, //?
-  multi_line_comment: /(\/\*)(.|\n){0,}?(\*\/)/,
-  single_line_comment: /(\/\/)(.){0,}?/,
-  punctuator: /(&&|&=|&)|(\/=|\/)|(===|==|=>|=)(!==|!==|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)(\|\||\|\=|\|)|(%=|%)|(...)|(++|+=|+)|(^=|=)|(*=|*)|([{}[\];?:])/,
-  white_space: /( |\n|\t|\r)+/,
-  regex_literal: /\/(.[^\/*])+([^\\]\/)[a-ZA-Z]*/, 
-  html_tag: /<script[[\]+=)(*&^%$#@!.,?<]*[.]/ //?
-}
-
-let result_from_execute = [];
+let JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/([^\/\*].)+([^\\]\/)[a-zA-Z]*))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|(?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(^=|=)|(\*=|\*)|([,{}[\];\?\:\^\~]))/;
+let shared = require('generate/data');
+let recursive_counter_script = 0;
+let recursive_counter_string = 0; 
+let currently_inside_of = 'string';
+let current_line_number = 0;
+let template_tokens = [];
+let current_template_string = []; //string template string template string template...etc
+let error = {};
+let tree = {};
+let match;
 
  function generate(fldrs, f_t_g, f_t) {
  
@@ -176,13 +171,89 @@ let result_from_execute = [];
   
  }
 
- function js_regex_tokenzier(last_index) { 
-
- 
- 
-  return js_regex_tokenzier(last_index);
-
+function tokens() { 
+ while(JavascriptTokenizer.lastIndex < shared.get_data_length()) { 
+  match = JavascriptTokenizer.exec(shared.get_data());
+  if(match[0] === '`'){ 
+    template_tokens.push('beginning-template');
+    template();
+    template_tokens.push('ending_template');
+  } else if(match[0] !== null) { 
+    //count line numbers in token
+    //push token with group name
+    //if punc build tree
+    //if prevous is whatever... push expect error
+  } else { 
+    throw new Error(`Unexpected: ${match[0]}`);
+  }
  }
+}
+
+function template() { 
+
+ if(
+  currently_inside_of === 'string' && 
+  shared.get_data().charAt(JavascriptTokenizer.lastIndex) === '$' && 
+  shared.get_data().charAt(JavascriptTokenizer.lastIndex + 1) === '{'
+ ) { 
+  currently_inside_of = 'script'
+  recursive_counter_script = recursive_counter_script + 1; 
+  JavascriptTokenizer.lastIndex += 2;
+  return recurse();
+ } else if(currently_inside_of === 'string') { 
+  //add to string
+ }
+
+ if(
+  currently_inside_of === 'script' && 
+  shared.get_data().charAt(JavascriptTokenizer.lastIndex) === '}'
+ ) {
+  currently_inside_of = 'string'; 
+  recursive_counter_script -= 1;
+  JavascriptTokenizer.lastIndex += 1;
+  
+  return recurse();
+ } else if (currently_inside_of === 'script') { 
+  //add to current tokens
+ }
+
+ if(
+  currently_inside_of === 'script' && 
+  shared.get_data().charAt(JavascriptTokenizer.lastIndex) === '`'
+ ) { 
+  currently_inside_of = 'string'; 
+  recursive_counter_string += 1;
+  regex_tokenizer.lastIndex += 1;
+  return recurse();
+ }
+
+ if(
+  currently_inside_of === 'string' && 
+  shared.get_data().charAt(JavascriptTokenizer.lastIndex) === '`'
+ ) {
+  currently_inside_of = 'script'; 
+  recursive_counter_string -= 1;
+  JavascriptTokenizer.lastIndex += 1;
+  if(
+   recursive_counter_string === 0 && 
+   recursive_counter_script === 0
+  ) {
+   recursive_counter_script = 0;
+   recursive_counter_string = 0; 
+   currently_inside_of = 'string';
+   return;
+ }
+  return recurse();
+ }
+
+ JavascriptTokenizer.lastIndex += 1; 
+ return recurse();
+
+}
+
+function build_tree() { 
+  // {}
+}
   
 //   shared.update_current_token_type('string-literal');
 //   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
