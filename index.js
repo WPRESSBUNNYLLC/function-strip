@@ -4,9 +4,8 @@ let html_tag = require('generate/html_recursive_exit/html_tag');
 let html_comment = require('./html_recursive_exit/html_comment');
 let tag_update = {}; 
 let folders = [];
-let file_type = '';
-let JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/([^\/\*].)+([^\\]\/)[a-zA-Z]*))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|(?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(^=|=)|(\*=|\*)|([,{}[\];\?\:\^\~]))/;
-let shared = require('generate/data');
+let file_type = '';                                                                                                                                                                                                                                                                                                                                                                                   //wrong                                              
+let JavascriptTokenizer = /(?<template_total>(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/([^\/\*].)+([^\\]\/)[a-zA-Z]*))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`(([^\(\${\)].)*(\${\k<template_total>})?(.)*)`))|(?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(^=|=)|(\*=|\*)|([,{}[\];\?\:\^\~])))/; 
 let recursive_counter_script = 0;
 let recursive_counter_string = 0; 
 let currently_inside_of = 'string';
@@ -15,6 +14,8 @@ let template_tokens = [];
 let current_template_string = []; //string template string template string template...etc
 let error = {};
 let tree = {};
+let tree_index = []; //left left right right left left left right right right left left
+let tree_scope = {};
 let match;
 
  function generate(fldrs, f_t_g, f_t) {
@@ -82,7 +83,7 @@ let match;
      } else if(file_type === 'js') { 
       file_type = 'javascript';
      } else if(file_type === 'html') {
-      file_type = 'html';
+      file_type = 'html'; 
      } else { 
       file_type = '';
      }
@@ -105,79 +106,15 @@ let match;
 
  }
 
- function run_from_html() { 
- 
-  if(shared.get_data_index() > shared.get_data_length()) { 
-   return;
-  }
- 
-  if(shared.get_data().charAt(shared.get_data_index()) === '\n') { 
-   shared.update_line_number(1);
-  }
- 
-  if(
-   shared.get_data().charAt(shared.get_data_index()) === '<' && 
-   shared.get_data().charAt(shared.get_data_index() + 1) === '!' && 
-   shared.data.charAt(shared.get_data_index() + 2) === '-' && 
-   shared.data.charAt(shared.get_data_index() + 3) === '-' 
-  ) { 
-   shared.update_data_index(4);
-   html_comment();
-   return run_from_html();
-  }
-
-  if(
-   shared.get_data().charAt(shared.get_data_index()) === '<' && 
-   shared.get_data().charAt(shared.get_data_index() + 2).test(first_valid_character_html_tag) === true
-  ) { 
-   temp_line_number = shared.get_line_number();
-   bts = '<' +  shared.get_data().charAt(shared.get_data_index() + 1);
-   shared.update_data_index(2);
-   tag_update = html_tag(bts, shared.get_data().charAt(shared.get_data_index() + 1));
-   tags.push({
-    tag_line_number_start: temp_line_number, 
-    tag_line_number_end: shared.get_line_number(), 
-    type: 'opening', 
-    name: tag_update.script_name.toLowerCase(), 
-    tag_string: tag_update.tag_string
-   })
-   if(tag_update.script_name.toLowerCase() === 'script') { 
-    js();
-   } 
-   return run_from_html();
-  }
-
-  if(
-   shared.get_data().charAt(shared.get_data_index()) === '<' && 
-   shared.get_data().charAt(shared.get_data_index() + 1) === '/' &&
-   shared.get_data().charAt(shared.get_data_index() + 2).test(first_valid_character_html_tag) === true
-  ) { 
-   temp_line_number = shared.get_line_number();
-   bts = '<' + shared.get_data().charAt(shared.get_data_index() + 1) + shared.get_data().charAt(shared.get_data_index() + 2);
-   shared.update_data_index(3);
-   tag_update = html_tag(bts, shared.data.charAt(shared.get_data_index() + 2));
-   tags.push({
-    tag_line_number_start: temp_line_number, 
-    tag_line_number_end: shared.get_line_number(), 
-    type: 'closing', 
-    name: tag_update.script_name.toLowerCase(), 
-    tag_string: tag_update.tag_string
-   })
-   return run_from_html();
-  }
-
-  shared.update_data_index(1); 
-  return run_from_html();
-  
+ function run_from_html() {
+  //go through and get only javascript
  }
 
-function tokens() { 
- while(JavascriptTokenizer.lastIndex < shared.get_data_length()) { 
+ function tokens() { 
+  while(JavascriptTokenizer.lastIndex < shared.get_data_length()) { 
   match = JavascriptTokenizer.exec(shared.get_data());
   if(match[0] === '`'){ 
-    template_tokens.push('beginning-template');
     template();
-    template_tokens.push('ending_template');
   } else if(match[0] !== null) { 
     //count line numbers in token
     //push token with group name
@@ -190,69 +127,11 @@ function tokens() {
 }
 
 function template() { 
-
- if(
-  currently_inside_of === 'string' && 
-  shared.get_data().charAt(JavascriptTokenizer.lastIndex) === '$' && 
-  shared.get_data().charAt(JavascriptTokenizer.lastIndex + 1) === '{'
- ) { 
-  currently_inside_of = 'script'
-  recursive_counter_script = recursive_counter_script + 1; 
-  JavascriptTokenizer.lastIndex += 2;
-  return recurse();
- } else if(currently_inside_of === 'string') { 
-  //add to string
- }
-
- if(
-  currently_inside_of === 'script' && 
-  shared.get_data().charAt(JavascriptTokenizer.lastIndex) === '}'
- ) {
-  currently_inside_of = 'string'; 
-  recursive_counter_script -= 1;
-  JavascriptTokenizer.lastIndex += 1;
-  
-  return recurse();
- } else if (currently_inside_of === 'script') { 
-  //add to current tokens
- }
-
- if(
-  currently_inside_of === 'script' && 
-  shared.get_data().charAt(JavascriptTokenizer.lastIndex) === '`'
- ) { 
-  currently_inside_of = 'string'; 
-  recursive_counter_string += 1;
-  regex_tokenizer.lastIndex += 1;
-  return recurse();
- }
-
- if(
-  currently_inside_of === 'string' && 
-  shared.get_data().charAt(JavascriptTokenizer.lastIndex) === '`'
- ) {
-  currently_inside_of = 'script'; 
-  recursive_counter_string -= 1;
-  JavascriptTokenizer.lastIndex += 1;
-  if(
-   recursive_counter_string === 0 && 
-   recursive_counter_script === 0
-  ) {
-   recursive_counter_script = 0;
-   recursive_counter_string = 0; 
-   currently_inside_of = 'string';
-   return;
- }
-  return recurse();
- }
-
- JavascriptTokenizer.lastIndex += 1; 
- return recurse();
-
+ //turn regular expression into a long string and go over manually just count ` and ${} -- 
 }
 
 function build_tree() { 
-  // {}
+  //{}
 }
   
 //   shared.update_current_token_type('string-literal');
