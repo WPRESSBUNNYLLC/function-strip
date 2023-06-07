@@ -5,7 +5,6 @@ let folders = [];
 let file_type = '';                                                                                                                                                                                                                                                                                                                                                                                                                                 
 let JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(^=|=)|(\*=|\*)|([,{}[\];\?\:\^\~])))/; 
 let TemplateTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?'))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(^=|=)|(\*=|\*)|([,{}[\];\?\:\^\~])))/; 
-
 let current_line_number = 0;
 let beginning_index = 0;
 let ending_index = 0;
@@ -114,19 +113,14 @@ let match;
   match = JavascriptTokenizer.exec(shared.get_data());
   if(match[0] === '`') { 
     template_index = JavascriptTokenizer.lastIndex;
-    beginng_line_number = current_line_number;
     template_string_();
-    ending_line_number = current_line_number;
     beginning_index = match.index; 
     ending_index = JavascriptTokenizer.lastIndex;
   } else if(match[0] !== null) { 
     beginning_index = match.index; 
     ending_index = JavascriptTokenizer.lastIndex;   
-    beginng_line_number = current_line_number;
-    current_line_number += (match[0].match(/\/n/g) || []).length;
-    ending_line_number = current_line_number;
     //push token with group name
-    //if punc build tree
+    //if punc or keyword build tree
     //if prevous is whatever... push expect error
 //   shared.update_current_token_type('string-literal');
 //   shared.update_current_token(shared.get_data().charAt(shared.get_data_index()));
@@ -304,7 +298,7 @@ function update_all_index(i) {
 function construct_template_string_as_seperated_non_error() { 
   for(let i = 0; i < combined.length; i++) {
     if(typeof(combined.template_string)) { 
-     //push string
+     //push string token
     } else {
      while(true) { 
       //build tokens
@@ -312,8 +306,6 @@ function construct_template_string_as_seperated_non_error() {
     }
   }
 }
-
-//get the output from each step and not run an error when seeing the combining value...
 
 function build_tree() { 
   //{}
