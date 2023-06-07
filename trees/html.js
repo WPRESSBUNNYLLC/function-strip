@@ -1,0 +1,1 @@
+//for html would have to do on the fly to avoid a misleading closing script error
