@@ -85,7 +85,7 @@ module.exports = class js extends shared {
  }
  
  tokens() {
-  while(this.JavascriptTokenizer.lastIndex <= shared.get_data_length()) {
+  while(this.JavascriptTokenizer.lastIndex === shared.get_data_length()) {
    this.match = this.JavascriptTokenizer.exec(shared.get_data());
    if(this.match[0] === '`') { 
     this.add_token('beginning_template_literal', '`');
@@ -93,13 +93,12 @@ module.exports = class js extends shared {
     this.add_token('ending_template_literal', '`');
     this.JavascriptTokenizer.lastIndex = this.template_index;
    } else if(this.match[0] !== null) { 
-     this.which_token(false);
+     this.which_token('');
    }
   }
  }
 
  which_token(T) { 
-  T = T === false ? '' : T;
   if(this.match.groups['regex']) { 
    this.tokens.push({ group: `${T}regex`, value: this.match[0] });
   } else if(this.match.groups['comment']) { 
@@ -151,6 +150,7 @@ module.exports = class js extends shared {
      this.JavascriptTokenizer.lastIndex += 1;
    }
   }
+  throw new Error('template literal has not ended');
  }
 
  template_object_() {
@@ -169,7 +169,7 @@ module.exports = class js extends shared {
    } else if(this.match[0] === '`') { 
      return this.template_string_();
    } else { 
-     which_token(true);
+     which_token('T-');
    }
   }
  }
