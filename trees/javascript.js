@@ -114,7 +114,11 @@ module.exports = class js extends shared {
     this.tokens.push({ group: `${T}identifier`, value: this.match[0] });
    }
   } else if(this.match.groups['punctuator']) {
-    this.tokens.push({ group: `${T}punctuator`, value: this.match[0] });
+    if(this.match[0] === '=>') { 
+     this.tokens.push({ group: `${T}identifier`, value: this.match[0] });
+    } else {
+     this.tokens.push({ group: `${T}punctuator`, value: this.match[0] });
+    }
   } else if(this.match.groups['whitespace']) { 
     this.tokens.push({ group: `${T}whitespace`, value: this.match[0] });
   } else { 
