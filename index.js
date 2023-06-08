@@ -87,9 +87,7 @@ let file_type = '';
      }
     }
    })
-   
   }
-
  }
 
 module.exports = generate;

@@ -7,24 +7,32 @@ module.exports = class js extends shared {
   this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-f0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(^=|=)|(\*=|\*)|([,{}[\];\?\:\^\~])))/g; 
   this.error = {};
   this.tokens = [];
-  this.tree = {};
+  this.token_index = 0;
+  this.saved_identifier_or_number_when_root_null = {};
+  this.tree_index = 0; // save the index of each root from left to right
+  //when operation and right is null, move right left and replace current right
+  this.saved_previous_block_on_boolean_operator = {};
+  this.tree = {
+    root: null, //boolan operator, block name, any defintion
+    left: null, //value -- parameters if function or block or a value
+    right: null //value
+  };
   this.tree_index = [];
   this.waiting_on_punctuator = [];
   this.tree_scope = {};
-  this.this.match = [];
-  this.this.template_string = '';
+  this.match = [];
+  this.template_string = '';
   this.counter_opening_bracket = 0;
   this.counter_closing_bracket = 0;
+  this.counter_opening_literal_string = 0; //dont think there is any use for this
+  this.counter_closing_literal_string = 0; 
+  this.current = [];
   this.key_words = {
-    'abstract'	: true,
     'arguments'	: true,
     'await'	: true,
-    'boolean' : true,
     'break' : true,
-    'byte' : true,
     'case' : true,	
     'catch' : true,
-    'char' : true,	
     'class' : true,
     'const' : true,
     'continue' : true,
@@ -32,29 +40,22 @@ module.exports = class js extends shared {
     'default' : true,	
     'delete' : true,	
     'do' : true,
-    'double' : true,
     'else' : true,	
     'enum' : true,	
     'eval' : true,
     'export' : true,
     'extends' : true,	
     'false' : true,	
-    'final' : true,
     'finally' : true,	
-    'float' : true,	
     'for' : true,	
     'function' : true,
-    'goto' : true,	
     'if' : true,	
     'implements' : true,	
     'import' : true,
     'in' : true,	
     'instanceof' : true,	
-    'int' : true,	
     'interface' : true,
     'let' : true,
-    'long' : true,	
-    'native' : true,	
     'new' : true,
     'null' : true,
     'package' : true,	
@@ -62,40 +63,37 @@ module.exports = class js extends shared {
     'protected' : true,
     'public' : true,	
     'return' : true,	
-    'short' : true,
     'static' : true,
     'super' : true,	
     'switch': true,	
-    'synchronized': true,	
     'this': true,
     'throw': true,
-    'throws': true,
-    'transient': true,
     'true': true,
     'try': true,
     'typeof': true,
     'var': true,
     'void': true,
-    'volatile': true,	
     'while': true,
     'with': true,
     'yield': true, 
+    'require': true,
     '=>': true
    }
  }
- 
- tokens() {
-  while(this.JavascriptTokenizer.lastIndex === shared.get_data_length()) {
+
+ tokens_() {
+  while(this.JavascriptTokenizer.lastIndex <= shared.get_data_length()) {
    this.match = this.JavascriptTokenizer.exec(shared.get_data());
    if(this.match[0] === '`') { 
-    this.add_token('beginning_template_literal', '`');
+    this.tokens.push({group: 'beginning-template-literal', value: '`'});
     this.template_string_();
-    this.add_token('ending_template_literal', '`');
+    this.tokens.push({group: 'ending-template-literal', value: '`'});
     this.JavascriptTokenizer.lastIndex = this.template_index;
    } else if(this.match[0] !== null) { 
      this.which_token('');
    }
   }
+  this.build_tree(this.tree);
  }
 
  which_token(T) { 
@@ -115,7 +113,7 @@ module.exports = class js extends shared {
    }
   } else if(this.match.groups['punctuator']) {
     if(this.match[0] === '=>') { 
-     this.tokens.push({ group: `${T}identifier`, value: this.match[0] });
+     this.tokens.push({ group: `${T}key-word`, value: this.match[0] });
     } else {
      this.tokens.push({ group: `${T}punctuator`, value: this.match[0] });
     }
@@ -132,15 +130,15 @@ module.exports = class js extends shared {
      shared.get_data().charAt(this.JavascriptTokenizer.lastIndex) === '$' && 
      shared.get_data().charAt(this.JavascriptTokenizer.lastIndex + 1) === '{'
     ) { 
-     this.tokens.push({ group: 'template_string', value: this.template_string });
+     this.template_string.length > 0 ? this.tokens.push({ group: 'template-string', value: this.template_string }) : '';
      this.template_string = '';
      this.counter_opening_bracket += 1;
      this.JavascriptTokenizer.lastIndex += 2;
      return this.template_object_();
     } else if(shared.get_data().charAt(this.JavascriptTokenizer.lastIndex) === '`') { 
-     this.tokens.push({ group: 'template_string', value: this.template_string });
+     this.template_string.length > 0 ? this.tokens.push({ group: 'template-string', value: this.template_string }) : '';
      this.template_string = '';
-     if(this.counter_opening_bracket !== this.counter_closing_bracket) {
+     if((this.counter_opening_bracket !== this.counter_closing_bracket)) {
       this.JavascriptTokenizer.lastIndex += 1;
       return this.template_object_();
      } else { 
@@ -154,7 +152,6 @@ module.exports = class js extends shared {
      this.JavascriptTokenizer.lastIndex += 1;
    }
   }
-  throw new Error('template literal has not ended');
  }
 
  template_object_() {
@@ -170,7 +167,7 @@ module.exports = class js extends shared {
     } else { 
      this.tokens.push({ group: 'T-punctuator', value: this.match[0] });
     }
-   } else if(this.match[0] === '`') { 
+   } else if(this.match[0] === '`') {
      return this.template_string_();
    } else { 
      which_token('T-');
@@ -178,47 +175,64 @@ module.exports = class js extends shared {
   }
  }
 
- /* 
+/*
+ operating on current
+--if identifier or number, and root is null, [save]... when punctuator, push the saved let... continue and find next identifier/number push right
+--save every full root left and right when present... if next is and/or, push that block to its current left and stick the and/or in root ...continue
+--if statements, while loops, functions: parameters on left, body on right... dont push parens anywhere... store paren when saving identifier or number...  
+--whitespace... just add a parameter of white space on the last blocks optional next whitespace
+--whitespace has new line or ; set new expression expected = true; in case two expressoins back to back on the same line
+--every value including objecs have a tree, recurse through after to bul
+--count brackets and parens on if/while/etc to know when to enter into the body ...also expt the body
+--calls: if identifier and next is an opening, define as a call, go through normally
+-- calmas attached as last value inside of expression... new expression started
+--save right hand identifier if next is operation(=,+ ,)...push the right hand left and put operation in right -- figure out which ones to move left
+--treat parameters as binary as well...
+*/
 
-  builds the tree using tokens
-  scope blocks - every new block(key word) inside of another... push that as an inner block. within the block, look for correct leading syntax and proceeding(=>) and expressions
-  tree expressions
-  (look over correct keywords -- some are not used anymore)
-
-  {
-    key-word-function:(block 1) { 
-        function name:
-        parameters
-        body: (body encapsulates expressions and blocks below)
-        expression:
-        expression:
-        expression:
-        expression:
-        key-word-function:(block 2) { 
-            function name:
-            parameters
-            body: (body encapsulates expressions and blocks below)
-            expression
-            expression
-            expression
-            expression
-            key-word-while (block 3)
-                parameters <-- parameters could also have a block statement
-                body <-- body could be a single expression if first value in isnt an opening bracket
-        }
-    }
+ build_tree(current_root) { 
+  if(this.tokens[this.token_index].group === 'punctuator') { 
+   this.handle_punctuator(current_root, this.tokens[this.token_index].value);
+  } else if(this.tokens[this.token_index].group === 'identifier') { 
+   this.handle_identifier(current_root, this.tokens[this.token_index].value);
+  } else if(this.tokens[this.token_index].group === 'key-word') { 
+   this.handle_key_word(curret.root, this.tokens[this.token_index].value);
+  } else if(this.tokens[this.token_index].group === 'regex') { 
+   this.handle_regex(current.root, this.tokens[this.token_index].value);
+  } else if(this.tokens[this.token_index].group === 'string') { 
+   this.handle_string(current.root, this.tokens[this.token_index].value);
+  } else if(this.tokens[this.token_index].group === 'comment') { 
+   this.handle_comment(current.root, this.tokens[this.token_index].value);
+  } else if(this.tokens[this.token_index].group === 'beginning-template-literal') { 
+   this.handle_template_literal(current_root, this.tokens[this.token_index].value);
+  } else if(this.tokens[this.token_index].group === 'number') { 
+   this.handle_number(current_root, this.tokens[this.token_index].value);
+  } else if(this.tokens[this.token_index].group === 'whitespace') { 
+   this.handle_white_space(current_root, this.tokens[this.token_index].value);
   }
-
-  after tree is built, overlap each block and append their references, file name and body as it was built in the document
-
- */
-
- build_tree_after_tokenization() { 
-  
-  
  }
 
- tree_error() { 
+ handle_punctuator(current_root, value) { 
+
+ }
+
+ handle_identifier(current_root, value) { 
+
+ }
+
+ handle_key_word(current_root, value) { 
+
+ }
+
+ handle_regex(current_root, value) { 
+
+ }
+
+ handle_string(current_root, value) { 
+
+ }
+
+ handle_comment(current_root, value) { 
 
  }
 

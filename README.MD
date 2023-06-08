@@ -10,3 +10,5 @@ https://web.stanford.edu/class/cs143/lectures/lecture06.pdf
 # Data structures
 
 gets all data structures / defintions in a document
+
+#tree
