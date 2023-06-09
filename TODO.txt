@@ -588,4 +588,6 @@ module.exports = class js extends shared { //pos(s|h)ibly return the tree from h
 --calls: if identifier and next is an opening, define as a call, go through normally
 -- calmas attached as last value inside of expression... new expression started
 --save right hand identifier if next is operation(=,+ ,)...push the right hand left and put operation in right -- figure out which ones to move left
+
+seprtate into locks and expressions.. blocks anything containing code inside... if block doesnt start with {, single expression
 */

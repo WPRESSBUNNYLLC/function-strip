@@ -8,14 +8,6 @@ let file_type = '';
  
   let error_initial = '';
  
-  if(
-   typeof(f_t) !== 'object' ||
-   typeof(f_t.regular) !== 'boolean' || 
-   typeof(f_t.arrow) !== 'boolean'
-  ) { 
-   error_initial += 'f_t: function types must be regular, arrow, react_function_component and react_class_component \n';
-  }
- 
   if(typeof(f_t_g) !== 'string') { 
    error_initial += 'f_t_g: file to generate must be a string \n';
   }
@@ -28,7 +20,6 @@ let file_type = '';
    throw new Error(error_initial);
   }
  
-  function_types = f_t;
   file_to_generate = f_t_g;
   folders = fldrs;
  
@@ -87,6 +78,7 @@ let file_type = '';
      }
     }
    })
+
   }
  }
 
