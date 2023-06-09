@@ -9,13 +9,12 @@ module.exports = class js extends shared {
   this.tokens = [];
   this.token_index = 0;
   this.saved_identifier_or_number_when_root_null = {};
-  this.tree_index = 0; // save the index of each root from left to right
-  //when operation and right is null, move right left and replace current right
+  this.tree_index = 0;
   this.saved_previous_block_on_boolean_operator = {};
   this.tree = {
-    root: null, //boolan operator, block name, any defintion
-    left: null, //value -- parameters if function or block or a value
-    right: null //value
+    root: null,
+    left: null,
+    right: null
   };
   this.tree_index = [];
   this.waiting_on_punctuator = [];
@@ -24,7 +23,7 @@ module.exports = class js extends shared {
   this.template_string = '';
   this.counter_opening_bracket = 0;
   this.counter_closing_bracket = 0;
-  this.counter_opening_literal_string = 0; //dont think there is any use for this
+  this.counter_opening_literal_string = 0;
   this.counter_closing_literal_string = 0; 
   this.current = [];
   this.key_words = {
@@ -174,21 +173,6 @@ module.exports = class js extends shared {
    }
   }
  }
-
-/*
- operating on current
---if identifier or number, and root is null, [save]... when punctuator, push the saved let... continue and find next identifier/number push right
---save every full root left and right when present... if next is and/or, push that block to its current left and stick the and/or in root ...continue
---if statements, while loops, functions: parameters on left, body on right... dont push parens anywhere... store paren when saving identifier or number...  
---whitespace... just add a parameter of white space on the last blocks optional next whitespace
---whitespace has new line or ; set new expression expected = true; in case two expressoins back to back on the same line
---every value including objecs have a tree, recurse through after to bul
---count brackets and parens on if/while/etc to know when to enter into the body ...also expt the body
---calls: if identifier and next is an opening, define as a call, go through normally
--- calmas attached as last value inside of expression... new expression started
---save right hand identifier if next is operation(=,+ ,)...push the right hand left and put operation in right -- figure out which ones to move left
---treat parameters as binary as well...
-*/
 
  build_tree(current_root) { 
   if(this.tokens[this.token_index].group === 'punctuator') { 

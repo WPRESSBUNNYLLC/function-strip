@@ -576,3 +576,16 @@ module.exports = class js extends shared { //pos(s|h)ibly return the tree from h
  }
 
 }
+
+/*
+ operating on current
+--if identifier or number, and root is null, [save]... when punctuator, push the saved let... continue and find next identifier/number push right
+--save every full root left and right when present... if next is and/or, push that block to its current left and stick the and/or in root ...continue
+--if statements, while loops, functions: parameters on left, body on right... dont push parens anywhere... store paren when saving identifier or number...  
+--whitespace... just add a parameter of white space on the last blocks optional next whitespace
+--whitespace has new line or ; set new expression expected = true; in case two expressoins back to back on the same line
+--count brackets and parens on if/while/etc to know when to enter into the body ...also expt the body
+--calls: if identifier and next is an opening, define as a call, go through normally
+-- calmas attached as last value inside of expression... new expression started
+--save right hand identifier if next is operation(=,+ ,)...push the right hand left and put operation in right -- figure out which ones to move left
+*/
