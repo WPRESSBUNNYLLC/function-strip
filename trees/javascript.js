@@ -3,8 +3,6 @@ let shared = require('../data');
 
 module.exports = class js extends shared {
 
-  //expression right left right left block params expression left right blo
-
  constructor() {                                                                                                                                                                                                                                                                                                                                                                                                                               
   this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(^=|=)|(\*=|\*)|([,{}[\];\?\:\^\~])))/g;
   this.tokens = [];
@@ -15,7 +13,7 @@ module.exports = class js extends shared {
   this.in_block_closing_block_count = 0;
   this.token_index = 0;
   this.file = {};
-  this.point_to_previous_block_multi_dimensional = []; //each index will be an array used to point back to the last block to continue next ex/block --- push set on every new block.... when end of expression, go to previous block
+  this.point_to_previous_block_multi_dimensional = [];
   this.match = [];
   this.template_string = '';
   this.counter_opening_bracket = 0;
@@ -116,16 +114,16 @@ module.exports = class js extends shared {
      value: this.match[0] 
     });
   } else if(this.match.groups['identifier']) { 
-   if(key_words[this.match[0]]) { 
-    this.tokens.push({
-     group: `${T}key-word`, 
-     value: this.match[0] 
-    });
-   } else {
-    this.tokens.push({ 
-     group: `${T}identifier`, 
-     value: this.match[0] 
-    });
+    if(key_words[this.match[0]]) { 
+     this.tokens.push({
+      group: `${T}key-word`, 
+      value: this.match[0] 
+     });
+    } else {
+     this.tokens.push({ 
+      group: `${T}identifier`, 
+      value: this.match[0] 
+     });
    }
   } else if(this.match.groups['punctuator']) {
     if(this.match[0] === '=>') { 
