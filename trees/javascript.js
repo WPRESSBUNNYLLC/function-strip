@@ -3,29 +3,23 @@ let shared = require('../data');
 
 module.exports = class js extends shared {
 
+  //expression right left right left block params expression left right blo
+
  constructor() {                                                                                                                                                                                                                                                                                                                                                                                                                               
   this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(^=|=)|(\*=|\*)|([,{}[\];\?\:\^\~])))/g;
-  this.error = {};
   this.tokens = [];
-  this.current_block_count = 0; 
-  this.current_expression_count = 0;
-  this.in_parameter_set = false;
-  this.in_block = false;
-  this.in_parameter_set_opening_paren_count = 0; //entering and exiting parameters of block... when ///exiting check next for single expression or counting brackets
+  this.current_block_and_expression_count = 0;
+  this.in_parameter_set_opening_paren_count = 0;
   this.in_parameter_set_closing_paren_count = 0;
+  this.in_block_opening_block_count = 0;
+  this.in_block_closing_block_count = 0;
   this.token_index = 0;
-  this.saved_identifier_or_number_when_root_null = {};
-  this.tree_index = 0;
-  this.saved_previous_block_on_boolean_operator = {};
-  this.file = {}; //seperate into blocks and expressions
-  this.tree_index = [];
-  this.waiting_on_punctuator = [];
-  this.tree_scope = {};
+  this.file = {};
+  this.point_to_previous_block_multi_dimensional = []; //each index will be an array used to point back to the last block to continue next ex/block --- push set on every new block.... when end of expression, go to previous block
   this.match = [];
   this.template_string = '';
   this.counter_opening_bracket = 0;
   this.counter_closing_bracket = 0;
-  this.current = [];
   this.key_words = {
     'arguments'	: true,
     'await'	: true,
@@ -259,6 +253,7 @@ module.exports = class js extends shared {
       parameters: {}, 
       body: {}
      }
+     this.save_previous_block = this.current_block_count;
      this.current_block_count += 1;
     case 'while': 
      current_root.block = { 
@@ -288,56 +283,5 @@ module.exports = class js extends shared {
  handle_white_space(current_root, value) { 
 
  }
-
- //function root, parameters left, body right 
- //object left is identifier, right is value, middle is : --- seperate these each into their indvidual scope
- //single expressions are single trees
-
- //example 
-
- /*
-
-  function wow() { 
-
-    let a = {
-      awesomel 1, 
-      cool: 3
-    }
-
-    let b = cool;
-
-
-  }
-
-  let a = 3
-
-  wow === true ? console.log('awesome') : '';
-
-      1-function     2-assign
-       function     = assign
-                   / \
-       /     \    a   3
-  parameters  =
-             / \
-            a  object -- put many left1's right 1's in root... instead of a single left right... number each of them right1 left1, right2, left2 (iterate and use typeof to find out when ending)
-                /  \
-            awesome 1 -- count brackets to know when function has ended to move next
-
-
-  wow === true ? console.log('awesome') : '';
-
-  ===
- /  \
-wow true
-    / \ 
-    .  ''
-   / \
-console log
-        /
-      'awesome' 
-
- */
-
-
 
 }
