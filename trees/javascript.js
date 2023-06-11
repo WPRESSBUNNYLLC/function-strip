@@ -4,7 +4,7 @@ let shared = require('../data');
 module.exports = class js extends shared {
 
  constructor() {                                                                                                                                                                                                                                                                                                                                                                                                                               
-  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(^=|^)|(\*=|\*)|([,{}[\];\?\:\~])))/g;
+  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*=|\*)|([,\{\}[\];\?\:\~])))/g;
   this.tokens = [];
   this.current_block_and_expression_count = 0;
   this.token_index = 0;
@@ -12,10 +12,17 @@ module.exports = class js extends shared {
   this.point_to_previous_block = []; 
   this.match = [];
   this.template_string = '';
-  this.counter_opening_bracket_inside = 0;
-  this.counter_closing_bracket_inside = 0;
-  this.counter_opening_bracket_global = 0;
-  this.counter_closing_bracket_global = 0;
+  this.template_count_pop = [];
+  this.template_string_open_close = { o: 0, c: 0 };
+  this.attach_to_regex = '';
+  this.igsmuy = {
+    i: { v: 'i', found: false }, 
+    g: { v: 'g', found: false }, 
+    y: { v: 'y', found: false }, 
+    u: { v: 'u', found: false }, 
+    m: { v: 'm', found: false }, 
+    s: { v: 's', found: false }, 
+  }
   this.key_words = {
     'arguments'	: true,
     'await'	: true,
@@ -92,10 +99,12 @@ module.exports = class js extends shared {
 
  which_token(T) { 
   if(this.match.groups['regex']) { 
+    this.check_regex_extension();
     this.tokens.push({
      group: `${T}regex`, 
-     value: this.match[0] 
+     value: this.match[0] + this.attach_to_regex
     });
+    this.attach_to_regex = '';
   } else if(this.match.groups['comment']) { 
     this.tokens.push({ 
      group: `${T}comment`, 
@@ -145,6 +154,27 @@ module.exports = class js extends shared {
   }
  }
 
+ check_regex_extension() {
+  if(
+   typeof this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)] !== 'undefined' && 
+   this.igsmuy[this.JavascriptTokenizer.lastIndex].found === false
+  ) { 
+   this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].found = true;
+   this.attach_to_regex += this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].v;
+   this.JavascriptTokenizer.lastIndex += 1;
+   this.check_regex_extension();
+  } else { 
+    if(this.attach_to_regex.length > 0) {
+     for (const [key, value] of Object.entries(this.igsmuy)) {
+      this.igsmuy[key].v = false;
+     }
+    }
+    return;
+  }
+ }
+
+ v() { console.log(`dsdsd${ a = { a: `a ${c}` } }hj ` ) };
+
  template_string_() {
    while(true) {
     if(
@@ -157,29 +187,26 @@ module.exports = class js extends shared {
       value: this.template_string 
      }) : '';
      this.template_string = '';
-     this.counter_opening_bracket_inside += 1;
-     this.counter_opening_bracket_global += 1;
+     this.template_count_pop.push({o: 1, c: 0});
      this.JavascriptTokenizer.lastIndex += 2;
      return this.template_object_();
     } else if(shared.get_data().charAt(this.JavascriptTokenizer.lastIndex) === '`') { 
+     this.template_string_open_close.c += 1;
      this.template_string.length > 0 ? 
      this.tokens.push({
        group: 'template-string', 
        value: this.template_string 
       }) : '';
      this.template_string = '';
-     if((this.counter_opening_bracket_global !== this.counter_closing_bracket_global)) {
+     if(this.template_string_open_close.o !== this.template_string_open_close.c) {
       this.JavascriptTokenizer.lastIndex += 1;
-      //exited a string inside of a template literal, counting the first template literal bracket of current.. waiting on end
-      this.counter_opening_bracket_inside += 1;
       return this.template_object_();
      } else { 
       this.JavascriptTokenizer.lastIndex += 1;
       this.template_string = '';
-      this.counter_opening_bracket_inside = 0;
-      this.counter_closing_bracket_inside = 0;
-      this.counter_opening_bracket_global = 0; 
-      this.counter_closing_bracket_global = 0;
+      this.template_count_pop = [];
+      this.template_string_open_close.o = 0;
+      this.template_string_open_close.c = 0; 
       break;
      }
     } else { 
@@ -193,18 +220,15 @@ module.exports = class js extends shared {
   while(true) { 
    this.match = this.JavascriptTokenizer.exec(shared.get_data());
    if(this.match[0] === '{') {
-    this.counter_opening_bracket_global += 1;
-    this.counter_opening_bracket_inside +=1;
+    this.template_count_pop[this.template_count_pop.length - 1].o += 1;
     this.tokens.push({ 
       group: 'T-punctuator', 
       value: this.match[0] 
     });
    } else if(this.match[0] === '}') { 
-    this.counter_closing_bracket_inside += 1;
-    this.counter_closing_bracket_global += 1;
-    if(this.counter_closing_bracket_inside === this.counter_opening_bracket_inside) { 
-     this.counter_opening_bracket_inside = 0; 
-     this.counter_closing_bracket_inside = 0;
+    this.template_count_pop[this.template_count_pop.length - 1].c += 1;
+    if(this.template_count_pop[this.template_count_pop.length - 1].o === this.template_count_pop[this.template_count_pop.length - 1].c) { 
+     this.template_count_pop.pop();
      return this.template_string_();
     } else { 
      this.tokens.push({ 
@@ -213,6 +237,7 @@ module.exports = class js extends shared {
      });
     }
    } else if(this.match[0] === '`') {
+     this.template_string_open_close.c += 1;
      return this.template_string_();
    } else { 
      which_token('T-');
