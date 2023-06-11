@@ -1,12 +1,1 @@
-*when expression, save expression, initiate tree, go through
-*when block, save block, initiate params, body, then initiate tree in params and go through
-*count parens on params, when match, exit into body
-*count brackets in body, when done exit back
-
-ex right left right block-25
-block-25 ...
-ex
-block
-
-define every block and expression on the outermost
-if run into a block in an expression that is not finished (left and right most id/num) push that into an array..jsut figure it out
+figure it out

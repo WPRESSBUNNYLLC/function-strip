@@ -4,20 +4,18 @@ let shared = require('../data');
 module.exports = class js extends shared {
 
  constructor() {                                                                                                                                                                                                                                                                                                                                                                                                                               
-  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(^=|=)|(\*=|\*)|([,{}[\];\?\:\^\~])))/g;
+  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(^=|^)|(\*=|\*)|([,{}[\];\?\:\~])))/g;
   this.tokens = [];
   this.current_block_and_expression_count = 0;
-  this.in_parameter_set_opening_paren_count = 0;
-  this.in_parameter_set_closing_paren_count = 0;
-  this.in_block_opening_block_count = 0;
-  this.in_block_closing_block_count = 0;
   this.token_index = 0;
   this.file = {};
-  this.point_to_previous_block_multi_dimensional = [];
+  this.point_to_previous_block = []; 
   this.match = [];
   this.template_string = '';
-  this.counter_opening_bracket = 0;
-  this.counter_closing_bracket = 0;
+  this.counter_opening_bracket_inside = 0;
+  this.counter_closing_bracket_inside = 0;
+  this.counter_opening_bracket_global = 0;
+  this.counter_closing_bracket_global = 0;
   this.key_words = {
     'arguments'	: true,
     'await'	: true,
@@ -159,7 +157,8 @@ module.exports = class js extends shared {
       value: this.template_string 
      }) : '';
      this.template_string = '';
-     this.counter_opening_bracket += 1;
+     this.counter_opening_bracket_inside += 1;
+     this.counter_opening_bracket_global += 1;
      this.JavascriptTokenizer.lastIndex += 2;
      return this.template_object_();
     } else if(shared.get_data().charAt(this.JavascriptTokenizer.lastIndex) === '`') { 
@@ -169,14 +168,18 @@ module.exports = class js extends shared {
        value: this.template_string 
       }) : '';
      this.template_string = '';
-     if((this.counter_opening_bracket !== this.counter_closing_bracket)) {
+     if((this.counter_opening_bracket_global !== this.counter_closing_bracket_global)) {
       this.JavascriptTokenizer.lastIndex += 1;
+      //exited a string inside of a template literal, counting the first template literal bracket of current.. waiting on end
+      this.counter_opening_bracket_inside += 1;
       return this.template_object_();
      } else { 
       this.JavascriptTokenizer.lastIndex += 1;
       this.template_string = '';
-      this.counter_opening_bracket = 0;
-      this.counter_closing_bracket = 0;
+      this.counter_opening_bracket_inside = 0;
+      this.counter_closing_bracket_inside = 0;
+      this.counter_opening_bracket_global = 0; 
+      this.counter_closing_bracket_global = 0;
       break;
      }
     } else { 
@@ -189,15 +192,19 @@ module.exports = class js extends shared {
  template_object_() {
   while(true) { 
    this.match = this.JavascriptTokenizer.exec(shared.get_data());
-   if(this.match[0] === '{') { 
-    this.counter_opening_bracket +=1;
+   if(this.match[0] === '{') {
+    this.counter_opening_bracket_global += 1;
+    this.counter_opening_bracket_inside +=1;
     this.tokens.push({ 
       group: 'T-punctuator', 
       value: this.match[0] 
     });
    } else if(this.match[0] === '}') { 
-    this.counter_closing_bracket += 1;
-    if(counter_closing_bracket === counter_opening_bracket) { 
+    this.counter_closing_bracket_inside += 1;
+    this.counter_closing_bracket_global += 1;
+    if(this.counter_closing_bracket_inside === this.counter_opening_bracket_inside) { 
+     this.counter_opening_bracket_inside = 0; 
+     this.counter_closing_bracket_inside = 0;
      return this.template_string_();
     } else { 
      this.tokens.push({ 
@@ -244,22 +251,7 @@ module.exports = class js extends shared {
  }
 
  handle_key_word(current_root, value) { 
-  switch(value) { 
-    case 'function': 
-     current_root[`block-${this.current_block_count}`] = {
-      block_name: 'function',
-      parameters: {}, 
-      body: {}
-     }
-     this.save_previous_block = this.current_block_count;
-     this.current_block_count += 1;
-    case 'while': 
-     current_root.block = { 
-      block_name: 'while', 
-      parameters: {}, 
-      body: {}
-     }
-  }
+
  }
 
  handle_regex(current_root, value) { 
