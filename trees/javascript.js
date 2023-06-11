@@ -173,8 +173,6 @@ module.exports = class js extends shared {
   }
  }
 
- v() { console.log(`dsdsd${ a = { a: `a ${c}` } }hj ` ) };
-
  template_string_() {
    while(true) {
     if(
@@ -237,7 +235,7 @@ module.exports = class js extends shared {
      });
     }
    } else if(this.match[0] === '`') {
-     this.template_string_open_close.c += 1;
+     this.template_string_open_close.o += 1;
      return this.template_string_();
    } else { 
      which_token('T-');
