@@ -4,11 +4,12 @@ let shared = require('../data');
 module.exports = class js extends shared {
 
  constructor() {                                                                                                                                                                                                                                                                                                                                                                                                                               
-  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*=|\*)|([,\{\}[\];\?\:\~])))/g;
+  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*=|\*)|([,\{\}[\];\?\:\~\(\)])))/g;
   this.tokens = [];
   this.current_block_and_expression_count = 0;
   this.token_index = 0;
   this.file = {};
+  this.bracket_count_block_pop = []; //for exiting the current block and down one
   this.point_to_previous_block = []; 
   this.match = [];
   this.template_string = '';
@@ -21,7 +22,7 @@ module.exports = class js extends shared {
     y: { v: 'y', found: false }, 
     u: { v: 'u', found: false }, 
     m: { v: 'm', found: false }, 
-    s: { v: 's', found: false }, 
+    s: { v: 's', found: false }
   }
   this.key_words = {
     'arguments'	: true,
@@ -85,6 +86,7 @@ module.exports = class js extends shared {
       group: 'beginning-template-literal', 
       value: '`'
     });
+    this.template_string_open_close.o += 1;
     this.template_string_();
     this.tokens.push({
       group: 'ending-template-literal', 
@@ -94,7 +96,7 @@ module.exports = class js extends shared {
      this.which_token('');
    }
   }
-  this.build_tree(this.file);
+  this.build_tree();
  }
 
  which_token(T) { 
@@ -166,7 +168,7 @@ module.exports = class js extends shared {
   } else { 
     if(this.attach_to_regex.length > 0) {
      for (const [key, value] of Object.entries(this.igsmuy)) {
-      this.igsmuy[key].v = false;
+      this.igsmuy[key].found = false;
      }
     }
     return;
@@ -243,57 +245,154 @@ module.exports = class js extends shared {
   }
  }
 
- build_tree(current_root) { 
-  if(this.tokens[this.token_index].group === 'punctuator') { 
-   this.handle_punctuator(current_root, this.tokens[this.token_index].value);
-  } else if(this.tokens[this.token_index].group === 'identifier') { 
-   this.handle_identifier(current_root, this.tokens[this.token_index].value);
-  } else if(this.tokens[this.token_index].group === 'key-word') { 
-   this.handle_key_word(curret.root, this.tokens[this.token_index].value);
-  } else if(this.tokens[this.token_index].group === 'regex') { 
-   this.handle_regex(current.root, this.tokens[this.token_index].value);
-  } else if(this.tokens[this.token_index].group === 'string') { 
-   this.handle_string(current.root, this.tokens[this.token_index].value);
-  } else if(this.tokens[this.token_index].group === 'comment') { 
-   this.handle_comment(current.root, this.tokens[this.token_index].value);
-  } else if(this.tokens[this.token_index].group === 'beginning-template-literal') { 
-   this.handle_template_literal(current_root, this.tokens[this.token_index].value);
-  } else if(this.tokens[this.token_index].group === 'number') { 
-   this.handle_number(current_root, this.tokens[this.token_index].value);
-  } else if(this.tokens[this.token_index].group === 'whitespace') { 
-   this.handle_white_space(current_root, this.tokens[this.token_index].value);
+ build_tree(current) { 
+  switch(this.tokens[this.token_index].group) { 
+   case 'punctuator': this.handle_punctuator(this.tokens[this.token_index].value, current);
+   case 'identifier': this.handle_identifier(this.tokens[this.token_index].value, current);
+   case 'key-word': this.handle_key_word(this.tokens[this.token_index].value, current);
+   case 'regex': this.handle_regex(this.tokens[this.token_index].value, current);
+   case 'string': this.handle_string(this.tokens[this.token_index].value, current);
+   case 'comment': this.handle_comment(this.tokens[this.token_index].value, current);
+   case 'beginning-template-literal': this.handle_template_literal(this.tokens[this.token_index].value, current);
+   case 'number': this.handle_number(this.tokens[this.token_index].value, current);
+   case 'whitespace': this.handle_white_space(this.tokens[this.token_index].value, current);
   }
  }
 
- handle_punctuator(current_root, value) { 
+ handle_punctuator(value, current) { 
+  switch(value) { 
+    case '&&': 
+    case '&=': 
+    case '&': 
+    case '/=': 
+    case '/': 
+    case '===': 
+    case '==': 
+    case '=>': 
+    case '=': 
+    case '!==': 
+    case '!=': 
+    case '!': 
+    case '>>>=': 
+    case '>>=': 
+    case '>>>': 
+    case '>>': 
+    case '>=': 
+    case '>': 
+    case '<<=': 
+    case '<<': 
+    case '<=': 
+    case '<': 
+    case '-=': 
+    case '--':
+    case '-':
+    case '||':
+    case '|=':
+    case '|': 
+    case '%=':
+    case '%':
+    case '...':
+    case '++': 
+    case '+=': 
+    case '+': 
+    case '^=': 
+    case '^': 
+    case '*=': 
+    case '*': 
+    case '[': 
+    case ',': 
+    case '{': 
+    case '}': 
+    case ']': 
+    case ';': 
+    case ':': 
+    case '~':
+    case '(': 
+    case ')':
+    default: throw new error('unidentified token');
+  }
+ }
+
+ handle_identifier(value, current) { 
+  if(value[0] === '.') { 
+
+  } else { 
+
+  }
+ }
+
+ handle_key_word(value, current) { 
+  switch(value) { 
+    case 'arguments':
+    case 'await':
+    case 'break':
+    case 'case':
+    case 'catch':
+    case 'class':
+    case 'const':
+    case 'continue':
+    case 'debugger':
+    case 'default':
+    case 'delete':
+    case 'do':
+    case 'else':
+    case 'enum':
+    case 'eval':
+    case 'export':
+    case 'extends':
+    case 'false':
+    case 'finally':
+    case 'for':
+    case 'function':
+    case 'if':
+    case 'implements':
+    case 'import':
+    case 'in':
+    case 'instanceof':
+    case 'interface':
+    case 'let':
+    case 'new':
+    case 'null':
+    case 'package':
+    case 'private':
+    case 'protected':
+    case 'public':
+    case 'return': 
+    case 'static':
+    case 'super':
+    case 'switch':
+    case 'this':
+    case 'throw':
+    case 'true':
+    case 'try':
+    case 'typeof':
+    case 'var':
+    case 'void':
+    case 'while':
+    case 'with':
+    case 'yield':
+    case 'require':
+    case '=>': 
+  }
+ }
+
+ handle_regex(value, current) { 
 
  }
 
- handle_identifier(current_root, value) { 
+ handle_string(value, current) { 
 
  }
 
- handle_key_word(current_root, value) { 
+ handle_comment(value, current) { 
 
  }
 
- handle_regex(current_root, value) { 
-
+ handle_template_literal(value, current) { 
+  
  }
 
- handle_string(current_root, value) { 
-
- }
-
- handle_comment(current_root, value) { 
-
- }
-
- handle_template_literal(current_root, value) { 
-
- }
-
- handle_white_space(current_root, value) { 
+ handle_white_space(value, current) { 
 
  }
 
