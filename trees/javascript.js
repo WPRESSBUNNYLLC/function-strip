@@ -8,8 +8,15 @@ module.exports = class js extends shared {
   this.tokens = [];
   this.current_block_and_expression_count = 0;
   this.token_index = 0;
-  this.file = {};
-  this.bracket_count_block_pop = []; //for exiting the current block and down one
+  this.block = 1;
+  this.file = { 1: null };
+  this.expression_chain = []; //pointing back one previous to check if valid next.. pointed through current expression --- or save previous 
+  this.current_expression = { 
+   root: null, 
+   left: null, 
+   right: null 
+  }
+  this.bracket_count_block_pop = [];
   this.point_to_previous_block = []; 
   this.match = [];
   this.template_string = '';
@@ -96,7 +103,7 @@ module.exports = class js extends shared {
      this.which_token('');
    }
   }
-  this.build_tree();
+  this.build_tree(this.current_expression);
  }
 
  which_token(T) { 
@@ -159,7 +166,7 @@ module.exports = class js extends shared {
  check_regex_extension() {
   if(
    typeof this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)] !== 'undefined' && 
-   this.igsmuy[this.JavascriptTokenizer.lastIndex].found === false
+   this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].found === false
   ) { 
    this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].found = true;
    this.attach_to_regex += this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].v;
@@ -202,6 +209,9 @@ module.exports = class js extends shared {
       this.JavascriptTokenizer.lastIndex += 1;
       return this.template_object_();
      } else { 
+      if(this.template_count_pop.length !== 0) { 
+        throw new Error('the template literal string has ended but there are still remaining brackets? wait, so you mean to tell me Alex.');
+      }
       this.JavascriptTokenizer.lastIndex += 1;
       this.template_string = '';
       this.template_count_pop = [];
@@ -262,55 +272,148 @@ module.exports = class js extends shared {
  handle_punctuator(value, current) { 
   switch(value) { 
     case '&&': 
+     this.handle_common_punc_a(current);
     case '&=': 
+     this.handle_common_punc_a(current);
     case '&': 
+     this.handle_common_punc_a(current);
     case '/=': 
+     this.handle_common_punc_a(current);
     case '/': 
+     this.handle_common_punc_a(current);
     case '===': 
+     this.handle_common_punc_a(current);
     case '==': 
+     this.handle_common_punc_a(current);
     case '=>': 
+    //arrow 
     case '=': 
+    //always root
     case '!==': 
+     this.handle_common_punc_a(current);
     case '!=': 
+     this.handle_common_punc_a(current);
     case '!': 
+     //
     case '>>>=': 
+     this.handle_common_punc_a(current);
     case '>>=': 
-    case '>>>': 
+     this.handle_common_punc_a(current);
+    case '>>>':
+     this.handle_common_punc_a(current); 
     case '>>': 
+     this.handle_common_punc_a(current);
     case '>=': 
+     this.handle_common_punc_a(current);
     case '>': 
+     this.handle_common_punc_a(current);
     case '<<=': 
+     this.handle_common_punc_a(current);
     case '<<': 
+     this.handle_common_punc_a(current);
     case '<=': 
+     this.handle_common_punc_a(current);
     case '<': 
+     this.handle_common_punc_a(current);
     case '-=': 
+     this.handle_common_punc_a(current);
     case '--':
+     this.handle_common_punc_a(current);
     case '-':
+     this.handle_common_punc_a(current);
     case '||':
+     this.handle_common_punc_a(current);
     case '|=':
+     this.handle_common_punc_a(current);
     case '|': 
+     this.handle_common_punc_a(current);
     case '%=':
+     this.handle_common_punc_a(current);
     case '%':
+     this.handle_common_punc_a(current);
     case '...':
+    //
     case '++': 
+     this.handle_common_punc_a(current);
     case '+=': 
+     this.handle_common_punc_a(current);
     case '+': 
+     this.handle_common_punc_a(current);
     case '^=': 
+     this.handle_common_punc_a(current);
     case '^': 
+     this.handle_common_punc_a(current);
     case '*=': 
+     this.handle_common_punc_a(current);
     case '*': 
+     this.handle_common_punc_a(current);
     case '[': 
+     //
     case ',': 
+     this.handle_common_punc_a(current);
     case '{': 
+    //
     case '}': 
+     //
     case ']': 
+     //
     case ';': 
+     //
     case ':': 
+     //
     case '~':
+     //
     case '(': 
+     //
     case ')':
-    default: throw new error('unidentified token');
+     //
   }
+ }
+
+ handle_common_punc_a(current) { 
+
+  if(
+    current.root === null && 
+    typeof(current.left) === 'object' && current.left !== null
+   ) { 
+    current.root = { 
+      index: this.token_index, 
+      type_: 'punctuator', 
+      value: '&&' 
+    }
+    current.right = { 
+      root: null, 
+      left: null, 
+      right: null
+    }; 
+    this.token_index += 1; 
+    return this.build_tree(current.right);
+   } 
+
+   if(
+    typeof(current.root) === 'object' && current.root !== null &&
+    typeof(current.left) === 'object' && current.left !== null &&
+    typeof(current.right) === 'object' && current.right !== null
+   ) { 
+    let temp = current.right; 
+    current.right = { 
+      root: {
+       index: this.token_index, 
+       type_: 'punctuator', 
+       value: '&&' 
+      },
+      left: temp, 
+      right: { 
+        root: null, 
+        left: null, 
+        right: null
+      }
+    }
+    //save prev right
+    this.token_index += 1; 
+    return this.build_tree(current.right.right);
+   } 
+
  }
 
  handle_identifier(value, current) { 

@@ -1,1 +1,3 @@
-figure it out, kxss kenz then lex, and call it a day
+handle errors respectively
+change some things 
+maybe use deault on punc a
