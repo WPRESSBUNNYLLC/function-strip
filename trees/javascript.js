@@ -16,18 +16,19 @@ module.exports = class js extends shared {
   this.block = 1;
   this.file = {};
   this.current_expression = { 
-   root: null, 
-   left: null, 
-   right: null 
+    root: null, 
+    left: null, 
+    right: null 
   }
+  this.new_expression_expected = false;
   this.bracket_count_block_pop = [];
   this.point_to_previous_block = []; 
   this.match = [];
   this.template_string = '';
   this.template_count_pop = [];
   this.template_string_open_close = { 
-   o: 0, 
-   c: 0 
+    o: 0, 
+    c: 0 
   };
   this.attach_to_regex = '';
   this.igsmuy = {
@@ -202,8 +203,8 @@ module.exports = class js extends shared {
      }) : '';
      this.template_string = '';
      this.template_count_pop.push({ 
-      o: 1, 
-      c: 0
+       o: 1, 
+       c: 0
      });
      this.JavascriptTokenizer.lastIndex += 2;
      return this.template_object_();
@@ -211,8 +212,8 @@ module.exports = class js extends shared {
      this.template_string_open_close.c += 1;
      this.template_string.length > 0 ? 
      this.tokens.push({
-       group: 'template-string', 
-       value: this.template_string 
+        group: 'template-string', 
+        value: this.template_string 
       }) : '';
      this.template_string = '';
      if(this.template_string_open_close.o !== this.template_string_open_close.c) {
@@ -284,11 +285,11 @@ module.exports = class js extends shared {
     case '&&': 
      this.handle_common_punc_a(current, value);
     case '&=': 
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_b(current, value);
     case '&': 
      this.handle_common_punc_a(current, value);
     case '/=': 
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_b(current, value);
     case '/': 
      this.handle_common_punc_a(current, value);
     case '===': 
@@ -324,41 +325,41 @@ module.exports = class js extends shared {
     case '<': 
      this.handle_common_punc_a(current, value);
     case '-=': 
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_b(current, value);
     case '--':
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_c(current, value);
     case '-':
      this.handle_common_punc_a(current, value);
     case '||':
      this.handle_common_punc_a(current, value);
     case '|=':
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_b(current, value);
     case '|': 
      this.handle_common_punc_a(current, value);
     case '%=':
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_b(current, value);
     case '%':
      this.handle_common_punc_a(current, value);
     case '...':
     //
     case '++': 
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_c(current, value);
     case '+=': 
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_b(current, value);
     case '+': 
      this.handle_common_punc_a(current, value);
     case '^=': 
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_b(current, value);
     case '^': 
      this.handle_common_punc_a(current, value);
     case '*=': 
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_b(current, value);
     case '*': 
      this.handle_common_punc_a(current, value);
     case '[': 
      //
     case ',': 
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_d(current, value);
     case '{': 
     //
     case '}': 
@@ -378,20 +379,38 @@ module.exports = class js extends shared {
   }
  }
 
- handle_common_punc_a(current, value) { 
+
+
+//  	0	0	0 error
+//  	0	0	1 error
+//  	0	1	0 error
+//  	0	1	1 error
+//  	1	0	0 fine - 1
+//  	1	0	1 error
+//  	1	1	0 fine - 2
+//  	1	1	1 fine - 3
+
+ handle_common_punc_a(current, value) {
   let next;
   if(
+   current.left !== null && 
    current.root === null && 
-   current.left !== null
+   current.right === null
   ) { 
    current.root = { 
     index: this.token_index, 
     type_: 'punctuator', 
     value: value 
    }
-   this.token_index += 1; 
    next = current;
-  } 
+  } else if(
+   current.left !== null && 
+   current.root !== null && 
+   current.right === null
+  ) { 
+   current.right = value; 
+   next = current;
+  }
   else if(
    current.root !== null &&
    current.left !== null &&
@@ -407,28 +426,26 @@ module.exports = class js extends shared {
     left: temp, 
     right: null
    }
-   this.token_index += 1; 
    next = current.right;
   } else { 
-   current.left = { //error
-    root: {
-     index: this.token_index, 
-     type_: 'punctuator', 
-     value: value
-    },
-    left: null, //empty
-    right: null //empty
-   }
-   next = current; //will not run current expression error ... identifier must come before
+    throw new Error('invalid tree');
   }
+  this.token_index += 1;
   if(
    this.is_current_an_error(current) || 
-   this.is_tree_an_error(this.current_expression) || //maybe skip this
-   this.is_tree_finished(this.current_expression) //maybe run tree error after tree finished
+   this.is_tree_finished(this.current_expression)
   ) { 
    return;
   }
   return this.build_tree(next);
+ }
+
+ handle_common_punc_b() { 
+
+ }
+
+ handle_common_punc_c() { 
+
  }
 
  handle_identifier(value, current) { 
