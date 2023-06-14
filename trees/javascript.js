@@ -1,3 +1,8 @@
+/*
+ Javascript tokenizer and compiler 
+ Author: Alex Eatman
+*/
+
 let fs = require('file-system');
 let shared = require('../data');
 
@@ -9,8 +14,7 @@ module.exports = class js extends shared {
   this.current_block_and_expression_count = 0;
   this.token_index = 0;
   this.block = 1;
-  this.file = { 1: null };
-  this.expression_chain = []; //pointing back one previous to check if valid next.. pointed through current expression --- or save previous 
+  this.file = {};
   this.current_expression = { 
    root: null, 
    left: null, 
@@ -21,7 +25,10 @@ module.exports = class js extends shared {
   this.match = [];
   this.template_string = '';
   this.template_count_pop = [];
-  this.template_string_open_close = { o: 0, c: 0 };
+  this.template_string_open_close = { 
+   o: 0, 
+   c: 0 
+  };
   this.attach_to_regex = '';
   this.igsmuy = {
     i: { v: 'i', found: false }, 
@@ -171,7 +178,7 @@ module.exports = class js extends shared {
    this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].found = true;
    this.attach_to_regex += this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].v;
    this.JavascriptTokenizer.lastIndex += 1;
-   this.check_regex_extension();
+   return this.check_regex_extension();
   } else { 
     if(this.attach_to_regex.length > 0) {
      for (const [key, value] of Object.entries(this.igsmuy)) {
@@ -194,7 +201,10 @@ module.exports = class js extends shared {
       value: this.template_string 
      }) : '';
      this.template_string = '';
-     this.template_count_pop.push({o: 1, c: 0});
+     this.template_count_pop.push({ 
+      o: 1, 
+      c: 0
+     });
      this.JavascriptTokenizer.lastIndex += 2;
      return this.template_object_();
     } else if(shared.get_data().charAt(this.JavascriptTokenizer.lastIndex) === '`') { 
@@ -272,85 +282,83 @@ module.exports = class js extends shared {
  handle_punctuator(value, current) { 
   switch(value) { 
     case '&&': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '&=': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '&': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '/=': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '/': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '===': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '==': 
-     this.handle_common_punc_a(current);
-    case '=>': 
-    //arrow 
+     this.handle_common_punc_a(current, value);
     case '=': 
     //always root
     case '!==': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '!=': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '!': 
      //
     case '>>>=': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '>>=': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '>>>':
-     this.handle_common_punc_a(current); 
+     this.handle_common_punc_a(current, value); 
     case '>>': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '>=': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '>': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '<<=': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '<<': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '<=': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '<': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '-=': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '--':
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '-':
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '||':
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '|=':
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '|': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '%=':
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '%':
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '...':
     //
     case '++': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '+=': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '+': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '^=': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '^': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '*=': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '*': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '[': 
      //
     case ',': 
-     this.handle_common_punc_a(current);
+     this.handle_common_punc_a(current, value);
     case '{': 
     //
     case '}': 
@@ -370,50 +378,57 @@ module.exports = class js extends shared {
   }
  }
 
- handle_common_punc_a(current) { 
-
+ handle_common_punc_a(current, value) { 
+  let next;
   if(
-    current.root === null && 
-    typeof(current.left) === 'object' && current.left !== null
-   ) { 
-    current.root = { 
-      index: this.token_index, 
-      type_: 'punctuator', 
-      value: '&&' 
-    }
-    current.right = { 
-      root: null, 
-      left: null, 
-      right: null
-    }; 
-    this.token_index += 1; 
-    return this.build_tree(current.right);
-   } 
-
-   if(
-    typeof(current.root) === 'object' && current.root !== null &&
-    typeof(current.left) === 'object' && current.left !== null &&
-    typeof(current.right) === 'object' && current.right !== null
-   ) { 
-    let temp = current.right; 
-    current.right = { 
-      root: {
-       index: this.token_index, 
-       type_: 'punctuator', 
-       value: '&&' 
-      },
-      left: temp, 
-      right: { 
-        root: null, 
-        left: null, 
-        right: null
-      }
-    }
-    //save prev right
-    this.token_index += 1; 
-    return this.build_tree(current.right.right);
-   } 
-
+   current.root === null && 
+   current.left !== null
+  ) { 
+   current.root = { 
+    index: this.token_index, 
+    type_: 'punctuator', 
+    value: value 
+   }
+   this.token_index += 1; 
+   next = current;
+  } 
+  else if(
+   current.root !== null &&
+   current.left !== null &&
+   current.right !== null
+  ) { 
+   let temp = current.right; 
+   current.right = { 
+    root: {
+     index: this.token_index, 
+     type_: 'punctuator', 
+     value: value
+    },
+    left: temp, 
+    right: null
+   }
+   this.token_index += 1; 
+   next = current.right;
+  } else { 
+   current.left = { //error
+    root: {
+     index: this.token_index, 
+     type_: 'punctuator', 
+     value: value
+    },
+    left: null, //empty
+    right: null //empty
+   }
+   next = current; //will not run current expression error ... identifier must come before
+  }
+  if(
+   this.is_current_an_error(current) || 
+   this.is_tree_an_error(this.current_expression) || //maybe skip this
+   this.is_tree_finished(this.current_expression) //maybe run tree error after tree finished
+  ) { 
+   return;
+  }
+  return this.build_tree(next);
  }
 
  handle_identifier(value, current) { 
@@ -496,6 +511,18 @@ module.exports = class js extends shared {
  }
 
  handle_white_space(value, current) { 
+
+ }
+
+ is_current_an_error() { 
+
+ }
+
+ is_tree_an_error() { 
+
+ }
+
+ is_tree_finished() { 
 
  }
 

@@ -1,5 +1,7 @@
 const generate = require("../lib/generate");
 
+function compile() {
+
 const folders = [
   { folder: "./stripThisTest", files: 'all' },
 ];
@@ -17,4 +19,6 @@ try {
   console.log(generate(folders, file_to_generate, function_types));
 } catch (err) {
   console.log(err.message);
+}
+
 }
