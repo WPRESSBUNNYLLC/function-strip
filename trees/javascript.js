@@ -8,8 +8,8 @@ let shared = require('../data');
 
 module.exports = class js extends shared {
 
- constructor() {                                                                                                                                                                                                                                                                                                                                                                                                                               
-  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>(\.?[a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*=|\*)|([,\{\}[\];\?\:\~\(\)])))/g;
+ constructor() {   
+  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*=|\*)|([,\{\}[\];\?\:\~\(\)])))/g;
   this.tokens = [];
   this.current_block_and_expression_count = 0;
   this.token_index = 0;
@@ -198,13 +198,13 @@ module.exports = class js extends shared {
     ) { 
      this.template_string.length > 0 ? 
      this.tokens.push({ 
-      group: 'template-string', 
-      value: this.template_string 
+       group: 'template-string', 
+       value: this.template_string 
      }) : '';
      this.template_string = '';
      this.template_count_pop.push({ 
-       o: 1, 
-       c: 0
+      o: 1, 
+      c: 0
      });
      this.JavascriptTokenizer.lastIndex += 2;
      return this.template_object_();
@@ -212,16 +212,17 @@ module.exports = class js extends shared {
      this.template_string_open_close.c += 1;
      this.template_string.length > 0 ? 
      this.tokens.push({
-        group: 'template-string', 
-        value: this.template_string 
-      }) : '';
+      group: 'template-string', 
+      value: this.template_string 
+     }) : '';
      this.template_string = '';
+     //use template object length instead and get rid of string count
      if(this.template_string_open_close.o !== this.template_string_open_close.c) {
       this.JavascriptTokenizer.lastIndex += 1;
       return this.template_object_();
      } else { 
       if(this.template_count_pop.length !== 0) { 
-        throw new Error('the template literal string has ended but there are still remaining brackets? wait, so you mean to tell me Alex.');
+       throw new Error('the template literal string has ended but there are still remaining brackets?');
       }
       this.JavascriptTokenizer.lastIndex += 1;
       this.template_string = '';
@@ -297,7 +298,7 @@ module.exports = class js extends shared {
     case '==': 
      this.handle_common_punc_a(current, value);
     case '=': 
-    this.handle_common_punc_s(current, value);
+     this.handle_common_punc_s(current, value);
     case '!==': 
      this.handle_common_punc_a(current, value);
     case '!=': 
@@ -379,89 +380,127 @@ module.exports = class js extends shared {
   }
  }
 
-//  	0	0	0 error
-//  	0	0	1 error
-//  	0	1	0 error
-//  	0	1	1 error
-//  	1	0	0 fine - 1
-//  	1	0	1 error
-//  	1	1	0 error - 2 --- maybe not, an identifier/keyword is the only value that can make the current tree fulln identifier is the only value that can make the current tree full. this punctuaro can only act on a tree that has a left or a tree that is full.
-//  	1	1	1 fine - 3
-
  handle_common_punc_a(current, value) {
   let next;
   if(
-   current.left !== null && //left will always be inserted as root: object, right null, left null idfk stfu ill keel you boi
-   current.root === null && //root will be an object always
-   current.right === null //will have a left root as its left, a root, and a right when moving next
+   current.left !== null &&
+   current.root === null &&
+   current.right === null
   ) { 
    current.root = { 
-    index: this.token_index, 
     type_: 'punctuator', 
     value: value 
    }
    next = current;
-   //implying to never move next when the tree is full from an identifier... just get the next token and compare
   } else if(
    current.root !== null &&
    current.left !== null &&
    current.right !== null
   ) { 
-   //should only have left as an identifier which i place below
-   let temp = current.right; 
+   let temp = current.right.root;
    current.right = { 
     root: {
-     index: this.token_index, 
      type_: 'punctuator', 
      value: value
     },
-    //should be a single value -- maybe make this root
     left: {
-     //only situation when left and right are null is when shifting... continue in these situations down the right side
-     root: temp.left,
+     root: temp,
      left: null, 
      right: null 
     }, 
     right: null
    }
    next = current.right;
-  } else { 
-    throw new Error('invalid tree');
   }
   this.token_index += 1;
-  if(
-   this.is_current_an_error(current) || 
-   this.is_tree_finished(this.current_expression)
-  ) { 
-   return;
-  }
   return this.build_tree(next);
  }
 
-//look ahead for next identifier attached to rights left
-//  	0	0	0 error
-//  	0	0	1 error
-//  	0	1	0 error
-//  	0	1	1 error
-//  	1	0	0 fine - 1
-//  	1	0	1 error
-//  	1	1	0 error - 2 --- maybe not, an identifier/keyword is the only value that can make the current tree fulln identifier is the only value that can make the current tree full. this punctuaro can only act on a tree that has a left or a tree that is full.
-//  	1	1	1 fine - 3 -- maybe not ... if a + 5 -- invalid left... if a, b
-
- handle_common_punc_b() { 
- 
+ handle_common_punc_b(current, value) { 
+  if(
+   current.left !== null && 
+   current.root === null && 
+   current.right === null
+  ) { 
+   let temp = current.left.root;
+   current.root = { 
+    type_: 'punctuator', 
+    value: value[1]
+   }
+   current.right = { 
+    root: {
+     type_: 'punctuator', 
+     value: value[0]
+    },
+    left: { 
+     root: { 
+      type_: temp.type_, 
+      value: temp.value
+     }, 
+     left: null, 
+     right: null
+    }, 
+    right: null
+   }
+  }
+  this.token_index += 1;
+  this.build_tree(current.right);
  }
 
  handle_common_punc_c() { 
 
  }
 
+ handle_common_punc_s() { 
+
+ }
+
+ handle_common_punc_n() { 
+
+ }
+
+ handle_common_p() { 
+
+ }
+
+ handle_common_punc_d() { 
+
+ }
+
+ handle_common_punc_h() { 
+
+ }
+
+ handle_common_punc_i() { 
+
+ }
+
+ handle_common_punc_j() { 
+
+ }
+
+ handle_common_punc_k() { 
+
+ }
+
+ handle_common_punc_e() { 
+
+ }
+
+ handle_common_punc_e2() { 
+
+ }
+
+ handle_common_punc_f() { 
+
+ }
+
+ handle_common_punc_f2() { 
+
+ }
+
  handle_identifier(value, current) { 
-  if(value[0] === '.') { 
-
-  } else { 
-
-  }
+  
  }
 
  handle_key_word(value, current) { 
