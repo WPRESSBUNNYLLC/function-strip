@@ -205,7 +205,8 @@ module.exports = class js extends shared {
      this.tokens[i].group === 'identifier' || 
      this.tokens[i].group === 'T-identifier'
     ) { 
-     this.tokens[i].group = 'call';
+     let T = this.tokens[i].group === 'identifier' ? '' : 'T-';
+     this.tokens[i].group = `${T}call`;
      break;
     } else { 
      break;
@@ -298,9 +299,10 @@ module.exports = class js extends shared {
    case 'regex': this.handle_regex(this.tokens[this.token_index].value, current);
    case 'string': this.handle_string(this.tokens[this.token_index].value, current);
    case 'comment': this.handle_comment(this.tokens[this.token_index].value, current);
-   case 'beginning-template-literal': this.handle_template_literal(this.tokens[this.token_index].value, current);
+   case 'beginning-template-literal': this.handle_template_literal(this.tokens[this.token_index].value, current); //encap everything
    case 'number': this.handle_number(this.tokens[this.token_index].value, current);
    case 'whitespace': this.handle_white_space(this.tokens[this.token_index].value, current);
+   case 'call': this.handle_white_space(this.tokens[this.token_index].value, current);
   }
  }
 
