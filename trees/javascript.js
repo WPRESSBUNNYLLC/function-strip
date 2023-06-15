@@ -1,5 +1,5 @@
 /*
- Javascript tokenizer and compiler 
+ Javascript tokenizer and AST 
  Author: Alex Eatman
 */
 
@@ -9,6 +9,7 @@ let shared = require('../data');
 module.exports = class js extends shared {
 
  constructor() {   
+  //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators --add the others
   this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*=|\*)|([,\{\}[\];\?\:\~\(\)])))/g;
   this.tokens = [];
   this.current_block_and_expression_count = 0;
@@ -306,9 +307,9 @@ module.exports = class js extends shared {
     case '!': 
      this.handle_common_punc_n(current, value);
     case '>>>=': 
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_b(current, value);
     case '>>=': 
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_b(current, value);
     case '>>>':
      this.handle_common_punc_a(current, value); 
     case '>>': 
@@ -318,7 +319,7 @@ module.exports = class js extends shared {
     case '>': 
      this.handle_common_punc_a(current, value);
     case '<<=': 
-     this.handle_common_punc_a(current, value);
+     this.handle_common_punc_b(current, value);
     case '<<': 
      this.handle_common_punc_a(current, value);
     case '<=': 
@@ -416,7 +417,7 @@ module.exports = class js extends shared {
   return this.build_tree(next);
  }
 
- handle_common_punc_b(current, value) { 
+ handle_common_punc_b(current, value) {
   if(
    current.left !== null && 
    current.root === null && 
@@ -425,18 +426,15 @@ module.exports = class js extends shared {
    let temp = current.left.root;
    current.root = { 
     type_: 'punctuator', 
-    value: value[1]
+    value: '='
    }
    current.right = { 
     root: {
      type_: 'punctuator', 
-     value: value[0]
+     value: value.split('=')[0]
     },
     left: { 
-     root: { 
-      type_: temp.type_, 
-      value: temp.value
-     }, 
+     root: temp, 
      left: null, 
      right: null
     }, 
@@ -447,8 +445,12 @@ module.exports = class js extends shared {
   this.build_tree(current.right);
  }
 
- handle_common_punc_c() { 
+//'Pre-crement means increment on the same line. Post-increment means increment after the line executes.'
+//wait until expression is over then increment for i++
+//figure it out after
 
+ handle_common_punc_c(current, value) { 
+  
  }
 
  handle_common_punc_s() { 
@@ -500,7 +502,35 @@ module.exports = class js extends shared {
  }
 
  handle_identifier(value, current) { 
-  
+  if(
+   current.left === null && 
+   current.root === null && 
+   current.right === null
+  ) { 
+   current.left = { 
+    root: { 
+    value: value, 
+    type_: 'identifier'
+   },
+    left: null, 
+    right: null
+   }
+  } else if(
+   current.left !== null && 
+   current.root !== null && 
+   current.right === null
+  ) { 
+   current.right = { 
+    root: { 
+     value: value, 
+     type_: 'identifier'
+    },
+    left: null, 
+    right: null
+   }
+  }
+  this.token_index += 1; 
+  this.build_tree(current);
  }
 
  handle_key_word(value, current) { 
@@ -559,10 +589,14 @@ module.exports = class js extends shared {
  }
 
  handle_regex(value, current) { 
-
+  
  }
 
  handle_string(value, current) { 
+
+ }
+
+ handle_number(value, current) { 
 
  }
 
@@ -587,6 +621,10 @@ module.exports = class js extends shared {
  }
 
  is_tree_finished() { 
+
+ }
+
+ make_asm() { 
 
  }
 
