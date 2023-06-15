@@ -9,7 +9,7 @@ let shared = require('../data');
 module.exports = class js extends shared {
 
  constructor() {   
-  //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators --add the others
+  //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators -- add the others -- make identifier a call if a paren after but add the paren individually as a punctuator for counting
   this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*=|\*)|([,\{\}[\];\?\:\~\(\)])))/g;
   this.tokens = [];
   this.current_block_and_expression_count = 0;
@@ -17,9 +17,9 @@ module.exports = class js extends shared {
   this.block = 1;
   this.file = {};
   this.current_expression = { 
-    root: null, 
-    left: null, 
-    right: null 
+   root: null, 
+   left: null, 
+   right: null 
   }
   this.new_expression_expected = false;
   this.bracket_count_block_pop = [];
@@ -28,69 +28,69 @@ module.exports = class js extends shared {
   this.template_string = '';
   this.template_count_pop = [];
   this.template_string_open_close = { 
-    o: 0, 
-    c: 0 
+   o: 0, 
+   c: 0 
   };
   this.attach_to_regex = '';
   this.igsmuy = {
-    i: { v: 'i', found: false }, 
-    g: { v: 'g', found: false }, 
-    y: { v: 'y', found: false }, 
-    u: { v: 'u', found: false }, 
-    m: { v: 'm', found: false }, 
-    s: { v: 's', found: false }
+   i: { v: 'i', found: false }, 
+   g: { v: 'g', found: false }, 
+   y: { v: 'y', found: false }, 
+   u: { v: 'u', found: false }, 
+   m: { v: 'm', found: false }, 
+   s: { v: 's', found: false }
   }
   this.key_words = {
-    'arguments'	: true,
-    'await'	: true,
-    'break' : true,
-    'case' : true,	
-    'catch' : true,
-    'class' : true,
-    'const' : true,
-    'continue' : true,
-    'debugger' : true,	
-    'default' : true,	
-    'delete' : true,	
-    'do' : true,
-    'else' : true,	
-    'enum' : true,	
-    'eval' : true,
-    'export' : true,
-    'extends' : true,	
-    'false' : true,	
-    'finally' : true,	
-    'for' : true,	
-    'function' : true,
-    'if' : true,	
-    'implements' : true,	
-    'import' : true,
-    'in' : true,	
-    'instanceof' : true,	
-    'interface' : true,
-    'let' : true,
-    'new' : true,
-    'null' : true,
-    'package' : true,	
-    'private' : true,	
-    'protected' : true,
-    'public' : true,	
-    'return' : true,	
-    'static' : true,
-    'super' : true,	
-    'switch': true,	
-    'this': true,
-    'throw': true,
-    'true': true,
-    'try': true,
-    'typeof': true,
-    'var': true,
-    'void': true,
-    'while': true,
-    'with': true,
-    'yield': true, 
-    'require': true,
-    '=>': true
+   'arguments'	: true,
+   'await'	: true,
+   'break' : true,
+   'case' : true,	
+   'catch' : true,
+   'class' : true,
+   'const' : true,
+   'continue' : true,
+   'debugger' : true,	
+   'default' : true,	
+   'delete' : true,	
+   'do' : true,
+   'else' : true,	
+   'enum' : true,	
+   'eval' : true,
+   'export' : true,
+   'extends' : true,	
+   'false' : true,	
+   'finally' : true,	
+   'for' : true,	
+   'function' : true,
+   'if' : true,	
+   'implements' : true,	
+   'import' : true,
+   'in' : true,	
+   'instanceof' : true,	
+   'interface' : true,
+   'let' : true,
+   'new' : true,
+   'null' : true,
+   'package' : true,	
+   'private' : true,	
+   'protected' : true,
+   'public' : true,	
+   'return' : true,	
+   'static' : true,
+   'super' : true,	
+   'switch': true,	
+   'this': true,
+   'throw': true,
+   'true': true,
+   'try': true,
+   'typeof': true,
+   'var': true,
+   'void': true,
+   'while': true,
+   'with': true,
+   'yield': true, 
+   'require': true,
+   '=>': true
    }
  }
 
@@ -161,6 +161,9 @@ module.exports = class js extends shared {
       group: `${T}punctuator`, 
       value: this.match[0] 
      });
+     if(this.match[0] === '(') { 
+      this.check_if_previous_identifier_is_a_call();
+     }
     }
   } else if(this.match.groups['whitespace']) { 
     this.tokens.push({ 
@@ -191,6 +194,25 @@ module.exports = class js extends shared {
   }
  }
 
+ check_if_previous_identifier_is_a_call() { 
+  for(let i = this.tokens.length - 1; i > -1; i--) { 
+    if(
+     this.tokens[i].group === 'comment' || 
+     this.tokens[i].group === 'whitespace'
+    ) { 
+     continue;
+    } else if(
+     this.tokens[i].group === 'identifier' || 
+     this.tokens[i].group === 'T-identifier'
+    ) { 
+     this.tokens[i].group = 'call';
+     break;
+    } else { 
+     break;
+    }
+  }
+ }
+
  template_string_() {
    while(true) {
     if(
@@ -199,8 +221,8 @@ module.exports = class js extends shared {
     ) { 
      this.template_string.length > 0 ? 
      this.tokens.push({ 
-       group: 'template-string', 
-       value: this.template_string 
+      group: 'template-string', 
+      value: this.template_string 
      }) : '';
      this.template_string = '';
      this.template_count_pop.push({ 
@@ -381,7 +403,7 @@ module.exports = class js extends shared {
   }
  }
 
- handle_common_punc_a(current, value) {
+ handle_common_punc_a(current, value) { //only move forward on punctuator
   let next;
   if(
    current.left !== null &&
@@ -501,14 +523,14 @@ module.exports = class js extends shared {
 
  }
 
- handle_identifier(value, current) { 
+ handle_identifier(value, current) { //check for an invalid left hand assignment in case ahsh() --- just split up identifier in tokenizer to call or identiider 
   if(
    current.left === null && 
    current.root === null && 
    current.right === null
   ) { 
    current.left = { 
-    root: { 
+   root: { 
     value: value, 
     type_: 'identifier'
    },
@@ -533,7 +555,7 @@ module.exports = class js extends shared {
   this.build_tree(current);
  }
 
- handle_key_word(value, current) { 
+ handle_key_word(value, current) { //will require look aheads
   switch(value) { 
     case 'arguments':
     case 'await':
@@ -588,23 +610,69 @@ module.exports = class js extends shared {
   }
  }
 
+ //string numbers and regex should only appear on the left side when shifting.. when adding in normally.. push to the right of current... unless im wrong which i might be. joann will let me know that right joann. yea, you're a bitch.
+
  handle_regex(value, current) { 
-  
+  if(
+   current.left !== null && 
+   current.root !== null && 
+   current.right === null
+  ) { 
+   current.right = { 
+    root: {
+     type_: 'regex', 
+     value: value
+    }, 
+    left: null, 
+    right: null
+   }
+  }
+  this.token_index += 1; 
+  this.build_tree(current);
  }
 
  handle_string(value, current) { 
-
+  if(
+   current.left !== null && 
+   current.root !== null && 
+   current.right === null
+  ) { 
+   current.right = { 
+    root: {
+     type_: 'string', 
+     value: value
+    }, 
+    left: null, 
+    right: null
+   }
+  }
+  this.token_index += 1; 
+  this.build_tree(current);
  }
 
  handle_number(value, current) { 
-
+  if(
+   current.left !== null && 
+   current.root !== null && 
+   current.right === null
+  ) { 
+   current.right = { 
+    root: {
+     type_: 'number', 
+     value: value
+    }, 
+    left: null, 
+    right: null
+   }
+  }
+  this.token_index += 1; 
+  this.build_tree(current);
  }
 
  handle_comment(value, current) { 
-
  }
 
- handle_template_literal(value, current) { 
+ handle_template_literal(value, current) { //will require a look ahead
   
  }
 
@@ -620,7 +688,7 @@ module.exports = class js extends shared {
 
  }
 
- is_tree_finished() { 
+ is_tree_finished() { //only all three would be null if tree is finished
 
  }
 
