@@ -15,15 +15,17 @@ module.exports = class js extends shared {
   this.current_block_and_expression_count = 0;
   this.token_index = 0;
   this.block = 1;
+  this.prev_block = [1];
+  this.attach_previous = '';
   this.file = {};
   this.current_expression = { 
    root: null, 
    left: null, 
    right: null 
   }
-  this.new_expression_expected = false;
   this.bracket_count_block_pop = [];
-  this.point_to_previous_block = []; 
+  this.array_bracket_block_pop = [];
+  this.paren_block_pop = [];
   this.match = [];
   this.template_string = '';
   this.template_count_pop = [];
@@ -202,7 +204,7 @@ module.exports = class js extends shared {
     ) { 
      continue;
     } else if(
-     this.tokens[i].group === 'identifier' || 
+     this.tokens[i].group === 'identifier' || //if a function in ast just set to the parameters
      this.tokens[i].group === 'T-identifier'
     ) { 
      let T = this.tokens[i].group === 'identifier' ? '' : 'T-';
@@ -407,12 +409,15 @@ module.exports = class js extends shared {
 
  handle_common_punc_a(current, value) { //only move forward on punctuator
   let next;
+  let temp_prev = this.attach_previous;
+  this.attach_previous = '';
   if(
    current.left !== null &&
    current.root === null &&
    current.right === null
   ) { 
    current.root = { 
+    prev_comment_whitespace: temp_prev,
     type_: 'punctuator', 
     value: value 
    }
@@ -425,6 +430,7 @@ module.exports = class js extends shared {
    let temp = current.right.root;
    current.right = { 
     root: {
+     prev_comment_whitespace: temp_prev,
      type_: 'punctuator', 
      value: value
     },
@@ -438,10 +444,12 @@ module.exports = class js extends shared {
    next = current.right;
   }
   this.token_index += 1;
-  return this.build_tree(next);
+  this.build_tree(next);
  }
 
  handle_common_punc_b(current, value) {
+  let temp_prev = this.attach_previous;
+  this.attach_previous = '';
   if(
    current.left !== null && 
    current.root === null && 
@@ -449,6 +457,7 @@ module.exports = class js extends shared {
   ) { 
    let temp = current.left.root;
    current.root = { 
+    prev_comment_whitespace: temp_prev,
     type_: 'punctuator', 
     value: '='
    }
@@ -470,7 +479,7 @@ module.exports = class js extends shared {
  }
 
 //'Pre-crement means increment on the same line. Post-increment means increment after the line executes.'
-//wait until expression is over then increment for i++
+//wait until expression is over then increment for i++ ,,, ust create a new expression after or just insert it with a flag saying execute after and when end.. get that execute after
 //figure it out after
 
  handle_common_punc_c(current, value) { 
@@ -525,7 +534,9 @@ module.exports = class js extends shared {
 
  }
 
- handle_identifier(value, current) { //check for an invalid left hand assignment in case ahsh() --- just split up identifier in tokenizer to call or identiider 
+ handle_identifier(value, current) {
+  let temp_prev = this.attach_previous;
+  this.attach_previous = '';
   if(
    current.left === null && 
    current.root === null && 
@@ -533,6 +544,7 @@ module.exports = class js extends shared {
   ) { 
    current.left = { 
    root: { 
+    prev_comment_whitespace: temp_prev,
     value: value, 
     type_: 'identifier'
    },
@@ -546,6 +558,7 @@ module.exports = class js extends shared {
   ) { 
    current.right = { 
     root: { 
+     prev_comment_whitespace: temp_prev,
      value: value, 
      type_: 'identifier'
     },
@@ -557,7 +570,7 @@ module.exports = class js extends shared {
   this.build_tree(current);
  }
 
- handle_key_word(value, current) { //will require look aheads
+ handle_key_word(value, current) {
   switch(value) { 
     case 'arguments':
     case 'await':
@@ -613,6 +626,8 @@ module.exports = class js extends shared {
  }
 
  handle_regex(value, current) { 
+  let temp_prev = this.attach_previous;
+  this.attach_previous = '';
   if(
    current.left !== null && 
    current.root !== null && 
@@ -620,6 +635,7 @@ module.exports = class js extends shared {
   ) { 
    current.right = { 
     root: {
+     prev_comment_whitespace: temp_prev,
      type_: 'regex', 
      value: value
     }, 
@@ -632,6 +648,8 @@ module.exports = class js extends shared {
  }
 
  handle_string(value, current) { 
+  let temp_prev = this.attach_previous;
+  this.attach_previous = '';
   if(
    current.left !== null && 
    current.root !== null && 
@@ -639,6 +657,7 @@ module.exports = class js extends shared {
   ) { 
    current.right = { 
     root: {
+     prev_comment_whitespace: temp_prev,
      type_: 'string', 
      value: value
     }, 
@@ -651,6 +670,8 @@ module.exports = class js extends shared {
  }
 
  handle_number(value, current) { 
+  let temp_prev = this.attach_previous;
+  this.attach_previous = '';
   if(
    current.left !== null && 
    current.root !== null && 
@@ -658,6 +679,7 @@ module.exports = class js extends shared {
   ) { 
    current.right = { 
     root: {
+     prev_comment_whitespace: temp_prev,
      type_: 'number', 
      value: value
     }, 
@@ -669,15 +691,24 @@ module.exports = class js extends shared {
   this.build_tree(current);
  }
 
- handle_comment(value, current) { 
- }
-
- handle_template_literal(value, current) { //will require a look ahead
+ handle_template_literal(value, current) {
   
  }
 
- handle_white_space(value, current) { 
+ handle_call() { 
 
+ }
+
+ handle_white_space(value, current) { 
+  this.attach_previous += value; 
+  this.token_index += 1;
+  this.build_tree(current);
+ }
+
+ handle_comment(value, current) { 
+  this.attach_previous += value; 
+  this.token_index += 1;
+  this.build_tree(current);
  }
 
  is_current_an_error() { 
