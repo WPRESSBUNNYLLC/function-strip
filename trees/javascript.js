@@ -302,7 +302,7 @@ module.exports = class js extends shared {
    case 'beginning-template-literal': this.handle_template_literal(this.tokens[this.token_index].value, current); //encap everything
    case 'number': this.handle_number(this.tokens[this.token_index].value, current);
    case 'whitespace': this.handle_white_space(this.tokens[this.token_index].value, current);
-   case 'call': this.handle_white_space(this.tokens[this.token_index].value, current);
+   case 'call': this.handle_call(this.tokens[this.token_index].value, current);
   }
  }
 
@@ -611,8 +611,6 @@ module.exports = class js extends shared {
     case '=>': 
   }
  }
-
- //string numbers and regex should only appear on the left side when shifting.. when adding in normally.. push to the right of current... unless im wrong which i might be. joann will let me know that right joann. yea, you're a bitch.
 
  handle_regex(value, current) { 
   if(
