@@ -73,6 +73,7 @@ module.exports = class js extends shared {
    'let' : true,
    'new' : true,
    'null' : true,
+   'module' : true,
    'package' : true,	
    'private' : true,	
    'protected' : true,
@@ -163,9 +164,6 @@ module.exports = class js extends shared {
       group: `${T}punctuator`, 
       value: this.match[0] 
      });
-     if(this.match[0] === '(') { 
-      this.check_if_previous_identifier_is_a_call();
-     }
     }
   } else if(this.match.groups['whitespace']) { 
     this.tokens.push({ 
@@ -193,26 +191,6 @@ module.exports = class js extends shared {
      }
     }
     return;
-  }
- }
-
- check_if_previous_identifier_is_a_call() { 
-  for(let i = this.tokens.length - 1; i > -1; i--) { 
-    if(
-     this.tokens[i].group === 'comment' || 
-     this.tokens[i].group === 'whitespace'
-    ) { 
-     continue;
-    } else if(
-     this.tokens[i].group === 'identifier' || //if a function in ast just set to the parameters
-     this.tokens[i].group === 'T-identifier'
-    ) { 
-     let T = this.tokens[i].group === 'identifier' ? '' : 'T-';
-     this.tokens[i].group = `${T}call`;
-     break;
-    } else { 
-     break;
-    }
   }
  }
 
@@ -534,7 +512,7 @@ module.exports = class js extends shared {
 
  }
 
- handle_identifier(value, current) {
+ handle_identifier(value, current) { //handle the call here... if next is a ( ... then this cant be a left hand assignment and will need to do some look ahead
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
   if(
@@ -600,6 +578,7 @@ module.exports = class js extends shared {
     case 'instanceof':
     case 'interface':
     case 'let':
+    case 'module': 
     case 'new':
     case 'null':
     case 'package':
@@ -620,7 +599,7 @@ module.exports = class js extends shared {
     case 'while':
     case 'with':
     case 'yield':
-    case 'require':
+    case 'require': //implement the required tree as a subset in the root
     case '=>': 
   }
  }
