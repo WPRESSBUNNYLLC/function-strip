@@ -14,6 +14,7 @@ module.exports = class js extends shared {
   this.tokens = [];
   this.current_block_and_expression_count = 0;
   this.token_index = 0;
+  this.last_token = '';
   this.block = 1;
   this.prev_block = [1];
   this.attach_previous = '';
@@ -176,12 +177,13 @@ module.exports = class js extends shared {
  }
 
  check_regex_extension() {
+  let character_index = shared.get_data().charAt(this.JavascriptTokenizer.lastIndex);
   if(
-   typeof this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)] !== 'undefined' && 
-   this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].found === false
+   typeof this.igsmuy[character_index] !== 'undefined' && 
+   this.igsmuy[character_index].found === false
   ) { 
-   this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].found = true;
-   this.attach_to_regex += this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].v;
+   this.igsmuy[character_index].found = true;
+   this.attach_to_regex += this.igsmuy[character_index].v;
    this.JavascriptTokenizer.lastIndex += 1;
    return this.check_regex_extension();
   } else { 
@@ -282,11 +284,10 @@ module.exports = class js extends shared {
    case 'beginning-template-literal': this.handle_template_literal(this.tokens[this.token_index].value, current); //encap everything
    case 'number': this.handle_number(this.tokens[this.token_index].value, current);
    case 'whitespace': this.handle_white_space(this.tokens[this.token_index].value, current);
-   case 'call': this.handle_call(this.tokens[this.token_index].value, current);
   }
  }
 
- handle_punctuator(value, current) { 
+ handle_punctuator(value, current) {
   switch(value) { 
     case '&&': 
      this.handle_common_punc_a(current, value);
@@ -385,10 +386,14 @@ module.exports = class js extends shared {
   }
  }
 
- handle_common_punc_a(current, value) { //only move forward on punctuator
+ handle_common_punc_a(current, value) { 
   let next;
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
+  if(this.last_token === 'punctuator') { 
+   throw new Error('unexpected token');
+  }
+  this.last_token = 'punctuator';
   if(
    current.left !== null &&
    current.root === null &&
@@ -420,6 +425,8 @@ module.exports = class js extends shared {
     right: null
    }
    next = current.right;
+  } else { 
+   throw new Error('Invalid tree syntax');
   }
   this.token_index += 1;
   this.build_tree(next);
@@ -428,6 +435,10 @@ module.exports = class js extends shared {
  handle_common_punc_b(current, value) {
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
+  if(this.last_token === 'punctuator') { 
+    throw new Error('unexpected token');
+   }
+   this.last_token = 'punctuator';
   if(
    current.left !== null && 
    current.root === null && 
@@ -451,14 +462,12 @@ module.exports = class js extends shared {
     }, 
     right: null
    }
+  } else { 
+   throw new Error('Invalid tree syntax');
   }
   this.token_index += 1;
   this.build_tree(current.right);
  }
-
-//'Pre-crement means increment on the same line. Post-increment means increment after the line executes.'
-//wait until expression is over then increment for i++ ,,, ust create a new expression after or just insert it with a flag saying execute after and when end.. get that execute after
-//figure it out after
 
  handle_common_punc_c(current, value) { 
   
@@ -512,9 +521,18 @@ module.exports = class js extends shared {
 
  }
 
- handle_identifier(value, current) { //handle the call here... if next is a ( ... then this cant be a left hand assignment and will need to do some look ahead
+ handle_identifier(value, current) { //new exp
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
+  if(
+   this.last_token === 'identifier' || 
+   this.last_token === 'string' || 
+   this.last_token === 'number' || 
+   this.last_token === 'regex'
+  ) { 
+   throw new Error('unexpected token');
+  }
+  this.last_token = 'identifier';
   if(
    current.left === null && 
    current.root === null && 
@@ -543,6 +561,8 @@ module.exports = class js extends shared {
     left: null, 
     right: null
    }
+  } else { 
+   throw new Error('Invalid tree syntax');
   }
   this.token_index += 1; 
   this.build_tree(current);
@@ -599,7 +619,7 @@ module.exports = class js extends shared {
     case 'while':
     case 'with':
     case 'yield':
-    case 'require': //implement the required tree as a subset in the root
+    case 'require':
     case '=>': 
   }
  }
@@ -607,6 +627,15 @@ module.exports = class js extends shared {
  handle_regex(value, current) { 
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
+  if(
+   this.last_token === 'identifier' || 
+   this.last_token === 'string' || 
+   this.last_token === 'number' || 
+   this.last_token === 'regex'
+  ) { 
+   throw new Error('unexpected token');
+  }
+  this.last_token = 'regex';
   if(
    current.left !== null && 
    current.root !== null && 
@@ -621,14 +650,25 @@ module.exports = class js extends shared {
     left: null, 
     right: null
    }
+  } else { 
+   throw new Error('Invalid tree syntax');
   }
   this.token_index += 1; 
-  this.build_tree(current);
+  this.build_tree(current, value);
  }
 
  handle_string(value, current) { 
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
+  if(
+   this.last_token === 'identifier' || 
+   this.last_token === 'string' || 
+   this.last_token === 'number' || 
+   this.last_token === 'regex'
+  ) { 
+   throw new Error('unexpected token');
+  }
+  this.last_token = 'string';
   if(
    current.left !== null && 
    current.root !== null && 
@@ -643,6 +683,8 @@ module.exports = class js extends shared {
     left: null, 
     right: null
    }
+  } else { 
+   throw new Error('Invalid tree syntax');
   }
   this.token_index += 1; 
   this.build_tree(current);
@@ -651,6 +693,15 @@ module.exports = class js extends shared {
  handle_number(value, current) { 
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
+  if(
+   this.last_token === 'identifier' || 
+   this.last_token === 'string' || 
+   this.last_token === 'number' || 
+   this.last_token === 'regex'
+  ) { 
+   throw new Error('unexpected token');
+  }
+  this.last_token = 'number';
   if(
    current.left !== null && 
    current.root !== null && 
@@ -665,21 +716,19 @@ module.exports = class js extends shared {
     left: null, 
     right: null
    }
+  } else { 
+   throw new Error('Invalid tree syntax');
   }
   this.token_index += 1; 
   this.build_tree(current);
  }
 
  handle_template_literal(value, current) {
-  
- }
-
- handle_call() { 
 
  }
 
- handle_white_space(value, current) { 
-  this.attach_previous += value; 
+ handle_white_space(value, current) {
+  this.attach_previous += value;  //attaches to next tokens whitespace 
   this.token_index += 1;
   this.build_tree(current);
  }
