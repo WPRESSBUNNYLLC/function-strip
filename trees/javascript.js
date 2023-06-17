@@ -119,54 +119,84 @@ module.exports = class js extends shared {
   this.build_tree(this.current_expression);
  }
 
- which_token(T) { 
+ which_token(T) {
   if(this.match.groups['regex']) { 
-    this.check_regex_extension();
-    this.tokens.push({
-     group: `${T}regex`, 
-     value: this.match[0] + this.attach_to_regex
-    });
-    this.attach_to_regex = '';
+   if(this.last_token === 'identifier' || this.last_token === 'string' || this.last_token === 'number' || this.last_token === 'regex' ) { //seperate after
+    throw new Error('unexpected token');
+   }
+   this.last_token = 'regex';
+   this.check_regex_extension();
+   this.tokens.push({
+    group: `${T}regex`, 
+    value: this.match[0] + this.attach_to_regex
+   });
+   this.attach_to_regex = '';
   } else if(this.match.groups['comment']) { 
+    this.last_token = 'comment';
     this.tokens.push({ 
      group: `${T}comment`, 
      value: this.match[0] 
     });
   } else if(this.match.groups['string']) { 
+    if(this.last_token === 'identifier' || this.last_token === 'string' || this.last_token === 'number' || this.last_token === 'regex') { 
+     throw new Error('unexpected token');
+    }
+    this.last_token = 'string';
     this.tokens.push({
      group: `${T}string`, 
      value:  this.match[0] 
     });
   } else if(this.match.groups['number']) { 
+    if(this.last_token === 'identifier' || this.last_token === 'string' || this.last_token === 'number' || this.last_token === 'regex') { 
+     throw new Error('unexpected token');
+    }
+    this.last_token = 'number';
     this.tokens.push({ 
      group: `${T}number`, 
      value: this.match[0] 
     });
-  } else if(this.match.groups['identifier']) { 
+  } else if(this.match.groups['identifier']) {
     if(key_words[this.match[0]]) { 
+     if(this.last_token === 'key-word') { 
+      throw new Error('unexpected token');
+     }
+     this.last_token = 'key-word';
      this.tokens.push({
       group: `${T}key-word`, 
       value: this.match[0] 
      });
     } else {
-     this.tokens.push({ 
-      group: `${T}identifier`, 
-      value: this.match[0] 
-     });
-   }
+      if(this.last_token === 'identifier' || this.last_token === 'string' || this.last_token === 'number' || this.last_token === 'regex') { 
+       throw new Error('unexpected token');
+      }
+      this.last_token = 'identifier';
+      this.tokens.push({ 
+       group: `${T}identifier`, 
+       value: this.match[0] 
+      });
+    }
   } else if(this.match.groups['punctuator']) {
     if(this.match[0] === '=>') { 
+     if(this.last_token === 'key-word') { 
+      throw new Error('unexpected token');
+     }
+     this.last_token = 'key-word';
      this.tokens.push({ 
       group: `${T}key-word`, 
       value: this.match[0] 
      });
     } else {
+     if(this.last_token === 'punctuator') { 
+      throw new Error('unexpected token');
+     }
+     this.last_token = 'punctuator';
      this.tokens.push({ 
       group: `${T}punctuator`, 
       value: this.match[0] 
      });
     }
   } else if(this.match.groups['whitespace']) { 
+    this.last_token = 'whitespace';
     this.tokens.push({ 
      group: `${T}whitespace`, 
      value: this.match[0] 
@@ -177,13 +207,12 @@ module.exports = class js extends shared {
  }
 
  check_regex_extension() {
-  let character_index = shared.get_data().charAt(this.JavascriptTokenizer.lastIndex);
   if(
-   typeof this.igsmuy[character_index] !== 'undefined' && 
-   this.igsmuy[character_index].found === false
+   typeof this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)] !== 'undefined' && 
+   this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].found === false
   ) { 
-   this.igsmuy[character_index].found = true;
-   this.attach_to_regex += this.igsmuy[character_index].v;
+   this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].found = true;
+   this.attach_to_regex += this.igsmuy[shared.get_data().charAt(this.JavascriptTokenizer.lastIndex)].v;
    this.JavascriptTokenizer.lastIndex += 1;
    return this.check_regex_extension();
   } else { 
@@ -287,7 +316,7 @@ module.exports = class js extends shared {
   }
  }
 
- handle_punctuator(value, current) {
+ handle_punctuator(value, current) { //maybe just handle them all the same except for the block statements 
   switch(value) { 
     case '&&': 
      this.handle_common_punc_a(current, value);
@@ -390,10 +419,6 @@ module.exports = class js extends shared {
   let next;
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
-  if(this.last_token === 'punctuator') { 
-   throw new Error('unexpected token');
-  }
-  this.last_token = 'punctuator';
   if(
    current.left !== null &&
    current.root === null &&
@@ -435,10 +460,6 @@ module.exports = class js extends shared {
  handle_common_punc_b(current, value) {
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
-  if(this.last_token === 'punctuator') { 
-    throw new Error('unexpected token');
-   }
-   this.last_token = 'punctuator';
   if(
    current.left !== null && 
    current.root === null && 
@@ -524,15 +545,6 @@ module.exports = class js extends shared {
  handle_identifier(value, current) { //new exp
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
-  if(
-   this.last_token === 'identifier' || 
-   this.last_token === 'string' || 
-   this.last_token === 'number' || 
-   this.last_token === 'regex'
-  ) { 
-   throw new Error('unexpected token');
-  }
-  this.last_token = 'identifier';
   if(
    current.left === null && 
    current.root === null && 
@@ -628,15 +640,6 @@ module.exports = class js extends shared {
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
   if(
-   this.last_token === 'identifier' || 
-   this.last_token === 'string' || 
-   this.last_token === 'number' || 
-   this.last_token === 'regex'
-  ) { 
-   throw new Error('unexpected token');
-  }
-  this.last_token = 'regex';
-  if(
    current.left !== null && 
    current.root !== null && 
    current.right === null
@@ -661,15 +664,6 @@ module.exports = class js extends shared {
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
   if(
-   this.last_token === 'identifier' || 
-   this.last_token === 'string' || 
-   this.last_token === 'number' || 
-   this.last_token === 'regex'
-  ) { 
-   throw new Error('unexpected token');
-  }
-  this.last_token = 'string';
-  if(
    current.left !== null && 
    current.root !== null && 
    current.right === null
@@ -693,15 +687,6 @@ module.exports = class js extends shared {
  handle_number(value, current) { 
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
-  if(
-   this.last_token === 'identifier' || 
-   this.last_token === 'string' || 
-   this.last_token === 'number' || 
-   this.last_token === 'regex'
-  ) { 
-   throw new Error('unexpected token');
-  }
-  this.last_token = 'number';
   if(
    current.left !== null && 
    current.root !== null && 
