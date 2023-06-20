@@ -1,3 +1,4 @@
 handle errors respectively
 change some things 
 maybe use deault on punc a
+//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators -- add the others -- make identifier a call if a paren after but add the paren individually as a punctuator for counting

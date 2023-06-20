@@ -9,8 +9,7 @@ let shared = require('../data');
 module.exports = class js extends shared {
 
  constructor() {   
-  //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators -- add the others -- make identifier a call if a paren after but add the paren individually as a punctuator for counting
-  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*=|\*)|([,\{\}[\];\?\:\~\(\)])))/g;
+  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&=|&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\|=|\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*\*=|\*\*|\*=|\*)(??=|?)|([,{}[\];:~\(\)])))/g;
   this.tokens = [];
   this.current_block_and_expression_count = 0;
   this.token_index = 0;
@@ -24,6 +23,7 @@ module.exports = class js extends shared {
    left: null, 
    right: null 
   }
+  this.current = this.current_expression;
   this.bracket_count_block_pop = [];
   this.array_bracket_block_pop = [];
   this.paren_block_pop = [];
@@ -116,15 +116,11 @@ module.exports = class js extends shared {
      this.which_token('');
    }
   }
-  this.build_tree(this.current_expression);
+  this.build_tree(this.current_expression); //maybe put in which_token
  }
 
  which_token(T) {
-  if(this.match.groups['regex']) { 
-   if(this.last_token === 'identifier' || this.last_token === 'string' || this.last_token === 'number' || this.last_token === 'regex' ) { //seperate after
-    throw new Error('unexpected token');
-   }
-   this.last_token = 'regex';
+  if(this.match.groups['regex']) {  //determine when a new line or ; for a new expression to take place... maybe just change the error handling here and put build tree at the bottom
    this.check_regex_extension();
    this.tokens.push({
     group: `${T}regex`, 
@@ -132,44 +128,27 @@ module.exports = class js extends shared {
    });
    this.attach_to_regex = '';
   } else if(this.match.groups['comment']) { 
-    this.last_token = 'comment';
     this.tokens.push({ 
      group: `${T}comment`, 
      value: this.match[0] 
     });
   } else if(this.match.groups['string']) { 
-    if(this.last_token === 'identifier' || this.last_token === 'string' || this.last_token === 'number' || this.last_token === 'regex') { 
-     throw new Error('unexpected token');
-    }
-    this.last_token = 'string';
     this.tokens.push({
      group: `${T}string`, 
      value:  this.match[0] 
     });
   } else if(this.match.groups['number']) { 
-    if(this.last_token === 'identifier' || this.last_token === 'string' || this.last_token === 'number' || this.last_token === 'regex') { 
-     throw new Error('unexpected token');
-    }
-    this.last_token = 'number';
     this.tokens.push({ 
      group: `${T}number`, 
      value: this.match[0] 
     });
   } else if(this.match.groups['identifier']) {
     if(key_words[this.match[0]]) { 
-     if(this.last_token === 'key-word') { 
-      throw new Error('unexpected token');
-     }
-     this.last_token = 'key-word';
      this.tokens.push({
       group: `${T}key-word`, 
       value: this.match[0] 
      });
     } else {
-      if(this.last_token === 'identifier' || this.last_token === 'string' || this.last_token === 'number' || this.last_token === 'regex') { 
-       throw new Error('unexpected token');
-      }
-      this.last_token = 'identifier';
       this.tokens.push({ 
        group: `${T}identifier`, 
        value: this.match[0] 
@@ -177,26 +156,17 @@ module.exports = class js extends shared {
     }
   } else if(this.match.groups['punctuator']) {
     if(this.match[0] === '=>') { 
-     if(this.last_token === 'key-word') { 
-      throw new Error('unexpected token');
-     }
-     this.last_token = 'key-word';
      this.tokens.push({ 
       group: `${T}key-word`, 
       value: this.match[0] 
      });
     } else {
-     if(this.last_token === 'punctuator') { 
-      throw new Error('unexpected token');
-     }
-     this.last_token = 'punctuator';
      this.tokens.push({ 
       group: `${T}punctuator`, 
       value: this.match[0] 
      });
     }
   } else if(this.match.groups['whitespace']) { 
-    this.last_token = 'whitespace';
     this.tokens.push({ 
      group: `${T}whitespace`, 
      value: this.match[0] 
@@ -251,7 +221,6 @@ module.exports = class js extends shared {
       value: this.template_string 
      }) : '';
      this.template_string = '';
-     //use template object length instead and get rid of string count
      if(this.template_string_open_close.o !== this.template_string_open_close.c) {
       this.JavascriptTokenizer.lastIndex += 1;
       return this.template_object_();
@@ -316,6 +285,7 @@ module.exports = class js extends shared {
   }
  }
 
+ //going to simplify everything below into single trees...
  handle_punctuator(value, current) { //maybe just handle them all the same except for the block statements 
   switch(value) { 
     case '&&': 
@@ -375,6 +345,8 @@ module.exports = class js extends shared {
     case '%=':
      this.handle_common_punc_b(current, value);
     case '%':
+     this.handle_common_punc_a(current, value);
+    case '.':
      this.handle_common_punc_a(current, value);
     case '...':
      this.handle_common_punc_p(current, value);
@@ -664,7 +636,7 @@ module.exports = class js extends shared {
   let temp_prev = this.attach_previous;
   this.attach_previous = '';
   if(
-   current.left !== null && 
+   current.left !== null && //always shifted from punc
    current.root !== null && 
    current.right === null
   ) { 
