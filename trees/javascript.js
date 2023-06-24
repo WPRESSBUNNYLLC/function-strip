@@ -6,12 +6,13 @@
 let fs = require('file-system');
 let shared = require('../data');
 
-module.exports = class js extends shared {
+module.exports = class js {
 
  constructor() {   
   this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&=|&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\|=|\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*\*=|\*\*|\*=|\*)(??=|?)|([,{}[\];:~\(\)])))/g;
   this.tokens = [];
   this.current_block_and_expression_count = 0;
+  this.tree_index_value = '';
   this.token_index = 0;
   this.last_token = '';
   this.block = 1;
@@ -30,7 +31,7 @@ module.exports = class js extends shared {
   this.match = [];
   this.template_string = '';
   this.template_count_pop = [];
-  this.template_string_open_close = { 
+  this.template_string_open_close = {
    o: 0, 
    c: 0 
   };
@@ -116,11 +117,11 @@ module.exports = class js extends shared {
      this.which_token('');
    }
   }
-  this.build_tree(this.current_expression); //maybe put in which_token
+  this.build_tree(this.current_expression);
  }
 
  which_token(T) {
-  if(this.match.groups['regex']) {  //determine when a new line or ; for a new expression to take place... maybe just change the error handling here and put build tree at the bottom
+  if(this.match.groups['regex']) { 
    this.check_regex_extension();
    this.tokens.push({
     group: `${T}regex`, 
@@ -155,7 +156,7 @@ module.exports = class js extends shared {
       });
     }
   } else if(this.match.groups['punctuator']) {
-    if(this.match[0] === '=>') { 
+    if(key_words[this.match[0]]) { 
      this.tokens.push({ 
       group: `${T}key-word`, 
       value: this.match[0] 
@@ -272,98 +273,320 @@ module.exports = class js extends shared {
  }
 
  build_tree(current) { 
-  switch(this.tokens[this.token_index].group) { 
-   case 'punctuator': this.handle_punctuator(this.tokens[this.token_index].value, current);
-   case 'identifier': this.handle_identifier(this.tokens[this.token_index].value, current);
-   case 'key-word': this.handle_key_word(this.tokens[this.token_index].value, current);
-   case 'regex': this.handle_regex(this.tokens[this.token_index].value, current);
-   case 'string': this.handle_string(this.tokens[this.token_index].value, current);
-   case 'comment': this.handle_comment(this.tokens[this.token_index].value, current);
-   case 'beginning-template-literal': this.handle_template_literal(this.tokens[this.token_index].value, current); //encap everything
-   case 'number': this.handle_number(this.tokens[this.token_index].value, current);
-   case 'whitespace': this.handle_white_space(this.tokens[this.token_index].value, current);
+  if(this.token_index > this.tokens.length) { 
+   return;
+  }
+  let group = this.tokens[this.token_index].group;
+  let value = this.tokens[this.token_index].value;
+  this.attach_previous = '';
+
+  switch(group) { 
+
+   case 'punctuator':
+    if(
+     value === '&&' || 
+     value === '&' ||
+     value === '/' ||
+     value === '===' || 
+     value === '==' ||
+     value === '!==' ||
+     value === '!=' ||
+     value === '>>>' || 
+     value === '>>' || 
+     value === '>=' || 
+     value === '>' || 
+     value === '<<' || 
+     value === '<' || 
+     value === '-' || 
+     value === '||' || 
+     value === '|' || 
+     value === '.' || 
+     value === '%' || 
+     value === '+' || 
+     value === '^' || 
+     value === '*' || 
+     value === '<='
+    ) { 
+     let next;
+     if(
+      current.left !== null &&
+      current.root === null &&
+      current.right === null
+     ) { 
+      current.root = { 
+       prev_comment_whitespace: this.attach_previous,
+       type_: 'punctuator', 
+       value: value 
+      }
+      next = current;
+    } else if(
+      current.root !== null &&
+      current.left !== null &&
+      current.right !== null
+    ) { 
+     let temp = current.right.root;
+     current.right = { 
+      root: {
+       prev_comment_whitespace: temp_prev,
+       type_: 'punctuator', 
+       value: value
+      },
+      left: {
+       root: temp,   
+       left: null, 
+       right: null 
+      }, 
+      right: null
+     }
+     next = current.right;
+    } else { 
+     throw new Error('Invalid tree syntax');
+    }
+    this.token_index += 1;
+    return this.build_tree(next);
+   } else if( 
+    value === '&=' || 
+    value === '/=' || 
+    value === '>>>=' || 
+    value === '>>=' || 
+    value === '<<=' || 
+    value === '-=' || 
+    value === '|=' || 
+    value === '%=' || 
+    value === '+=' || 
+    value === '*=' || 
+    value === '^='
+   ) { 
+    if(
+     current.left !== null && 
+     current.root === null && 
+     current.right === null
+    ) { 
+     let temp = current.left.root;
+     current.root = { 
+      prev_comment_whitespace: this.attach_previous,
+      type_: 'punctuator', 
+      value: '='
+     }
+     current.right = { 
+      root: {
+       type_: 'punctuator', 
+       value: value.split('=')[0]
+      },
+      left: { 
+       root: temp, 
+       left: null, 
+       right: null
+      }, 
+      right: null
+     }
+    } else { 
+     throw new Error('Invalid tree syntax');
+    }
+    this.token_index += 1;
+    this.attach_previous = '';
+    return this.build_tree(current.right);
+   } 
+
+   case 'identifier': 
+    if(
+     current.left === null && 
+     current.root === null && 
+     current.right === null
+    ) { 
+     current.left = { 
+      root: { 
+       prev_comment_whitespace: this.attach_previous,
+       value: value, 
+       type_: 'identifier'
+      },
+      left: null, 
+      right: null
+     }
+    } else if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right === null
+    ) { 
+     current.right = { 
+      root: { 
+       prev_comment_whitespace: this.attach_previous,
+       value: value, 
+       type_: 'identifier'
+      },
+      left: null, 
+      right: null
+     }
+    } else { 
+    throw new Error('Invalid tree syntax');
+   }
+   this.token_index += 1; 
+   this.attach_previous = '';
+   return this.build_tree(current);
+
+   case 'key-word': 
+    this.handle_key_word(value, current);
+
+   case 'regex': 
+    if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right === null
+    ) { 
+     current.right = { 
+      root: {
+       prev_comment_whitespace: this.attach_previous,
+       type_: 'regex', 
+       value: value
+      }, 
+      left: null, 
+      right: null
+     }
+    } else { 
+     throw new Error('Invalid tree syntax');
+    }
+    this.token_index += 1; 
+    this.attach_previous = '';
+    return this.build_tree(current, value);
+
+   case 'string': 
+    if(
+     current.left !== null &&
+     current.root !== null && 
+     current.right === null
+    ) { 
+     current.right = { 
+      root: {
+       prev_comment_whitespace: this.attach_previous,
+       type_: 'string', 
+       value: value
+      }, 
+      left: null, 
+      right: null
+     }
+    } else { 
+     throw new Error('Invalid tree syntax');
+    }
+    this.token_index += 1; 
+    this.attach_previous = '';
+    return this.build_tree(current);
+
+   case 'comment': 
+    this.attach_previous += value;
+    this.token_index += 1;
+    return this.build_tree(current);
+
+   case 'beginning-template-literal': 
+    this.handle_template_literal(value, current);
+
+   case 'number': 
+    if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right === null
+    ) { 
+     current.right = { 
+      root: {
+       prev_comment_whitespace: this.attach_previous,
+       type_: 'number', 
+       value: value
+      }, 
+      left: null, 
+      right: null
+     }
+    } else { 
+     throw new Error('Invalid tree syntax');
+    }
+    this.token_index += 1; 
+    this.attach_previous = '';
+    return this.build_tree(current);
+
+   case 'whitespace': 
+    this.attach_previous += value;
+    this.token_index += 1;
+    return this.build_tree(current);  
+
   }
  }
 
- //going to simplify everything below into single trees...
- handle_punctuator(value, current) { //maybe just handle them all the same except for the block statements 
+ handle_punctuator(value, current) {
   switch(value) { 
-    case '&&': 
-     this.handle_common_punc_a(current, value);
-    case '&=': 
-     this.handle_common_punc_b(current, value);
-    case '&': 
-     this.handle_common_punc_a(current, value);
-    case '/=': 
-     this.handle_common_punc_b(current, value);
-    case '/': 
-     this.handle_common_punc_a(current, value);
-    case '===': 
-     this.handle_common_punc_a(current, value);
-    case '==': 
-     this.handle_common_punc_a(current, value);
+    // case '&&': 
+    //  this.handle_common_punc_a(current, value);
+    // case '&=': 
+    //  this.handle_common_punc_b(current, value);
+    // case '&': 
+    //  this.handle_common_punc_a(current, value);
+    // case '/=': 
+    //  this.handle_common_punc_b(current, value);
+    // case '/': 
+    //  this.handle_common_punc_a(current, value);
+    // case '===': 
+    //  this.handle_common_punc_a(current, value);
+    // case '==': 
+    //  this.handle_common_punc_a(current, value);
     case '=': 
      this.handle_common_punc_s(current, value);
-    case '!==': 
-     this.handle_common_punc_a(current, value);
-    case '!=': 
-     this.handle_common_punc_a(current, value);
+    // case '!==': 
+    //  this.handle_common_punc_a(current, value);
+    // case '!=': 
+    //  this.handle_common_punc_a(current, value);
     case '!': 
      this.handle_common_punc_n(current, value);
-    case '>>>=': 
-     this.handle_common_punc_b(current, value);
-    case '>>=': 
-     this.handle_common_punc_b(current, value);
-    case '>>>':
-     this.handle_common_punc_a(current, value); 
-    case '>>': 
-     this.handle_common_punc_a(current, value);
-    case '>=': 
-     this.handle_common_punc_a(current, value);
-    case '>': 
-     this.handle_common_punc_a(current, value);
-    case '<<=': 
-     this.handle_common_punc_b(current, value);
-    case '<<': 
-     this.handle_common_punc_a(current, value);
-    case '<=': 
-     this.handle_common_punc_a(current, value);
-    case '<': 
-     this.handle_common_punc_a(current, value);
-    case '-=': 
-     this.handle_common_punc_b(current, value);
+    // case '>>>=': 
+    //  this.handle_common_punc_b(current, value);
+    // case '>>=': 
+    //  this.handle_common_punc_b(current, value);
+    // case '>>>':
+    //  this.handle_common_punc_a(current, value); 
+    // case '>>': 
+    //  this.handle_common_punc_a(current, value);
+    // case '>=': 
+    //  this.handle_common_punc_a(current, value);
+    // case '>': 
+    //  this.handle_common_punc_a(current, value);
+    // case '<<=': 
+    //  this.handle_common_punc_b(current, value);
+    // case '<<': 
+    //  this.handle_common_punc_a(current, value);
+    // case '<=': 
+    //  this.handle_common_punc_a(current, value);
+    // case '<': 
+    //  this.handle_common_punc_a(current, value);
+    // case '-=': 
+    //  this.handle_common_punc_b(current, value);
     case '--':
      this.handle_common_punc_c(current, value);
-    case '-':
-     this.handle_common_punc_a(current, value);
-    case '||':
-     this.handle_common_punc_a(current, value);
-    case '|=':
-     this.handle_common_punc_b(current, value);
-    case '|': 
-     this.handle_common_punc_a(current, value);
-    case '%=':
-     this.handle_common_punc_b(current, value);
-    case '%':
-     this.handle_common_punc_a(current, value);
-    case '.':
-     this.handle_common_punc_a(current, value);
+    // case '-':
+    //  this.handle_common_punc_a(current, value);
+    // case '||':
+    //  this.handle_common_punc_a(current, value);
+    // case '|=':
+    //  this.handle_common_punc_b(current, value);
+    // case '|': 
+    //  this.handle_common_punc_a(current, value);
+    // case '%=':
+    //  this.handle_common_punc_b(current, value);
+    // case '%':
+    //  this.handle_common_punc_a(current, value);
+    // case '.':
+    //  this.handle_common_punc_a(current, value);
     case '...':
      this.handle_common_punc_p(current, value);
     case '++': 
      this.handle_common_punc_c(current, value);
-    case '+=': 
-     this.handle_common_punc_b(current, value);
-    case '+': 
-     this.handle_common_punc_a(current, value);
-    case '^=': 
-     this.handle_common_punc_b(current, value);
-    case '^': 
-     this.handle_common_punc_a(current, value);
-    case '*=': 
-     this.handle_common_punc_b(current, value);
-    case '*': 
-     this.handle_common_punc_a(current, value);
+    // case '+=': 
+    //  this.handle_common_punc_b(current, value);
+    // case '+': 
+    //  this.handle_common_punc_a(current, value);
+    // case '^=': 
+    //  this.handle_common_punc_b(current, value);
+    // case '^': 
+    //  this.handle_common_punc_a(current, value);
+    // case '*=': 
+    //  this.handle_common_punc_b(current, value);
+    // case '*': 
+    //  this.handle_common_punc_a(current, value);
     case '[': 
      this.handle_common_punc_f(current, value);
     case ',': 
@@ -387,47 +610,47 @@ module.exports = class js extends shared {
   }
  }
 
- handle_common_punc_a(current, value) { 
-  let next;
-  let temp_prev = this.attach_previous;
-  this.attach_previous = '';
-  if(
-   current.left !== null &&
-   current.root === null &&
-   current.right === null
-  ) { 
-   current.root = { 
-    prev_comment_whitespace: temp_prev,
-    type_: 'punctuator', 
-    value: value 
-   }
-   next = current;
-  } else if(
-   current.root !== null &&
-   current.left !== null &&
-   current.right !== null
-  ) { 
-   let temp = current.right.root;
-   current.right = { 
-    root: {
-     prev_comment_whitespace: temp_prev,
-     type_: 'punctuator', 
-     value: value
-    },
-    left: {
-     root: temp,
-     left: null, 
-     right: null 
-    }, 
-    right: null
-   }
-   next = current.right;
-  } else { 
-   throw new Error('Invalid tree syntax');
-  }
-  this.token_index += 1;
-  this.build_tree(next);
- }
+//  handle_common_punc_a(current, value) { 
+//   let next;
+//   let temp_prev = this.attach_previous;
+//   this.attach_previous = '';
+//   if(
+//    current.left !== null &&
+//    current.root === null &&
+//    current.right === null
+//   ) { 
+//    current.root = { 
+//     prev_comment_whitespace: temp_prev,
+//     type_: 'punctuator', 
+//     value: value 
+//    }
+//    next = current;
+//   } else if(
+//    current.root !== null &&
+//    current.left !== null &&
+//    current.right !== null
+//   ) { 
+//    let temp = current.right.root;
+//    current.right = { 
+//     root: {
+//      prev_comment_whitespace: temp_prev,
+//      type_: 'punctuator', 
+//      value: value
+//     },
+//     left: {
+//      root: temp,
+//      left: null, 
+//      right: null 
+//     }, 
+//     right: null
+//    }
+//    next = current.right;
+//   } else { 
+//    throw new Error('Invalid tree syntax');
+//   }
+//   this.token_index += 1;
+//   this.build_tree(next);
+//  }
 
  handle_common_punc_b(current, value) {
   let temp_prev = this.attach_previous;
@@ -514,44 +737,6 @@ module.exports = class js extends shared {
 
  }
 
- handle_identifier(value, current) { //new exp
-  let temp_prev = this.attach_previous;
-  this.attach_previous = '';
-  if(
-   current.left === null && 
-   current.root === null && 
-   current.right === null
-  ) { 
-   current.left = { 
-   root: { 
-    prev_comment_whitespace: temp_prev,
-    value: value, 
-    type_: 'identifier'
-   },
-    left: null, 
-    right: null
-   }
-  } else if(
-   current.left !== null && 
-   current.root !== null && 
-   current.right === null
-  ) { 
-   current.right = { 
-    root: { 
-     prev_comment_whitespace: temp_prev,
-     value: value, 
-     type_: 'identifier'
-    },
-    left: null, 
-    right: null
-   }
-  } else { 
-   throw new Error('Invalid tree syntax');
-  }
-  this.token_index += 1; 
-  this.build_tree(current);
- }
-
  handle_key_word(value, current) {
   switch(value) { 
     case 'arguments':
@@ -608,92 +793,8 @@ module.exports = class js extends shared {
   }
  }
 
- handle_regex(value, current) { 
-  let temp_prev = this.attach_previous;
-  this.attach_previous = '';
-  if(
-   current.left !== null && 
-   current.root !== null && 
-   current.right === null
-  ) { 
-   current.right = { 
-    root: {
-     prev_comment_whitespace: temp_prev,
-     type_: 'regex', 
-     value: value
-    }, 
-    left: null, 
-    right: null
-   }
-  } else { 
-   throw new Error('Invalid tree syntax');
-  }
-  this.token_index += 1; 
-  this.build_tree(current, value);
- }
-
- handle_string(value, current) { 
-  let temp_prev = this.attach_previous;
-  this.attach_previous = '';
-  if(
-   current.left !== null && //always shifted from punc
-   current.root !== null && 
-   current.right === null
-  ) { 
-   current.right = { 
-    root: {
-     prev_comment_whitespace: temp_prev,
-     type_: 'string', 
-     value: value
-    }, 
-    left: null, 
-    right: null
-   }
-  } else { 
-   throw new Error('Invalid tree syntax');
-  }
-  this.token_index += 1; 
-  this.build_tree(current);
- }
-
- handle_number(value, current) { 
-  let temp_prev = this.attach_previous;
-  this.attach_previous = '';
-  if(
-   current.left !== null && 
-   current.root !== null && 
-   current.right === null
-  ) { 
-   current.right = { 
-    root: {
-     prev_comment_whitespace: temp_prev,
-     type_: 'number', 
-     value: value
-    }, 
-    left: null, 
-    right: null
-   }
-  } else { 
-   throw new Error('Invalid tree syntax');
-  }
-  this.token_index += 1; 
-  this.build_tree(current);
- }
-
- handle_template_literal(value, current) {
-
- }
-
- handle_white_space(value, current) {
-  this.attach_previous += value;  //attaches to next tokens whitespace 
-  this.token_index += 1;
-  this.build_tree(current);
- }
-
- handle_comment(value, current) { 
-  this.attach_previous += value; 
-  this.token_index += 1;
-  this.build_tree(current);
+ handle_template_literal() { 
+  
  }
 
  is_current_an_error() { 
@@ -704,7 +805,7 @@ module.exports = class js extends shared {
 
  }
 
- is_tree_finished() { //only all three would be null if tree is finished
+ is_tree_finished() {
 
  }
 
