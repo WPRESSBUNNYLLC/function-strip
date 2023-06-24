@@ -273,9 +273,11 @@ module.exports = class js {
  }
 
  build_tree(current) { 
+
   if(this.token_index > this.tokens.length) { 
    return;
   }
+
   let group = this.tokens[this.token_index].group;
   let value = this.tokens[this.token_index].value;
   this.attach_previous = '';
@@ -327,7 +329,7 @@ module.exports = class js {
      let temp = current.right.root;
      current.right = { 
       root: {
-       prev_comment_whitespace: temp_prev,
+       prev_comment_whitespace: this.attach_previous,
        type_: 'punctuator', 
        value: value
       },
@@ -343,6 +345,7 @@ module.exports = class js {
      throw new Error('Invalid tree syntax');
     }
     this.token_index += 1;
+    this.attach_previous = '';
     return this.build_tree(next);
    } else if( 
     value === '&=' || 
@@ -386,7 +389,28 @@ module.exports = class js {
     this.token_index += 1;
     this.attach_previous = '';
     return this.build_tree(current.right);
-   } 
+   } else if(
+    value === '++' || 
+    value === '--'
+   ) { 
+    //do something
+   } else { 
+    switch(value) { 
+     case '=': 
+     case '!': 
+     case '...':
+     case '[': 
+     case ',': 
+     case '{': 
+     case '}': 
+     case ']': 
+     case ';': 
+     case ':': 
+     case '~':
+     case '(': 
+     case ')':
+     }
+   }
 
    case 'identifier': 
     if(
@@ -425,7 +449,59 @@ module.exports = class js {
    return this.build_tree(current);
 
    case 'key-word': 
-    this.handle_key_word(value, current);
+    switch(value) { 
+     case 'arguments':
+     case 'await':
+     case 'break':
+     case 'case':
+     case 'catch':
+     case 'class':
+     case 'const':
+     case 'continue':
+     case 'debugger':
+     case 'default':
+     case 'delete':
+     case 'do':
+     case 'else':
+     case 'enum':
+     case 'eval':
+     case 'export':
+     case 'extends':
+     case 'false':
+     case 'finally':
+     case 'for':
+     case 'function':
+     case 'if':
+     case 'implements':
+     case 'import':
+     case 'in':
+     case 'instanceof':
+     case 'interface':
+     case 'let':
+     case 'module': 
+     case 'new':
+     case 'null':
+     case 'package':
+     case 'private':
+     case 'protected':
+     case 'public':
+     case 'return': 
+     case 'static':
+     case 'super':
+     case 'switch':
+     case 'this':
+     case 'throw':
+     case 'true':
+     case 'try':
+     case 'typeof':
+     case 'var':
+     case 'void':
+     case 'while':
+     case 'with':
+     case 'yield':
+     case 'require':
+     case '=>': 
+    }
 
    case 'regex': 
     if(
@@ -477,7 +553,7 @@ module.exports = class js {
     return this.build_tree(current);
 
    case 'beginning-template-literal': 
-    this.handle_template_literal(value, current);
+    //set some values for in a template literal and go through
 
    case 'number': 
     if(
@@ -507,294 +583,6 @@ module.exports = class js {
     return this.build_tree(current);  
 
   }
- }
-
- handle_punctuator(value, current) {
-  switch(value) { 
-    // case '&&': 
-    //  this.handle_common_punc_a(current, value);
-    // case '&=': 
-    //  this.handle_common_punc_b(current, value);
-    // case '&': 
-    //  this.handle_common_punc_a(current, value);
-    // case '/=': 
-    //  this.handle_common_punc_b(current, value);
-    // case '/': 
-    //  this.handle_common_punc_a(current, value);
-    // case '===': 
-    //  this.handle_common_punc_a(current, value);
-    // case '==': 
-    //  this.handle_common_punc_a(current, value);
-    case '=': 
-     this.handle_common_punc_s(current, value);
-    // case '!==': 
-    //  this.handle_common_punc_a(current, value);
-    // case '!=': 
-    //  this.handle_common_punc_a(current, value);
-    case '!': 
-     this.handle_common_punc_n(current, value);
-    // case '>>>=': 
-    //  this.handle_common_punc_b(current, value);
-    // case '>>=': 
-    //  this.handle_common_punc_b(current, value);
-    // case '>>>':
-    //  this.handle_common_punc_a(current, value); 
-    // case '>>': 
-    //  this.handle_common_punc_a(current, value);
-    // case '>=': 
-    //  this.handle_common_punc_a(current, value);
-    // case '>': 
-    //  this.handle_common_punc_a(current, value);
-    // case '<<=': 
-    //  this.handle_common_punc_b(current, value);
-    // case '<<': 
-    //  this.handle_common_punc_a(current, value);
-    // case '<=': 
-    //  this.handle_common_punc_a(current, value);
-    // case '<': 
-    //  this.handle_common_punc_a(current, value);
-    // case '-=': 
-    //  this.handle_common_punc_b(current, value);
-    case '--':
-     this.handle_common_punc_c(current, value);
-    // case '-':
-    //  this.handle_common_punc_a(current, value);
-    // case '||':
-    //  this.handle_common_punc_a(current, value);
-    // case '|=':
-    //  this.handle_common_punc_b(current, value);
-    // case '|': 
-    //  this.handle_common_punc_a(current, value);
-    // case '%=':
-    //  this.handle_common_punc_b(current, value);
-    // case '%':
-    //  this.handle_common_punc_a(current, value);
-    // case '.':
-    //  this.handle_common_punc_a(current, value);
-    case '...':
-     this.handle_common_punc_p(current, value);
-    case '++': 
-     this.handle_common_punc_c(current, value);
-    // case '+=': 
-    //  this.handle_common_punc_b(current, value);
-    // case '+': 
-    //  this.handle_common_punc_a(current, value);
-    // case '^=': 
-    //  this.handle_common_punc_b(current, value);
-    // case '^': 
-    //  this.handle_common_punc_a(current, value);
-    // case '*=': 
-    //  this.handle_common_punc_b(current, value);
-    // case '*': 
-    //  this.handle_common_punc_a(current, value);
-    case '[': 
-     this.handle_common_punc_f(current, value);
-    case ',': 
-     this.handle_common_punc_d(current, value);
-    case '{': 
-     this.handle_common_punc_e(current, value);
-    case '}': 
-     this.handle_common_punc_e2(current, value);
-    case ']': 
-     this.handle_common_punc_f2(current, value);
-    case ';': 
-     this.handle_common_punc_h(current, value);
-    case ':': 
-     this.handle_common_punc_i(current, value);
-    case '~':
-     this.handle_common_punc_j(current, value);
-    case '(': 
-     this.handle_common_punc_k(current, value);
-    case ')':
-     this.handle_common_punc_k2(current, value);
-  }
- }
-
-//  handle_common_punc_a(current, value) { 
-//   let next;
-//   let temp_prev = this.attach_previous;
-//   this.attach_previous = '';
-//   if(
-//    current.left !== null &&
-//    current.root === null &&
-//    current.right === null
-//   ) { 
-//    current.root = { 
-//     prev_comment_whitespace: temp_prev,
-//     type_: 'punctuator', 
-//     value: value 
-//    }
-//    next = current;
-//   } else if(
-//    current.root !== null &&
-//    current.left !== null &&
-//    current.right !== null
-//   ) { 
-//    let temp = current.right.root;
-//    current.right = { 
-//     root: {
-//      prev_comment_whitespace: temp_prev,
-//      type_: 'punctuator', 
-//      value: value
-//     },
-//     left: {
-//      root: temp,
-//      left: null, 
-//      right: null 
-//     }, 
-//     right: null
-//    }
-//    next = current.right;
-//   } else { 
-//    throw new Error('Invalid tree syntax');
-//   }
-//   this.token_index += 1;
-//   this.build_tree(next);
-//  }
-
- handle_common_punc_b(current, value) {
-  let temp_prev = this.attach_previous;
-  this.attach_previous = '';
-  if(
-   current.left !== null && 
-   current.root === null && 
-   current.right === null
-  ) { 
-   let temp = current.left.root;
-   current.root = { 
-    prev_comment_whitespace: temp_prev,
-    type_: 'punctuator', 
-    value: '='
-   }
-   current.right = { 
-    root: {
-     type_: 'punctuator', 
-     value: value.split('=')[0]
-    },
-    left: { 
-     root: temp, 
-     left: null, 
-     right: null
-    }, 
-    right: null
-   }
-  } else { 
-   throw new Error('Invalid tree syntax');
-  }
-  this.token_index += 1;
-  this.build_tree(current.right);
- }
-
- handle_common_punc_c(current, value) { 
-  
- }
-
- handle_common_punc_s() { 
-
- }
-
- handle_common_punc_n() { 
-
- }
-
- handle_common_p() { 
-
- }
-
- handle_common_punc_d() { 
-
- }
-
- handle_common_punc_h() { 
-
- }
-
- handle_common_punc_i() { 
-
- }
-
- handle_common_punc_j() { 
-
- }
-
- handle_common_punc_k() { 
-
- }
-
- handle_common_punc_e() { 
-
- }
-
- handle_common_punc_e2() { 
-
- }
-
- handle_common_punc_f() { 
-
- }
-
- handle_common_punc_f2() { 
-
- }
-
- handle_key_word(value, current) {
-  switch(value) { 
-    case 'arguments':
-    case 'await':
-    case 'break':
-    case 'case':
-    case 'catch':
-    case 'class':
-    case 'const':
-    case 'continue':
-    case 'debugger':
-    case 'default':
-    case 'delete':
-    case 'do':
-    case 'else':
-    case 'enum':
-    case 'eval':
-    case 'export':
-    case 'extends':
-    case 'false':
-    case 'finally':
-    case 'for':
-    case 'function':
-    case 'if':
-    case 'implements':
-    case 'import':
-    case 'in':
-    case 'instanceof':
-    case 'interface':
-    case 'let':
-    case 'module': 
-    case 'new':
-    case 'null':
-    case 'package':
-    case 'private':
-    case 'protected':
-    case 'public':
-    case 'return': 
-    case 'static':
-    case 'super':
-    case 'switch':
-    case 'this':
-    case 'throw':
-    case 'true':
-    case 'try':
-    case 'typeof':
-    case 'var':
-    case 'void':
-    case 'while':
-    case 'with':
-    case 'yield':
-    case 'require':
-    case '=>': 
-  }
- }
-
- handle_template_literal() { 
-  
  }
 
  is_current_an_error() { 
