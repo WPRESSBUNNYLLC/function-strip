@@ -9,7 +9,7 @@ let shared = require('../data');
 module.exports = class js {
 
  constructor() {   
-  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&=|&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\|=|\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*\*=|\*\*|\*=|\*)(??=|?)|([,{}[\];:~\(\)])))/g;
+  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&=|&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\|=|\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*\*=|\*\*|\*=|\*)(\?\?=|\?)|([,{}[\];:~\(\)])))/g;
   this.tokens = [];
   this.current_block_and_expression_count = 0;
   this.tree_index_value = '';
@@ -274,13 +274,12 @@ module.exports = class js {
 
  build_tree(current) { 
 
-  if(this.token_index > this.tokens.length) { 
+  if(this.token_index > this.tokens.length - 1) { 
    return;
   }
 
   let group = this.tokens[this.token_index].group;
   let value = this.tokens[this.token_index].value;
-  this.attach_previous = '';
 
   switch(group) { 
 
@@ -393,23 +392,33 @@ module.exports = class js {
     value === '++' || 
     value === '--'
    ) { 
-    //do something
-   } else { 
-    switch(value) { 
-     case '=': 
-     case '!': 
-     case '...':
-     case '[': 
-     case ',': 
-     case '{': 
-     case '}': 
-     case ']': 
-     case ';': 
-     case ':': 
-     case '~':
-     case '(': 
-     case ')':
-     }
+    
+   } else if(value === '=') { 
+
+   } else if(value === '!') {
+
+   } else if(value === '...') { 
+
+   } else if(value === '[') { 
+
+   } else if(value === ']') { 
+
+   } else if(value === ',') { 
+
+   } else if(value === '{') { 
+
+   } else if(value === '}') { 
+
+   } else if(value === ';') { 
+
+   } else if(value === ':') { 
+
+   } else if(value === '~') { 
+
+   } else if(value === '(') { 
+
+   } else if(value === ')') { 
+
    }
 
    case 'identifier': 
@@ -449,58 +458,108 @@ module.exports = class js {
    return this.build_tree(current);
 
    case 'key-word': 
-    switch(value) { 
-     case 'arguments':
-     case 'await':
-     case 'break':
-     case 'case':
-     case 'catch':
-     case 'class':
-     case 'const':
-     case 'continue':
-     case 'debugger':
-     case 'default':
-     case 'delete':
-     case 'do':
-     case 'else':
-     case 'enum':
-     case 'eval':
-     case 'export':
-     case 'extends':
-     case 'false':
-     case 'finally':
-     case 'for':
-     case 'function':
-     case 'if':
-     case 'implements':
-     case 'import':
-     case 'in':
-     case 'instanceof':
-     case 'interface':
-     case 'let':
-     case 'module': 
-     case 'new':
-     case 'null':
-     case 'package':
-     case 'private':
-     case 'protected':
-     case 'public':
-     case 'return': 
-     case 'static':
-     case 'super':
-     case 'switch':
-     case 'this':
-     case 'throw':
-     case 'true':
-     case 'try':
-     case 'typeof':
-     case 'var':
-     case 'void':
-     case 'while':
-     case 'with':
-     case 'yield':
-     case 'require':
-     case '=>': 
+    if(value === 'arguments') { 
+
+    } else if(value === 'await') { 
+
+    } else if(value === 'break') { 
+
+    } else if(value === 'case') { 
+
+    } else if(value === 'catch') { 
+
+    } else if(value === 'class') { 
+
+    } else if(value === 'const') { 
+
+    } else if(value === 'continue') { 
+
+    } else if(value === 'debugger') { 
+
+    } else if(value === 'default') { 
+
+    } else if(value === 'delete') { 
+
+    } else if(value === 'do') { 
+
+    } else if(value === 'else') { 
+
+    } else if(value === 'enum') { 
+
+    } else if(value === 'eval') { 
+
+    } else if(value === 'export') { 
+
+    } else if(value === 'extends') { 
+
+    } else if(value === 'false') { 
+
+    } else if(value === 'finally') { 
+
+    } else if(value === 'for') { 
+
+    } else if(value === 'function') { 
+
+    } else if(value === 'if') { 
+
+    } else if(value === 'implements') { 
+
+    } else if(value === 'import') { 
+
+    } else if(value === 'in') { 
+
+    } else if(value === 'instanceof') { 
+
+    } else if(value === 'interface') { 
+
+    } else if(value === 'let') { 
+
+    } else if(value === 'module') { 
+
+    } else if(value === 'new') { 
+
+    } else if(value === 'null') { 
+
+    } else if(value === 'package') { 
+
+    } else if(value === 'private') { 
+
+    } else if(value === 'protected') { 
+
+    } else if(value === 'public') { 
+
+    } else if(value === 'return') { 
+
+    } else if(value === 'static') { 
+
+    } else if(value === 'super') { 
+
+    } else if(value === 'switch') { 
+
+    } else if(value === 'this') { 
+
+    } else if(value === 'throw') { 
+
+    } else if(value === 'true') { 
+
+    } else if(value === 'try') { 
+
+    } else if(value === 'typeof') { 
+
+    } else if(value === 'var') { 
+
+    } else if(value === 'void') { 
+
+    } else if(value === 'while') { 
+
+    } else if(value === 'with') { 
+
+    } else if(value === 'yield') { 
+
+    } else if(value === 'require') { 
+
+    } else if(value === '=>') { 
+
     }
 
    case 'regex': 
@@ -553,7 +612,7 @@ module.exports = class js {
     return this.build_tree(current);
 
    case 'beginning-template-literal': 
-    //set some values for in a template literal and go through
+    //set some values for in a template literal and go through (create and append a seperate expression)
 
    case 'number': 
     if(
