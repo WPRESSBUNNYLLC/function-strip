@@ -12,20 +12,33 @@ module.exports = class js {
   this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&=|&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\|=|\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*\*=|\*\*|\*=|\*)(\?\?=|\?)|([,{}[\];:~\(\)])))/g;
   this.tokens = [];
   this.current_block_and_expression_count = 0;
+  this.bracket_error = { 
+    array: { 
+     o: 0, 
+     c: 0 
+    }, 
+    paren: { 
+     o: 0, 
+     c: 0 
+    }, 
+    bracket: { 
+     o: 0, 
+     c: 0 
+    }
+  } 
   this.tree_index_value = '';
   this.token_index = 0;
   this.last_token = '';
-  this.block = 1;
-  this.prev_block = [1];
   this.attach_previous = '';
+  this.expresion_id = 0;
+  this.block_id = 0;
   this.file = {};
   this.current_expression = { 
    root: null, 
    left: null, 
    right: null 
   }
-  this.current = this.current_expression;
-  this.bracket_count_block_pop = [];
+  this.bracket_count_block_pop = []; //
   this.array_bracket_block_pop = [];
   this.paren_block_pop = [];
   this.match = [];
@@ -37,12 +50,30 @@ module.exports = class js {
   };
   this.attach_to_regex = '';
   this.igsmuy = {
-   i: { v: 'i', found: false }, 
-   g: { v: 'g', found: false }, 
-   y: { v: 'y', found: false }, 
-   u: { v: 'u', found: false }, 
-   m: { v: 'm', found: false }, 
-   s: { v: 's', found: false }
+   i: { 
+    v: 'i', 
+    found: false 
+   }, 
+   g: { 
+    v: 'g', 
+    found: false 
+   }, 
+   y: { 
+    v: 'y', 
+    found: false 
+   }, 
+   u: { 
+    v: 'u', 
+    found: false 
+   }, 
+   m: { 
+    v: 'm', 
+    found: false 
+   }, 
+   s: {
+    v: 's', 
+    found: false 
+   }
   }
   this.key_words = {
    'arguments'	: true,
@@ -166,6 +197,20 @@ module.exports = class js {
       group: `${T}punctuator`, 
       value: this.match[0] 
      });
+     if(this.match[0] === '{') { 
+      this.bracket_error.bracket.o += 1;
+     } else if(this.match[0] === '}') { 
+      this.bracket_error.bracket.c += 1;
+      //if closing greater than opening at any time, throw error --
+     } else if(this.match[0] === '(') { 
+      this.bracket_error.paren.o += 1;
+     } else if(this.match[0] === ')') {
+      this.bracket_error.paren.c += 1;
+     } else if(this.match[0] === '[') { 
+      this.bracket_error.array.o += 1;
+     } else if(this.match[0] === ']') { 
+      this.bracket_error.array.c += 1;
+     }
     }
   } else if(this.match.groups['whitespace']) { 
     this.tokens.push({ 
@@ -174,6 +219,9 @@ module.exports = class js {
     });
   } else { 
     throw new Error('invalid token')
+  }
+  if(this.tokens[this.tokens.length - 1].group === this.tokens[this.tokens.length - 2].group) { 
+    //throw error... two tokens back to back.. except comment and white space...
   }
  }
 
@@ -202,6 +250,7 @@ module.exports = class js {
      shared.get_data().charAt(this.JavascriptTokenizer.lastIndex) === '$' && 
      shared.get_data().charAt(this.JavascriptTokenizer.lastIndex + 1) === '{'
     ) { 
+     this.bracket_error.bracket.o += 1;
      this.template_string.length > 0 ? 
      this.tokens.push({ 
       group: 'template-string', 
@@ -226,9 +275,6 @@ module.exports = class js {
       this.JavascriptTokenizer.lastIndex += 1;
       return this.template_object_();
      } else { 
-      if(this.template_count_pop.length !== 0) { 
-       throw new Error('the template literal string has ended but there are still remaining brackets?');
-      }
       this.JavascriptTokenizer.lastIndex += 1;
       this.template_string = '';
       this.template_count_pop = [];
@@ -247,12 +293,17 @@ module.exports = class js {
   while(true) { 
    this.match = this.JavascriptTokenizer.exec(shared.get_data());
    if(this.match[0] === '{') {
+    this.bracket_error.bracket.o += 1;
     this.template_count_pop[this.template_count_pop.length - 1].o += 1;
     this.tokens.push({ 
       group: 'T-punctuator', 
       value: this.match[0] 
     });
    } else if(this.match[0] === '}') { 
+    this.bracket_error.bracket.c += 1;
+    if(this.bracket_error.bracket.c > this.bracket_error.bracket.o) { 
+     throw new Error('at no point should there be more opening brackets than closing brackets');
+    }
     this.template_count_pop[this.template_count_pop.length - 1].c += 1;
     if(this.template_count_pop[this.template_count_pop.length - 1].o === this.template_count_pop[this.template_count_pop.length - 1].c) { 
      this.template_count_pop.pop();
@@ -273,16 +324,12 @@ module.exports = class js {
  }
 
  build_tree(current) { 
-
   if(this.token_index > this.tokens.length - 1) { 
    return;
   }
-
   let group = this.tokens[this.token_index].group;
   let value = this.tokens[this.token_index].value;
-
   switch(group) { 
-
    case 'punctuator':
     if(
      value === '&&' || 
@@ -372,6 +419,7 @@ module.exports = class js {
      }
      current.right = { 
       root: {
+       prev_comment_whitespace: '',
        type_: 'punctuator', 
        value: value.split('=')[0]
       },
@@ -392,35 +440,70 @@ module.exports = class js {
     value === '++' || 
     value === '--'
    ) { 
-    
+    //++ or --
    } else if(value === '=') { 
-
+    if(
+     current.left !== null && 
+     current.root === null && 
+     current.right === null
+    ) { 
+     current.root = { 
+      prev_comment_whitespace: this.attach_previous, 
+      type_: 'punctuator', 
+      value: '='
+     }
+    } else { 
+     throw new Error('invalid tree syntax');
+    } 
+    this.token_index += 1;
+    this.attach_previous = '';
+    return this.build_tree(current);
    } else if(value === '!') {
-
+    if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right === null
+    ) { 
+     current.right = { 
+      root: { 
+       prev_comment_whitespace: this.attach_previous, 
+       type_: 'punctuator', 
+       value: '!'
+      }, 
+      left: null, 
+      right: null
+     } 
+    } else { 
+      throw new Error('invalid tree syntax');
+    }
+    this.token_index += 1;
+    this.attach_previous = '';
+    return this.build_tree(current);
    } else if(value === '...') { 
 
-   } else if(value === '[') { 
-
+   } else if(value === '[') {
+    //block pop or maybe just create a new block called block start stop -- or just create a chunk and by counting then go through
    } else if(value === ']') { 
 
-   } else if(value === ',') { 
-
+   } else if(value === ',') { //make sure to read the current expression if an assignment. if an assignment and a comment, begin a new expression
+    
    } else if(value === '{') { 
 
    } else if(value === '}') { 
 
    } else if(value === ';') { 
-
+    //read tree and end expression... when end, mark with ending thing
+    // this.file[this.expression_id].expression = this.current_expression;
+    // this.file[this.expression_id].add_to_end = this.current_expression;
    } else if(value === ':') { 
 
    } else if(value === '~') { 
 
    } else if(value === '(') { 
-
+   //block pop
    } else if(value === ')') { 
 
    }
-
    case 'identifier': 
     if(
      current.left === null && 
@@ -456,7 +539,6 @@ module.exports = class js {
    this.token_index += 1; 
    this.attach_previous = '';
    return this.build_tree(current);
-
    case 'key-word': 
     if(value === 'arguments') { 
 
@@ -488,7 +570,7 @@ module.exports = class js {
 
     } else if(value === 'eval') { 
 
-    } else if(value === 'export') { 
+    } else if(value === 'export') { //maybe do this in the beginning and make one massive file..
 
     } else if(value === 'extends') { 
 
@@ -556,12 +638,11 @@ module.exports = class js {
 
     } else if(value === 'yield') { 
 
-    } else if(value === 'require') { 
+    } else if(value === 'require') { //get this file 
 
     } else if(value === '=>') { 
 
     }
-
    case 'regex': 
     if(
      current.left !== null && 
@@ -583,7 +664,6 @@ module.exports = class js {
     this.token_index += 1; 
     this.attach_previous = '';
     return this.build_tree(current, value);
-
    case 'string': 
     if(
      current.left !== null &&
@@ -605,15 +685,10 @@ module.exports = class js {
     this.token_index += 1; 
     this.attach_previous = '';
     return this.build_tree(current);
-
    case 'comment': 
     this.attach_previous += value;
     this.token_index += 1;
     return this.build_tree(current);
-
-   case 'beginning-template-literal': 
-    //set some values for in a template literal and go through (create and append a seperate expression)
-
    case 'number': 
     if(
      current.left !== null && 
@@ -635,11 +710,14 @@ module.exports = class js {
     this.token_index += 1; 
     this.attach_previous = '';
     return this.build_tree(current);
-
    case 'whitespace': 
     this.attach_previous += value;
     this.token_index += 1;
     return this.build_tree(current);  
+   case 'beginning-template-literal': 
+   //set some values for in a template literal and go through (create and append a seperate expression)
+
+  //template literal stuff down here... just make the same thing but append a beginning and ending thing to concatenate
 
   }
  }
