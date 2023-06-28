@@ -9,7 +9,7 @@ let shared = require('../data');
 module.exports = class js {
 
  constructor() {   
-  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[\-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&=|&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\|=|\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*\*=|\*\*|\*=|\*)(\?\?=|\?)|([,{}[\];:~\(\)])))/g;
+  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&=|&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\|=|\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*\*=|\*\*|\*=|\*)(\?\?=|\?)|([,{}[\];:~\(\)])))/g;
   this.tokens = [];
   this.current_block_and_expression_count = 0;
   this.bracket_error = { 
@@ -38,7 +38,7 @@ module.exports = class js {
    left: null, 
    right: null 
   }
-  this.bracket_count_block_pop = []; //
+  this.bracket_count_block_pop = [];
   this.array_bracket_block_pop = [];
   this.paren_block_pop = [];
   this.match = [];
@@ -77,6 +77,7 @@ module.exports = class js {
   }
   this.key_words = {
    'arguments'	: true,
+   'async': true,
    'await'	: true,
    'break' : true,
    'case' : true,	
@@ -129,6 +130,8 @@ module.exports = class js {
    '=>': true
    }
  }
+
+
 
  tokens_() {
   while(this.JavascriptTokenizer.lastIndex <= shared.get_data_length()) {
@@ -201,15 +204,23 @@ module.exports = class js {
       this.bracket_error.bracket.o += 1;
      } else if(this.match[0] === '}') { 
       this.bracket_error.bracket.c += 1;
-      //if closing greater than opening at any time, throw error --
+      if(this.bracket_error.bracket.c > this.bracket_error.bracket.o) { 
+        throw new Error('at no point should there be more closing brackets than opening brackets');
+       }
      } else if(this.match[0] === '(') { 
       this.bracket_error.paren.o += 1;
      } else if(this.match[0] === ')') {
       this.bracket_error.paren.c += 1;
+      if(this.bracket_error.paren.c > this.bracket_error.paren.o) { 
+        throw new Error('at no point should there be more closing brackets than opening brackets');
+       }
      } else if(this.match[0] === '[') { 
       this.bracket_error.array.o += 1;
      } else if(this.match[0] === ']') { 
       this.bracket_error.array.c += 1;
+      if(this.bracket_error.array.c > this.bracket_error.array.o) { 
+        throw new Error('at no point should there be more closing brackets than opening brackets');
+       }
      }
     }
   } else if(this.match.groups['whitespace']) { 
@@ -220,8 +231,8 @@ module.exports = class js {
   } else { 
     throw new Error('invalid token')
   }
-  if(this.tokens[this.tokens.length - 1].group === this.tokens[this.tokens.length - 2].group) { 
-    //throw error... two tokens back to back.. except comment and white space...
+  if(this.tokens[this.tokens.length - 1].group === this.tokens[this.tokens.length - 2].group) { //check for certain things
+    throw new Error('back to back similar token error')
   }
  }
 
@@ -482,25 +493,23 @@ module.exports = class js {
    } else if(value === '...') { 
 
    } else if(value === '[') {
-    //block pop or maybe just create a new block called block start stop -- or just create a chunk and by counting then go through
+
    } else if(value === ']') { 
 
-   } else if(value === ',') { //make sure to read the current expression if an assignment. if an assignment and a comment, begin a new expression
+   } else if(value === ',') {
     
    } else if(value === '{') { 
 
    } else if(value === '}') { 
 
    } else if(value === ';') { 
-    //read tree and end expression... when end, mark with ending thing
-    // this.file[this.expression_id].expression = this.current_expression;
-    // this.file[this.expression_id].add_to_end = this.current_expression;
+
    } else if(value === ':') { 
 
    } else if(value === '~') { 
 
    } else if(value === '(') { 
-   //block pop
+
    } else if(value === ')') { 
 
    }
@@ -570,7 +579,7 @@ module.exports = class js {
 
     } else if(value === 'eval') { 
 
-    } else if(value === 'export') { //maybe do this in the beginning and make one massive file..
+    } else if(value === 'export') {
 
     } else if(value === 'extends') { 
 
@@ -638,7 +647,7 @@ module.exports = class js {
 
     } else if(value === 'yield') { 
 
-    } else if(value === 'require') { //get this file 
+    } else if(value === 'require') { 
 
     } else if(value === '=>') { 
 
@@ -715,9 +724,7 @@ module.exports = class js {
     this.token_index += 1;
     return this.build_tree(current);  
    case 'beginning-template-literal': 
-   //set some values for in a template literal and go through (create and append a seperate expression)
-
-  //template literal stuff down here... just make the same thing but append a beginning and ending thing to concatenate
+   
 
   }
  }
