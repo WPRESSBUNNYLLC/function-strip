@@ -9,22 +9,29 @@ let shared = require('../data');
 module.exports = class js {
 
  constructor() {   
-  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&=|&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\|=|\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*\*=|\*\*|\*=|\*)(\?\?=|\?)|([,{}[\];:~\(\)])))/g;
+  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&=|&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\|=|\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*\*=|\*\*|\*=|\*)(\?\?=|\?)|([,{}[\];:~\(\)])))/g;  
   this.tokens = [];
+  this.data_index = 0;
   this.current_block_and_expression_count = 0;
   this.bracket_error = { 
-    array: { 
-     o: 0, 
-     c: 0 
-    }, 
-    paren: { 
-     o: 0, 
-     c: 0 
-    }, 
-    bracket: { 
-     o: 0, 
-     c: 0 
-    }
+   array: { 
+    consistent_openings: 0, 
+    consistent_closings: 0,
+    o: 0, 
+    c: 0 
+   }, 
+   paren: { 
+    consistent_openings: 0, 
+    consistent_closings: 0,
+    o: 0, 
+    c: 0 
+   }, 
+   bracket: { 
+    consistent_openings: 0, 
+    consistent_closings: 0,
+    o: 0, 
+    c: 0 
+   }
   } 
   this.tree_index_value = '';
   this.token_index = 0;
@@ -151,6 +158,7 @@ module.exports = class js {
      this.which_token('');
    }
   }
+  //check for opening closing
   this.build_tree(this.current_expression);
  }
 
@@ -158,33 +166,39 @@ module.exports = class js {
   if(this.match.groups['regex']) { 
    this.check_regex_extension();
    this.tokens.push({
+    index: this.data_index,
     group: `${T}regex`, 
     value: this.match[0] + this.attach_to_regex
    });
    this.attach_to_regex = '';
   } else if(this.match.groups['comment']) { 
     this.tokens.push({ 
+     index: this.data_index,
      group: `${T}comment`, 
      value: this.match[0] 
     });
   } else if(this.match.groups['string']) { 
     this.tokens.push({
+     index: this.data_index,
      group: `${T}string`, 
      value:  this.match[0] 
     });
   } else if(this.match.groups['number']) { 
     this.tokens.push({ 
+     index: this.data_index,
      group: `${T}number`, 
      value: this.match[0] 
     });
   } else if(this.match.groups['identifier']) {
     if(key_words[this.match[0]]) { 
      this.tokens.push({
+      index: this.data_index,
       group: `${T}key-word`, 
       value: this.match[0] 
      });
     } else {
       this.tokens.push({ 
+       index: this.data_index,
        group: `${T}identifier`, 
        value: this.match[0] 
       });
@@ -192,39 +206,21 @@ module.exports = class js {
   } else if(this.match.groups['punctuator']) {
     if(key_words[this.match[0]]) { 
      this.tokens.push({ 
+      index: this.data_index,
       group: `${T}key-word`, 
       value: this.match[0] 
      });
     } else {
      this.tokens.push({ 
+      index: this.data_index,
       group: `${T}punctuator`, 
       value: this.match[0] 
      });
-     if(this.match[0] === '{') { 
-      this.bracket_error.bracket.o += 1;
-     } else if(this.match[0] === '}') { 
-      this.bracket_error.bracket.c += 1;
-      if(this.bracket_error.bracket.c > this.bracket_error.bracket.o) { 
-        throw new Error('at no point should there be more closing brackets than opening brackets');
-       }
-     } else if(this.match[0] === '(') { 
-      this.bracket_error.paren.o += 1;
-     } else if(this.match[0] === ')') {
-      this.bracket_error.paren.c += 1;
-      if(this.bracket_error.paren.c > this.bracket_error.paren.o) { 
-        throw new Error('at no point should there be more closing brackets than opening brackets');
-       }
-     } else if(this.match[0] === '[') { 
-      this.bracket_error.array.o += 1;
-     } else if(this.match[0] === ']') { 
-      this.bracket_error.array.c += 1;
-      if(this.bracket_error.array.c > this.bracket_error.array.o) { 
-        throw new Error('at no point should there be more closing brackets than opening brackets');
-       }
-     }
+     this.check_bracket_error();
     }
   } else if(this.match.groups['whitespace']) { 
     this.tokens.push({ 
+     index: this.data_index,
      group: `${T}whitespace`, 
      value: this.match[0] 
     });
@@ -234,6 +230,7 @@ module.exports = class js {
   if(this.tokens[this.tokens.length - 1].group === this.tokens[this.tokens.length - 2].group) { //check for certain things
     throw new Error('back to back similar token error')
   }
+  this.data_index += this.tokens[this.tokens.length - 1].length;
  }
 
  check_regex_extension() {
@@ -253,6 +250,31 @@ module.exports = class js {
     }
     return;
   }
+ }
+
+ check_bracket_error() { 
+  if(this.match[0] === '{') { 
+    this.bracket_error.bracket.o += 1;
+   } else if(this.match[0] === '}') { 
+    this.bracket_error.bracket.c += 1;
+    if(this.bracket_error.bracket.c > this.bracket_error.bracket.o) { 
+      throw new Error('at no point should there be more closing brackets than opening brackets');
+     }
+   } else if(this.match[0] === '(') { 
+    this.bracket_error.paren.o += 1;
+   } else if(this.match[0] === ')') {
+    this.bracket_error.paren.c += 1;
+    if(this.bracket_error.paren.c > this.bracket_error.paren.o) { 
+      throw new Error('at no point should there be more closing brackets than opening brackets');
+     }
+   } else if(this.match[0] === '[') { 
+    this.bracket_error.array.o += 1;
+   } else if(this.match[0] === ']') { 
+    this.bracket_error.array.c += 1;
+    if(this.bracket_error.array.c > this.bracket_error.array.o) { 
+      throw new Error('at no point should there be more closing brackets than opening brackets');
+     }
+   } 
  }
 
  template_string_() {
@@ -313,7 +335,7 @@ module.exports = class js {
    } else if(this.match[0] === '}') { 
     this.bracket_error.bracket.c += 1;
     if(this.bracket_error.bracket.c > this.bracket_error.bracket.o) { 
-     throw new Error('at no point should there be more opening brackets than closing brackets');
+     throw new Error('at no point should there be more closing brackets than opening brackets');
     }
     this.template_count_pop[this.template_count_pop.length - 1].c += 1;
     if(this.template_count_pop[this.template_count_pop.length - 1].o === this.template_count_pop[this.template_count_pop.length - 1].c) { 
@@ -492,8 +514,8 @@ module.exports = class js {
     return this.build_tree(current);
    } else if(value === '...') { 
 
-   } else if(value === '[') {
-
+   } else if(value === '[') { //this is going to be very frking difficult. shut the frk up. ooo hey kenz. u mad?
+ 
    } else if(value === ']') { 
 
    } else if(value === ',') {
