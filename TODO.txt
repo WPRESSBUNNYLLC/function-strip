@@ -3,3 +3,6 @@ change some things
 maybe use deault on punc a
 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators -- add the others -- make identifier a call if a paren after but add the paren individually as a punctuator for counting
 add a read tree on each
+
+after an insertion make sure to check the status of each current tree... make sure to run a large if else condition to see whats allowed and not allowed
+also run an insertion set on the entier tree

@@ -1,6 +1,5 @@
 let fs = require('file-system');
 let shared = require('./data');
-const key_words = require('./key-words');
 let folders = [];
 let file_type = '';                                                                                                                                                                                                                                                                                                                                                                                                                                 
 

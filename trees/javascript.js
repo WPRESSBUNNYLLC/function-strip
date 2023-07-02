@@ -158,7 +158,13 @@ module.exports = class js {
      this.which_token('');
    }
   }
-  //check for opening closing
+  if(
+   this.bracket_error.array.o !== this.bracket_error.array.c || 
+   this.bracket_error.bracket.o !== this.bracket_error.bracket.c || 
+   this.bracket_error.paren.o !== this.bracket_error.paren.c
+  ) { 
+   throw new Error('opening brackets do not match closing brackets'); 
+  }
   this.build_tree(this.current_expression);
  }
 
@@ -170,6 +176,7 @@ module.exports = class js {
     group: `${T}regex`, 
     value: this.match[0] + this.attach_to_regex
    });
+   this.token_error();
    this.attach_to_regex = '';
   } else if(this.match.groups['comment']) { 
     this.tokens.push({ 
@@ -183,12 +190,14 @@ module.exports = class js {
      group: `${T}string`, 
      value:  this.match[0] 
     });
+    this.token_error();
   } else if(this.match.groups['number']) { 
     this.tokens.push({ 
      index: this.data_index,
      group: `${T}number`, 
      value: this.match[0] 
     });
+    this.token_error();
   } else if(this.match.groups['identifier']) {
     if(key_words[this.match[0]]) { 
      this.tokens.push({
@@ -203,6 +212,7 @@ module.exports = class js {
        value: this.match[0] 
       });
     }
+    this.token_error();
   } else if(this.match.groups['punctuator']) {
     if(key_words[this.match[0]]) { 
      this.tokens.push({ 
@@ -217,6 +227,7 @@ module.exports = class js {
       value: this.match[0] 
      });
      this.check_bracket_error();
+     this.token_error();
     }
   } else if(this.match.groups['whitespace']) { 
     this.tokens.push({ 
@@ -226,9 +237,6 @@ module.exports = class js {
     });
   } else { 
     throw new Error('invalid token')
-  }
-  if(this.tokens[this.tokens.length - 1].group === this.tokens[this.tokens.length - 2].group) { //check for certain things
-    throw new Error('back to back similar token error')
   }
   this.data_index += this.tokens[this.tokens.length - 1].length;
  }
@@ -275,6 +283,18 @@ module.exports = class js {
       throw new Error('at no point should there be more closing brackets than opening brackets');
      }
    } 
+ }
+
+ token_error() { 
+  if(this.tokens[this.tokens.length - 1].group === this.tokens[this.tokens.length - 2].group) { //check for punctuators 
+    if(
+     this.tokens[this.tokens.length - 1].group === 'punctuator' && 
+     this.tokens[this.tokens.length - 1].value === '['
+    ) { 
+
+    }
+   throw new Error('back to back similar token error'); // check for array bracket here
+  }
  }
 
  template_string_() {
@@ -492,8 +512,9 @@ module.exports = class js {
     this.attach_previous = '';
     return this.build_tree(current);
    } else if(value === '!') {
+    //reformat
     if(
-     current.left !== null && 
+     current.left !== null &&
      current.root !== null && 
      current.right === null
     ) { 
@@ -514,7 +535,7 @@ module.exports = class js {
     return this.build_tree(current);
    } else if(value === '...') { 
 
-   } else if(value === '[') { //this is going to be very frking difficult. shut the frk up. ooo hey kenz. u mad?
+   } else if(value === '[') { //sve the block within the index of the object.
  
    } else if(value === ']') { 
 
@@ -527,8 +548,24 @@ module.exports = class js {
    } else if(value === ';') { 
 
    } else if(value === ':') { 
-
-   } else if(value === '~') { 
+    if(
+     current.left !== null && 
+     current.root === null && 
+     current.right === null
+    ) { 
+     current.root = { 
+      prev_comment_whitespace: this.attach_previous, 
+      type_: 'punctuator', 
+      value: ':'
+     }
+     next = current;
+    } else { 
+      throw new Error('invalid tree syntax');
+    }
+    this.token_index += 1; 
+    this.attach_previous = ''; 
+    return this.build_tree(current);
+   } else if(value === '~') { //this could get shifted
 
    } else if(value === '(') { 
 
@@ -574,6 +611,8 @@ module.exports = class js {
     if(value === 'arguments') { 
 
     } else if(value === 'await') { 
+
+    } else if(value === 'async') { 
 
     } else if(value === 'break') { 
 
