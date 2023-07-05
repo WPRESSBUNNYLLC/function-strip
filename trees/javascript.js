@@ -9,7 +9,7 @@ let shared = require('../data');
 module.exports = class js {
 
  constructor() {   
-  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&=|&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\|=|\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*\*=|\*\*|\*=|\*)(\?\?=|\?)|([,{}[\];:~\(\)])))/g;  
+  this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&=|&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\|=|\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*\*=|\*\*|\*=|\*)(\?\?=|\?)|([,{}\[\];:~\(\)])))/g;  
   this.tokens = [];
   this.data_index = 0;
   this.current_block_and_expression_count = 0;
@@ -39,12 +39,13 @@ module.exports = class js {
   this.attach_previous = '';
   this.expresion_id = 0;
   this.block_id = 0;
-  this.file = {};
-  this.current_expression = { 
+  this.expressions = {}; //push expressions normally -- make sure to tag the expression with a 
+  this.current_expression = {  //when this is finished push out
    root: null, 
    left: null, 
    right: null 
   }
+  this.visitor_block = {}; //when running into a block inside or outside of an expression. example a
   this.bracket_count_block_pop = [];
   this.array_bracket_block_pop = [];
   this.paren_block_pop = [];
@@ -227,8 +228,8 @@ module.exports = class js {
       value: this.match[0] 
      });
      this.check_bracket_error();
-     this.token_error();
     }
+    this.token_error();
   } else if(this.match.groups['whitespace']) { 
     this.tokens.push({ 
      index: this.data_index,
@@ -293,7 +294,7 @@ module.exports = class js {
     ) { 
 
     }
-   throw new Error('back to back similar token error'); // check for array bracket here
+   throw new Error('back to back similar token error'); // check for array bracket here and all the other things
   }
  }
 
@@ -512,7 +513,6 @@ module.exports = class js {
     this.attach_previous = '';
     return this.build_tree(current);
    } else if(value === '!') {
-    //reformat
     if(
      current.left !== null &&
      current.root !== null && 
@@ -535,18 +535,264 @@ module.exports = class js {
     return this.build_tree(current);
    } else if(value === '...') { 
 
-   } else if(value === '[') { //sve the block within the index of the object.
- 
+   } else if(value === '[') { //not sure how to do this... could create a a seperate object to handle blocks and point from the expression
+    let next;
+    if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right === null
+    ) { 
+     current.right = { 
+      root: { 
+       prev_comment_whitespace: this.attach_previous, 
+       type_: 'punctuator', 
+       value: '['
+      }, 
+      left: null, 
+      right: null
+     }
+     next = current;
+    } else if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right !== null
+    ) { 
+     let temp = current.right.root;
+     current.right = { 
+      root: {
+       prev_comment_whitespace: this.attach_previous,
+       type_: 'punctuator', 
+       value: '['
+      },
+      left: {
+       root: temp,   
+       left: null, 
+       right: null 
+      }, 
+      right: null
+     }
+     next = current.right;
+    } else { 
+     throw new Error('invalid tree syntax');
+    }
+    this.token_index += 1; 
+    this.attach_previous = '';
+    return this.build_tree(next);
    } else if(value === ']') { 
-
+    let next;
+    if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right === null
+    ) { 
+     current.right = { 
+      root: { 
+       prev_comment_whitespace: this.attach_previous, 
+       type_: 'punctuator', 
+       value: ']'
+      }, 
+      left: null, 
+      right: null
+     }
+     next = current;
+    } else if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right !== null
+    ) { 
+     let temp = current.right.root;
+     current.right = { 
+      root: {
+       prev_comment_whitespace: this.attach_previous,
+       type_: 'punctuator', 
+       value: ']'
+      },
+      left: {
+       root: temp,   
+       left: null, 
+       right: null 
+      }, 
+      right: null
+     }
+     next = current.right;
+    } else { 
+     throw new Error('invalid tree syntax');
+    }
+    this.token_index += 1; 
+    this.attach_previous = '';
+    return this.build_tree(next);
    } else if(value === ',') {
-    
+    let next;
+    if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right === null
+    ) { 
+     current.right = { 
+      root: { 
+       prev_comment_whitespace: this.attach_previous, 
+       type_: 'punctuator', 
+       value: ','
+      }, 
+      left: null, 
+      right: null
+     }
+     next = current;
+    } else if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right !== null
+    ) { 
+     let temp = current.right.root;
+     current.right = { 
+      root: {
+       prev_comment_whitespace: this.attach_previous,
+       type_: 'punctuator', 
+       value: ','
+      },
+      left: {
+       root: temp,   
+       left: null, 
+       right: null 
+      }, 
+      right: null
+     }
+     next = current.right;
+    } else { 
+     throw new Error('invalid tree syntax');
+    }
+    this.token_index += 1; 
+    this.attach_previous = '';
+    return this.build_tree(next);
    } else if(value === '{') { 
-
+    let next;
+    if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right === null
+    ) { 
+     current.right = { 
+      root: { 
+       prev_comment_whitespace: this.attach_previous, 
+       type_: 'punctuator', 
+       value: '{'
+      }, 
+      left: null, 
+      right: null
+     }
+     next = current;
+    } else if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right !== null
+    ) { 
+     let temp = current.right.root;
+     current.right = { 
+      root: {
+       prev_comment_whitespace: this.attach_previous,
+       type_: 'punctuator', 
+       value: '{'
+      },
+      left: {
+       root: temp,   
+       left: null, 
+       right: null 
+      }, 
+      right: null
+     }
+     next = current.right;
+    } else { 
+     throw new Error('invalid tree syntax');
+    }
+    this.token_index += 1; 
+    this.attach_previous = '';
+    return this.build_tree(next);
    } else if(value === '}') { 
-
+    let next;
+    if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right === null
+    ) { 
+     current.right = { 
+      root: { 
+       prev_comment_whitespace: this.attach_previous, 
+       type_: 'punctuator', 
+       value: '}'
+      }, 
+      left: null, 
+      right: null
+     }
+     next = current;
+    } else if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right !== null
+    ) { 
+     let temp = current.right.root;
+     current.right = { 
+      root: {
+       prev_comment_whitespace: this.attach_previous,
+       type_: 'punctuator', 
+       value: '}' //dont know how tf im gonna do this... just gonna organize it 
+      },
+      left: {
+       root: temp,   
+       left: null, 
+       right: null 
+      }, 
+      right: null
+     }
+     next = current.right;
+    } else { 
+     throw new Error('invalid tree syntax');
+    }
+    this.token_index += 1; 
+    this.attach_previous = '';
+    return this.build_tree(next);
    } else if(value === ';') { 
-
+    let next;
+    if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right === null
+    ) { 
+     current.right = { 
+      root: { 
+       prev_comment_whitespace: this.attach_previous, 
+       type_: 'punctuator', 
+       value: ';'
+      }, 
+      left: null, 
+      right: null
+     }
+     next = current;
+    } else if(
+     current.left !== null && 
+     current.root !== null && 
+     current.right !== null
+    ) { 
+     let temp = current.right.root;
+     current.right = { 
+      root: {
+       prev_comment_whitespace: this.attach_previous,
+       type_: 'punctuator', 
+       value: ';'
+      },
+      left: {
+       root: temp,   
+       left: null, 
+       right: null 
+      }, 
+      right: null
+     }
+     next = current.right;
+    } else { 
+     throw new Error('invalid tree syntax');
+    }
+    this.token_index += 1; 
+    this.attach_previous = '';
+    return this.build_tree(next);
    } else if(value === ':') { 
     if(
      current.left !== null && 
