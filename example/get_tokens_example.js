@@ -1,0 +1,1 @@
+//pass folders and file to generate then run

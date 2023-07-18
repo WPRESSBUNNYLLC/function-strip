@@ -2,12 +2,11 @@ module.exports = class shared {
 
  constructor() { 
   this.data = '';
-  this.data_length = 0;
   this.tokens = {};
   this.token_file_path = '';
  }
 
- add_to_trees(tokens, file_path) { 
+ add_to_tokens(tokens, file_path) { 
   tokens[file_path] = tokens;
  }
 
@@ -15,12 +14,20 @@ module.exports = class shared {
   return data;
  }
 
- get_file_name() {
+ set_data(d) { 
+  this.data = d
+ }
+
+ set_file_path(file_path) { 
+  this.token_file_path = file_path;
+ }
+
+ get_file_path() {
   return token_file_path;
  }
 
  get_data_length() { 
-  return data_length;
+  return this.data.length;
  }
 
  list() { 

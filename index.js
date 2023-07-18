@@ -2,7 +2,14 @@ let fs = require('file-system');
 let shared = require('./data');
 let javascript = require('./trees/javascript')
 let folders = [];
-let file_type = '';                                                                                                                                                                                                                                                                                                                                                                                                                                 
+let allowed_file_types = {
+ ts: 1, js: 1, html: 1
+};
+
+ /*
+  flders = array -> folders and files to get tokens from { folder: "./", files: 'all' },
+  f_t_g = string = string to generate all objects './example/tokenized/tokenized_files.js'; filepath: [tokens], filepath: [tokens]
+ */
 
  function generate(fldrs, f_t_g) {
  
@@ -55,30 +62,25 @@ let file_type = '';
     if(filename) { 
      file_type = filename.split('.');
      file_type = file_type[file_type.length - 1].toLowerCase(); 
-     if(file_type === 'ts') { 
-      file_type = 'typescript';
-     } else if(file_type === 'js') { 
-      file_type = 'javascript';
-     } else if(file_type === 'html') {
-      file_type = 'html'; 
-     } else { 
-      file_type = '';
-     }
-     if(file_type !== '') {
-      shared.update_data(fs.readFileSync(filepath, 'utf8'), filepath);
+     if(allowed_file_types[file_type]) { 
       try {
-       if(file_type === 'html') { 
-        //get html
-       } else if(file_type === 'javascript') { 
+       shared.set_data(fs.readFileSync(filepath, 'utf8'), filepath);
+       shared.set_file_path(filepath);
+       if(file_type === 'ts') { 
+        typescript.tokens();
+       } else if(file_type === 'js') { 
         javascript.tokens();
-       } 
+       } else if(file_type === 'html') {
+        html.tokens();
+       } else { 
+        console.log('file not added')
+       }
       } catch(err) { 
        console.log(err.message + '\n' + 'filepath: ' + filepath); 
       }
      }
     }
    })
-
   }
  }
 

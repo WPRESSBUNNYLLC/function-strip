@@ -140,7 +140,7 @@ module.exports = class js extends shared {
   ) { 
    throw new Error('opening brackets do not match closing brackets'); 
   }
-  shared.add_to_trees(this.tokens, shared.get_file_name());
+  shared.add_to_tokens(this.tokens, shared.get_file_name());
  }
 
  which_token(T) {
