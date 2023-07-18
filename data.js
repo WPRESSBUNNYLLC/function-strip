@@ -7,8 +7,8 @@ module.exports = class shared {
   this.token_file_path = '';
  }
 
- add_to_trees(tree, file_path) { 
-  tokens[file_path] = tree;
+ add_to_trees(tokens, file_path) { 
+  tokens[file_path] = tokens;
  }
 
  get_data() { 
@@ -23,8 +23,10 @@ module.exports = class shared {
   return data_length;
  }
 
- connect() { 
-  //connect trees from file names
+ list() { 
+  for (const [key, value] of Object.entries(this.tokens)) {
+   console.log(`${key}: ${value}`);
+  }
  }
 
 }

@@ -1,24 +1,20 @@
-const generate = require("../lib/generate");
+const generate = require("./index");
 
-function compile() {
+function tokenize(folders) {
+ const folders = [
+  { folder: "./", files: 'all' },
+ ];
 
-const folders = [
-  { folder: "./stripThisTest", files: 'all' },
-];
+ const file_to_generate = './example/tokenized/tokenized_files.js';
 
-const file_to_generate = './example/generated/generated_functions.js';
-
-const function_types = { 
- regular: true, 
- arrow: true, 
-}
-
-// add a file types array to this as well... just make it one object in the end
-
-try {
-  console.log(generate(folders, file_to_generate, function_types));
-} catch (err) {
+ try {
+  console.log(generate(folders, file_to_generate));
+ } catch (err) {
   console.log(err.message);
-}
+ }
+
+ return;
 
 }
+
+module.exports = tokenize;

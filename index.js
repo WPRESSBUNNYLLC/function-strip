@@ -1,9 +1,10 @@
 let fs = require('file-system');
 let shared = require('./data');
+let javascript = require('./trees/javascript')
 let folders = [];
 let file_type = '';                                                                                                                                                                                                                                                                                                                                                                                                                                 
 
- function generate(fldrs, f_t_g, f_t) {
+ function generate(fldrs, f_t_g) {
  
   let error_initial = '';
  
@@ -67,9 +68,9 @@ let file_type = '';
       shared.update_data(fs.readFileSync(filepath, 'utf8'), filepath);
       try {
        if(file_type === 'html') { 
-        run_from_html(); //imported int trees
+        //get html
        } else if(file_type === 'javascript') { 
-        js(); //imported in trees
+        javascript.tokens();
        } 
       } catch(err) { 
        console.log(err.message + '\n' + 'filepath: ' + filepath); 
