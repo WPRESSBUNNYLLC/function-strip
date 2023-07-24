@@ -1057,3 +1057,14 @@ module.exports = class js {
  }
 
 }
+
+divide everything into values with labels
+
+a = a + b + c;
+c = a - x + f 
+function 
+
+function(input)
+
+divide arrays into single valueswith labels
+a = [a, b]

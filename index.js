@@ -66,12 +66,15 @@ let allowed_file_types = {
       try {
        shared.set_data(fs.readFileSync(filepath, 'utf8'), filepath);
        shared.set_file_path(filepath);
-       if(file_type === 'ts') { 
-        typescript.tokens();
+       if(file_type === 'ts') {
+        // typescript.init(); 
+        // typescript.tokens();
        } else if(file_type === 'js') { 
+        javascript.init();
         javascript.tokens();
        } else if(file_type === 'html') {
-        html.tokens();
+        // html.init();
+        // html.tokens();
        } else { 
         console.log('file not added')
        }
@@ -81,6 +84,9 @@ let allowed_file_types = {
      }
     }
    })
+
+   return shared.get_tokens();
+
   }
  }
 
