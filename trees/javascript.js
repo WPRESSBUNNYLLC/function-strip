@@ -1,5 +1,5 @@
 /*
- ATRAIN BABY 2.0
+ 
 */
 
 let fs = require('file-system');
@@ -11,8 +11,8 @@ module.exports = class js extends shared {
   this.JavascriptTokenizer = /(?<comment>((\/\*)(.|\n){0,}?(\*\/))|((\/\/)(.){0,}))|(?<regex>(\/(.)+([^\\]\/)))|(?<whitespace>(( |\n|\t|\r)+))|(?<number>(0b([10]+)|0o([0-7]+)|0x([a-fA-F0-9]+)|(\.[0-9]{1,}|[0]\.?[0-9]{0,}|[1-9]{1}[0-9]{0,}\.?[0-9]{0,})(e[-+][0-9]+)?))|(?<identifier>([a-zA-Z_$]{1}([a-zA-Z_$0-9]{0,})))|(?<string>("(.){0,}?")|('(.){0,}?')|(`))|((?<punctuator>(&&=|&&|&=|&)|(\/=|\/)|(===|==|=>|=)|(!==|!=|!)|(>>>=|>>=|>>>|>>|>=|>)|(<<=|<<|<=|<)|(-=|--|-)|(\|\|=|\|\||\|\=|\|)|(%=|%)|(\.\.\.|\.)|(\+\+|\+=|\+)|(\^=|\^)|(\*\*=|\*\*|\*=|\*)|(\?\?=|\?)|([,{}\[\];:~\(\)])))/g;  
   this.tokens = [];
   this.tokenized_global_object_index = 0;
-  this.tokenized_global_object = {};
-  this.outter_most_scope_tokens = [];
+  this.global_token_array = [];
+  this.global_token_array_index = 0;
   this.bracket_error = { 
    array: { 
     o: 0, 
@@ -114,12 +114,10 @@ module.exports = class js extends shared {
    'yield': true, 
    'require': true,
    '=>': true
-   },
-  this.lookup_table = []; 
+   }
  }
 
  tokens_() {
-
   while(this.JavascriptTokenizer.lastIndex <= shared.get_data_length()) {
    this.match = this.JavascriptTokenizer.exec(shared.get_data());
    if(this.match[0] === '`') { 
@@ -143,69 +141,6 @@ module.exports = class js extends shared {
    this.bracket_error.paren.o !== this.bracket_error.paren.c
   ) { 
    throw new Error('opening brackets do not match closing brackets'); 
-  }
-
-  for(let i = 0; i < this.tokens.length; i++) { 
-   if(this.tokens[i].value === '[') { 
-    this.enter_encapsulation('array');
-   } else if(this.tokens[i].value === '(') { 
-    this.enter_encapsulation('paren');
-   } else if(this.tokens[i].value === '{') { 
-    this.enter_encapsulation('bracket');
-   } else if(this.tokens[i].value === ']') { 
-    this.exit_back_into_previous_encapsulation('array');
-   } else if(this.tokens[i].value === ')') { 
-    this.exit_back_into_previous_encapsulation('paren');
-   } else if(this.tokens[i].value === '}') { 
-    this.exit_back_into_previous_encapsulation('bracket');
-   } else { 
-    this.tokenized_global_object[this.tokenized_global_object_index].tokens.push(this.tokens[i]);
-   }
-  }
-
-  for(let i = 0; i < this.outter_most_scope_tokens.length; i++) { 
-    //pring entire set of code for each one... then look at errors
-  }
-
-  shared.add_to_tokens(this.tokens, shared.get_file_name());
- }
-
- enter_encapsulation(open_encapsulation_type) { 
-  this.tokenized_global_object[this.global_token_object_index].next = this.global_token_object_index + 1; //i have gotten to a new encapsulation, create the reference pointer in this object for the next encapsulation
-  if(typeof(this.tokenized_global_object[this.global_token_object_index + 1]) === 'undefined') { 
-    this.tokenized_global_object[this.global_token_object_index + 1] = [{ 
-     tokens: [],
-     scoped_declarations: {},
-     expressions: {}, 
-     last: this.tokenized_global_object_index, 
-     next: null, 
-     open_encapsulation_type: open_encapsulation_type
-    }];
-  } else { 
-    this.tokenized_global_object[this.global_token_object_index + 1].push({ 
-     tokens: [],
-     scoped_declarations: {},
-     expressions: {}, 
-     last: this.tokenized_global_object_index, 
-     next: null, 
-     open_encapsulation_type: open_encapsulation_type
-    }
-   )
-  }
-  this.tokenized_global_object_index += 1; 
- }
-
- exit_back_into_previous_encapsulation(closing_encapsulation_type) { 
-  if(this.tokenized_global_object[this.tokenized_global_object_index].open_encapsulation_type === closing_encapsulation_type) { 
-   this.tokenized_global_object -= 1; 
-   if(this.tokenized_global_object === 0) {
-    this.outter_most_scope_tokens.push(this.tokenized_global_object);
-    this.tokenized_global_object = {};
-   } else { 
-    //dont do anything... we are moving back -- we are basically capturing blocks, then running error handling on each block
-   }
-  } else { 
-    throw new Error('closing encapsulation type not the same as opening')
   }
  }
 
@@ -265,6 +200,7 @@ module.exports = class js extends shared {
   } else { 
     throw new Error('invalid token')
   }
+
  }
 
  check_regex_extension() {
@@ -293,7 +229,7 @@ module.exports = class js extends shared {
     this.bracket_error.bracket.c += 1;
     if(this.bracket_error.bracket.c > this.bracket_error.bracket.o) { 
       throw new Error('at no point should there be more closing brackets than opening brackets');
-     }
+    }
    } else if(this.match[0] === '(') { 
     this.bracket_error.paren.o += 1;
    } else if(this.match[0] === ')') {

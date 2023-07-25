@@ -1,16 +1,4 @@
-handle errors respectively
-change some things 
-maybe use deault on punc a
-//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators -- add the others -- make identifier a call if a paren after but add the paren individually as a punctuator for counting
-add a read tree on each
 
-after an insertion make sure to check the status of each current tree... make sure to run a large if else condition to see whats allowed and not allowed
-also run an insertion set on the entier tree
-
-saving this to make the other just a tokenizer and will figure out the AST later
-
-let fs = require('file-system');
-let shared = require('../data');
 
 module.exports = class js {
 
@@ -1057,14 +1045,3 @@ module.exports = class js {
  }
 
 }
-
-divide everything into values with labels
-
-a = a + b + c;
-c = a - x + f 
-function 
-
-function(input)
-
-divide arrays into single valueswith labels
-a = [a, b]
