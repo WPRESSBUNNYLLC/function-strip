@@ -1,5 +1,5 @@
 /*
- 
+ look through combinations 
 */
 
 let fs = require('file-system');
@@ -114,8 +114,28 @@ module.exports = class js extends shared {
    'yield': true, 
    'require': true,
    '=>': true
-   }
- }
+   },
+   //add all possible combinations. link repeatable functions by a scoped path
+   this.token_combination_labeled_lookaheads = {
+    'identifier-(': this.call(), //use an assignment one dimensional tree 
+    'function-identifier-(': this.declaration(), //would be added to the path
+    'if-(': this.if_condition(), 
+    'else-if-(',
+    'else-{', 
+    'while-(',
+    'do-{', 
+    'switch-(',
+    'case-:', 
+    'identifier-=-{', 
+    '(-function',
+    ')-=->-{',
+    'identifier-=', 
+    'identifier-:', 
+    'identifier-=-[', 
+    'identifier-=', 
+    'identifier-.', 
+    'identifier-['
+  }
 
  tokens_() {
   while(this.JavascriptTokenizer.lastIndex <= shared.get_data_length()) {
@@ -221,7 +241,7 @@ module.exports = class js extends shared {
     return;
   }
  }
-
+ 
  check_bracket_error() {
   if(this.match[0] === '{') { 
     this.bracket_error.bracket.o += 1;
@@ -230,20 +250,24 @@ module.exports = class js extends shared {
     if(this.bracket_error.bracket.c > this.bracket_error.bracket.o) { 
       throw new Error('at no point should there be more closing brackets than opening brackets');
     }
-   } else if(this.match[0] === '(') { 
+   } else if(this.match[0] === '(') { //delete repeated parens
     this.bracket_error.paren.o += 1;
+    //create a repeated void token
    } else if(this.match[0] === ')') {
+    //create a repeated void token
     this.bracket_error.paren.c += 1;
     if(this.bracket_error.paren.c > this.bracket_error.paren.o) { 
       throw new Error('at no point should there be more closing brackets than opening brackets');
-     }
+    }
    } else if(this.match[0] === '[') { 
     this.bracket_error.array.o += 1;
    } else if(this.match[0] === ']') { 
     this.bracket_error.array.c += 1;
     if(this.bracket_error.array.c > this.bracket_error.array.o) { 
       throw new Error('at no point should there be more closing brackets than opening brackets');
-     }
+    }
+   } else { 
+    //
    } 
  }
 
@@ -325,5 +349,7 @@ module.exports = class js extends shared {
    }
   }
  }
+
+
 
 }
